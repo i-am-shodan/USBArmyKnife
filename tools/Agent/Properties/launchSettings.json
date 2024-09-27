@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "SerialWiz": {
+      "commandName": "Project",
+      "commandLineArgs": "vid=cafe pid=403f",
+      "workingDirectory": "../../ui/vnc"
+    }
+  }
+}

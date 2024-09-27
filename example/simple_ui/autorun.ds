@@ -1,0 +1,34 @@
+VAR $FILE_INDEX = 0
+
+LOAD_FILES_FROM_SD()
+
+WHILE ( FILE_INDEX_VALID() == TRUE )
+    DISPLAY_PNG /select.png
+    DISPLAY_TEXT 0 35 #_FILE_INDEX_FILE_NAME_
+
+    DISPLAY_TEXT 0 55 Click) Next file
+    DISPLAY_TEXT 0 65 Hold ) Run
+
+    WAIT_FOR_BUTTON_PRESS
+
+    IF (BUTTON_SHORT_PRESS())
+        $FILE_INDEX = ( $FILE_INDEX + 1 )
+    ELSE IF (BUTTON_LONG_PRESS())
+        DISPLAY_PNG /select.png
+        DISPLAY_TEXT 0 35 Run #_FILE_INDEX_FILE_NAME_
+        DISPLAY_TEXT 0 45 Are you sure?
+
+        DISPLAY_TEXT 0 55 Click) Back
+        DISPLAY_TEXT 0 65 Hold ) Run
+        WAIT_FOR_BUTTON_PRESS
+
+        IF (BUTTON_LONG_PRESS() == 1)
+            DISPLAY_CLEAR
+            RUN_PAYLOAD #_FILE_INDEX_FILE_NAME_
+        ELSE
+            REM DO NOTHING
+        END_IF
+    END_IF
+END_WHILE
+
+RESTART_PAYLOAD

@@ -1,0 +1,20 @@
+REM Turn these on for debugging
+SERIAL 115200
+WEB_ON
+
+REM The internal functions FILE_EXISTS() and CREATE_FILE()
+REM both require a constant called #FILE to be set
+
+DEFINE #FILE /firstrun
+
+REM If a file exists choose covert mode
+IF (FILE_EXISTS() == TRUE) THEN
+  USB_MOUNT_DISK_READ_ONLY /disk.img
+END_IF
+
+REM If a file doesn't exist create first run file
+REM and mount the whole disk
+IF (FILE_EXISTS() == FALSE) THEN
+  CREATE_FILE()
+  ATTACKMODE STORAGE
+END_IF

