@@ -6,6 +6,8 @@ name: .NET
 on:
   push:
     branches: [ "master" ]
+    paths:
+      - 'tools/Agent/**'
   pull_request:
     branches: [ "master" ]
 
@@ -23,3 +25,8 @@ jobs:
     - name: Build
       run: dotnet publish -r win-x64
       working-directory: .\tools\Agent
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Agent binaries
+        path: tools/Agent/bin/Release/net8.0-windows/win-x64/publish/
