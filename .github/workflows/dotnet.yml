@@ -29,4 +29,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Agent binaries
-        path: tools/Agent/bin/Release/net8.0-windows/win-x64/
+        path: tools/Agent/bin/Release/net8.0-windows/win-x64/publish/
