@@ -28,3 +28,8 @@ jobs:
 
       - name: Build PlatformIO Project
         run: pio run
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Firmware binaries
+          path: .pio/build/LILYGO-T-Dongle-S3/*.bin
