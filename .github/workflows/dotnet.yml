@@ -6,6 +6,8 @@ name: .NET
 on:
   push:
     branches: [ "master" ]
+    paths:
+      - 'tools/Agent/**'
   pull_request:
     branches: [ "master" ]
 
