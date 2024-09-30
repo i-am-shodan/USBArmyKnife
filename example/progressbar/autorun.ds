@@ -1,7 +1,3 @@
-REM Turn on WiFi and serial for debugging
-SERIAL 115200
-WEB_ON
-
 TFT_OFF
 LED_OFF
 DELAY 1500

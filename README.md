@@ -44,14 +44,14 @@ This project implements a variety of attacks based around an easily concealable 
 | [Ultimate RickRoll](./rickroll/autorun.ds) | Inject keystrokes to display the famous rickroll video but also uses ESP32 Marauder to blast the lyrics over WiFi. |
 | [USB Ethernet PCAP](./usb_ethernet_pcap/autorun.ds) | Turns the device into a USB network adapter and collects a PCAP of the first few seconds of network traffic. |
 | [Deploy the serial agent](./install_agent_and_run_command/autorun.ds) | Deploys the agent if it isn't already installed and sends commands over the serial port. Command output can be seen in the web interface|
-| [Pull the screen](./vnc/autorun.ds) | Deploys the agent, uses this to install a VNC server. Now the screen can be viewed via the web interface|
+| [Pull the screen](./vnc/autorun.ds) | Deploys the agent, the agent includes a tiny VNC server. Now the screen can be viewed via the web interface|
 | [Simple UI](./simple_ui/autorun.ds) | A simple yet powerful UI to select scripts/images and run these using the hardware button. Shows how you can build complex UI interactions simply.  |
 
 ## Supported Hardware
 
 | **LilyGo T-Dongle S3**     | Supported      |
 | ------------- | ------------- |
-| ![screenshot](./docs/images/t-dongle-s3.png) | The LilyGo T-Dongle S3 is a USB pen drive shaped ESP32-S3 development board. It features a colour LCD screen, physical button, hidden/covert micro SD card adapter (inside the USB-A connector) as well as a SPI adapter. It has 16MB of flash. It is based on the ESP32-S3 chipset which enables it to host a WiFi station as well as support a range of WiFi and Bluetooth attacks. *It is incredibly cheap!* |
+| ![screenshot](./docs/images/t-dongle-s3.png) | The LilyGo T-Dongle S3 is a USB pen drive shaped ESP32-S3 development board. It features a colour LCD screen, physical button, hidden/covert micro SD card adapter (inside the USB-A connector) as well as a SPI adapter. It has 16MB of flash. It is based on the ESP32-S3 chipset which enables it to host a WiFi station as well as support a range of WiFi and Bluetooth attacks. *It is incredibly cheap!* There are two versions of this device with and without the screen. Only the version with the screen has been tested.  |
 
 
 
@@ -60,7 +60,7 @@ This project implements a variety of attacks based around an easily concealable 
 ### Prerequisites
 
 - **Hardware**:
-   * LilyGo T-Dongle S3 (or compatible hardware).
+   * LilyGo T-Dongle S3 with screen (or compatible hardware).
    * FAT32 formatted micro SD card (beware some micro SD cards seem incompatible).
 - **Software**: 
   * [Visual Studio Code](https://code.visualstudio.com/Download)
@@ -78,7 +78,7 @@ This project implements a variety of attacks based around an easily concealable 
 
 1. Click the PlatformIO icon (Alien icon)
 
-1. (Remove the dongle if it was inserted) Press and hold the hardware button, insert the LilyGo dongle, wait 1s and release the button.
+1. (Remove the dongle if it was inserted) **Press and hold the hardware button**, insert the LilyGo dongle, wait 1s and **release the button**.
 
 1. Under 'ESO32-S3-DevKitC-1' Select upload
 

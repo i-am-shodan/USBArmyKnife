@@ -14,6 +14,7 @@ public:
   void displayPng(HardwareStorage& storage, const std::string& filename);
   void display(const int &x, const int &y, const std::string &str);
   void clearScreen();
+  void powerOff();
 };
 
 namespace Devices

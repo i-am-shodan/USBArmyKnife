@@ -32,8 +32,11 @@ public:
   USBClassType currentClassType() { return curClassType; };   // what device class is currently enabled
   uint16_t getVID() { return vid; }
   uint16_t getPID() { return pid; }
+  const std::string getDeviceManufacturer() { return manufacturer; }
+  const std::string getProduct() { return product; }
 
   void changeUSBMode(DuckyInterpreter::USB_MODE &mode, const uint16_t &vid, const uint16_t &pid, const std::string &man, const std::string &prod, const std::string &serial);
+  void reset();
   
   std::string getCurrentUSBMode()
   {
@@ -57,6 +60,8 @@ private:
   USBClassType curClassType;
   uint16_t vid;
   uint16_t pid;
+  std::string manufacturer;
+  std::string product;
 };
 
 namespace Devices::USB

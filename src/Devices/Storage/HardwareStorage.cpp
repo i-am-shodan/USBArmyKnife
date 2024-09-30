@@ -2,6 +2,9 @@
 #include "../../Debug/Logging.h"
 #include "../../pin_config.h"
 
+#include "SDMMCFS2.h"
+using namespace fs;
+
 #define LOG_MMC "MMC"
 
 static uint8_t cachedCapacity = 0;
@@ -29,7 +32,7 @@ std::string HardwareStorage::readFile(fs::FS &fs, const char *path)
 
 void HardwareStorage::writeFileData(const std::string& filename, const uint8_t *buffer, const size_t size)
 {
-    File file = SD_MMC.open(filename.c_str(), FILE_WRITE);
+    File file = SD_MMC_2.open(filename.c_str(), FILE_WRITE);
     if (!file)
     {
         Debug::Log.info(LOG_MMC, "Could not open file");
@@ -46,7 +49,7 @@ void HardwareStorage::writeFileData(const std::string& filename, const uint8_t *
 
 std::size_t HardwareStorage::getFileSize(const std::string& filename)
 {
-    File file = SD_MMC.open(filename.c_str());
+    File file = SD_MMC_2.open(filename.c_str());
     if (!file)
     {
         Debug::Log.info(LOG_MMC, "Could not open file: " + filename);
@@ -61,12 +64,12 @@ std::size_t HardwareStorage::getFileSize(const std::string& filename)
 
 bool HardwareStorage::doesFileExist(const std::string& filename)
 {
-    return SD_MMC.exists(filename.c_str());
+    return SD_MMC_2.exists(filename.c_str());
 }
 
 uint8_t* HardwareStorage::readFileAsBinary(const std::string& filename)
 {
-    File file = SD_MMC.open(filename.c_str());
+    File file = SD_MMC_2.open(filename.c_str());
     if (!file)
     {
         Debug::Log.info(LOG_MMC, "Could not open file: " + filename);
@@ -102,7 +105,7 @@ uint8_t* HardwareStorage::readFileAsBinary(const std::string& filename)
 
 std::string HardwareStorage::readLineFromFile(const std::string &filename, const int lineNumber)
 {
-    File file = SD_MMC.open(filename.c_str());
+    File file = SD_MMC_2.open(filename.c_str());
     if (!file)
     {
         Debug::Log.info(LOG_MMC, "Could not open file: " + filename);
@@ -171,9 +174,9 @@ std::vector<std::string> HardwareStorage::listFiles()
         return filesCache;
     }
 
-    if (SD_MMC.cardType() != CARD_NONE)
+    if (SD_MMC_2.cardType() != CARD_NONE)
     {
-        listDir(filesCache, SD_MMC, "/");
+        listDir(filesCache, SD_MMC_2, "/");
     }
 
     return filesCache;
@@ -185,13 +188,13 @@ uint8_t HardwareStorage::usedPercentage()
     {
         return cachedCapacity;
     }
-    cachedCapacity = (SD_MMC.usedBytes() / SD_MMC.totalBytes()) * 100;
+    cachedCapacity = (SD_MMC_2.usedBytes() / SD_MMC_2.totalBytes()) * 100;
     return cachedCapacity;
 }
 
 bool HardwareStorage::createEmptyFile(const std::string &filename)
 {
-    File file = SD_MMC.open(filename.c_str(), FILE_WRITE);
+    File file = SD_MMC_2.open(filename.c_str(), FILE_WRITE);
     if (!file)
     {
         return false;
@@ -204,11 +207,12 @@ bool HardwareStorage::createEmptyFile(const std::string &filename)
 bool HardwareStorage::deleteFile(const std::string& filename)
 {
     filesCache.clear();
-    return SD_MMC.remove(filename.c_str());
+    return SD_MMC_2.remove(filename.c_str());
 }
 
 HardwareStorage::HardwareStorage()
 {
+    SD_MMC = SD_MMC_2;
 }
 
 void HardwareStorage::loop(Preferences &prefs)
@@ -217,14 +221,14 @@ void HardwareStorage::loop(Preferences &prefs)
 
 void HardwareStorage::begin(Preferences &prefs)
 {
-    SD_MMC.setPins(SD_MMC_CLK_PIN, SD_MMC_CMD_PIN, SD_MMC_D0_PIN, SD_MMC_D1_PIN, SD_MMC_D2_PIN, SD_MMC_D3_PIN);
-    if (!SD_MMC.begin())
+    SD_MMC_2.setPins(SD_MMC_CLK_PIN, SD_MMC_CMD_PIN, SD_MMC_D0_PIN, SD_MMC_D1_PIN, SD_MMC_D2_PIN, SD_MMC_D3_PIN);
+    if (!SD_MMC_2.begin())
     {
         Debug::Log.info(LOG_MMC, "MMC lib could not be started");
     }
     else
     {
-        uint8_t cardType = SD_MMC.cardType();
+        uint8_t cardType = SD_MMC_2.cardType();
         if (cardType == CARD_NONE)
         {
             Debug::Log.info(LOG_MMC, "Could not find MMC");

@@ -5,7 +5,9 @@
 #include <usb_ncm.h>
 #include <tcp_server.h>
 
-#include <SD_MMC.h>
+#include "../../Devices/Storage/SDMMCFS2.h"
+using namespace fs;
+
 #include "../../Utilities/PcapBuffer.h"
 
 static Adafruit_USBD_NET usbNetworking;
@@ -30,9 +32,9 @@ extern "C" void createPcap(uint8_t *buffer, uint32_t len, bool received)
 
 void USBNCM::startPacketCollection()
 {
-    if (Devices::USB::Core.currentDeviceType() == USBDeviceType::NCM && SD_MMC.cardType() != CARD_NONE && buf == nullptr)
+    if (Devices::USB::Core.currentDeviceType() == USBDeviceType::NCM && SD_MMC_2.cardType() != CARD_NONE && buf == nullptr)
     {
-        buf = new PcapBuffer(std::string("usbncm"), &SD_MMC);
+        buf = new PcapBuffer(std::string("usbncm"), &SD_MMC_2);
         set_packet_handler(&createPcap);
         Debug::Log.info("NCM", "Started PCAP");
     }

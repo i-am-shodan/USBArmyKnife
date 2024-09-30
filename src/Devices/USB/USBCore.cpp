@@ -66,7 +66,7 @@ USBCore::USBCore()
   registerUserConfigurableSetting(CATEGORY_USB, USB_DeviceProductDescriptor, USBArmyKnifeCapability::SettingType::String, USB_DeviceProductDescriptor_Default);
 }
 
-void USBCore::changeUSBMode(DuckyInterpreter::USB_MODE &mode, const uint16_t &vid, const uint16_t &pid, const std::string &man, const std::string &prod, const std::string &serial)
+void USBCore::changeUSBMode(DuckyInterpreter::USB_MODE &mode, const uint16_t &vidValue, const uint16_t &pidValue, const std::string &man, const std::string &prod, const std::string &serial)
 {
   // There are two methods to set a USB device type
   // * Set boot configuration which set the USB device options as soon as we get power
@@ -74,9 +74,10 @@ void USBCore::changeUSBMode(DuckyInterpreter::USB_MODE &mode, const uint16_t &vi
 
   if (curDeviceType != USBDeviceType::None)
   {
-    Debug::Log.error(LOG_USB, "Device started with USB Device type NOT set to None, ignoring change USB mode command");
-    return;
+    Debug::Log.warning(LOG_USB, "Device started with USB Device type NOT set to None, this is recommended when using ATTACKMODE command");
   }
+
+  auto startingMode = curDeviceType;
 
   if (mode == DuckyInterpreter::USB_MODE::OFF)
   {
@@ -87,28 +88,17 @@ void USBCore::changeUSBMode(DuckyInterpreter::USB_MODE &mode, const uint16_t &vi
     curClassType = USBClassType::None;
     return;
   }
-
-  if (vid != 0 && pid != 0)
-  {
-    TinyUSBDevice.setID(vid, pid);
-  }
-
-  TinyUSBDevice.setManufacturerDescriptor(man.c_str());
-  TinyUSBDevice.setProductDescriptor(prod.c_str());
-  TinyUSBDevice.setSerialDescriptor(serial.c_str());
-
-  if (mode & DuckyInterpreter::USB_MODE::HID)
+  else if (mode & DuckyInterpreter::USB_MODE::HID)
   {
     Debug::Log.info(LOG_USB, "Changing USB mode to HID");
     curDeviceType = USBDeviceType::USBSerial;
     curClassType = USBClassType::HID;
   }
-
-  if (mode & DuckyInterpreter::USB_MODE::STORAGE)
+  else if (mode & DuckyInterpreter::USB_MODE::STORAGE)
   {
     Debug::Log.info(LOG_USB, "Changing USB mode to STORAGE");
     curDeviceType = USBDeviceType::USBSerial;
-    curClassType = USBClassType::HID;
+    curClassType = USBClassType::Storage;
   }
 
   Preferences prefs;
@@ -119,6 +109,23 @@ void USBCore::changeUSBMode(DuckyInterpreter::USB_MODE &mode, const uint16_t &vi
   Devices::USB::NCM.begin(prefs);
   Devices::USB::HID.begin(prefs);
   Devices::USB::MSC.begin(prefs);
+
+  if (startingMode == USBDeviceType::None && mode != DuckyInterpreter::USB_MODE::OFF)
+  {
+    vid = vidValue == 0 ? prefs.getUShort(USB_DeviceVID, USB_DeviceVID_Default) : vidValue;
+    pid = pidValue == 0 ? prefs.getUShort(USB_DevicePID, USB_DevicePID_Default) : pidValue;
+
+    // we are moving from USB off to USB on, ensure USB strings are set correctly
+    TinyUSBDevice.setID(vid, pid);
+    TinyUSBDevice.setManufacturerDescriptor(man.c_str());
+    TinyUSBDevice.setProductDescriptor(prod.c_str());
+    TinyUSBDevice.setSerialDescriptor(serial.c_str());
+  }
+
+  if (mode & DuckyInterpreter::USB_MODE::STORAGE)
+  {
+    Devices::USB::MSC.mountSD();
+  }
 }
 
 void USBCore::begin(Preferences &prefs)
@@ -147,17 +154,39 @@ void USBCore::begin(Preferences &prefs)
   {
     TinyUSBDevice.setID(vid, pid); // USB_PID
 
-    uint16_t version = prefs.getUShort(USB_Version, USB_Version_Default);
+    const uint16_t version = prefs.getUShort(USB_Version, USB_Version_Default);
     TinyUSBDevice.setVersion(version);
 
-    uint16_t deviceVersion = prefs.getUShort(USB_DeviceVersion, USB_DeviceVersion_Default);
+    const uint16_t deviceVersion = prefs.getUShort(USB_DeviceVersion, USB_DeviceVersion_Default);
     TinyUSBDevice.setVersion(deviceVersion);
 
-    String manufacturer = prefs.getString(USB_DeviceManufacturer, USB_DeviceManufacturer_Default);
+    const String manufacturerArdString = prefs.getString(USB_DeviceManufacturer, USB_DeviceManufacturer_Default);
+    manufacturer = std::string(manufacturerArdString.c_str());
     TinyUSBDevice.setManufacturerDescriptor(manufacturer.c_str());
 
-    String product = prefs.getString(USB_DeviceProductDescriptor, USB_DeviceProductDescriptor_Default);
+    const String productArdString = prefs.getString(USB_DeviceProductDescriptor, USB_DeviceProductDescriptor_Default);
+    product = std::string(productArdString.c_str());
     TinyUSBDevice.setProductDescriptor(product.c_str());
+  }
+}
+
+void USBCore::reset()
+{
+  if (TinyUSBDevice.ready() && TinyUSBDevice.mounted())
+  {
+    Debug::Log.info(LOG_USB, "USB reset");
+    if (!TinyUSBDevice.detach())
+    {
+      Debug::Log.info(LOG_USB, "Detach failed");
+    }
+
+    tud_disconnect();
+    delay(100);
+    tud_connect();
+
+    TinyUSB_Device_Init(0, curDeviceType == USBDeviceType::NCM);
+
+    TinyUSBDevice.attach();
   }
 }
 
