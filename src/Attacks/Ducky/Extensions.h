@@ -42,7 +42,7 @@ static int handleDisplayClear(const std::string &str, std::unordered_map<std::st
 
 static int handleTFT_OFF(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
 {
-    Devices::TFT.display(0, 0, "");
+    Devices::TFT.powerOff();
     return true;
 }
 

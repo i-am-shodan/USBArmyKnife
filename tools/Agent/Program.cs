@@ -18,10 +18,14 @@ class Program
     [UnmanagedCallersOnly(EntryPoint = "Open32", CallConvs = new Type[] { typeof(CallConvStdcall) })]
     public static void Open32(IntPtr hwnd, IntPtr hinst, IntPtr lpszCmdLine, int nCmdShow)
     {
+#pragma warning disable CS0168 // Variable is declared but never used
         try
         {
-            var cmdLine = Marshal.PtrToStringAnsi(lpszCmdLine); 
-            Main(cmdLine.Split(" ")).Wait();
+            var cmdLine = Marshal.PtrToStringAnsi(lpszCmdLine);
+            if (!string.IsNullOrWhiteSpace(cmdLine))
+            {
+                Main(cmdLine.Split(" ")).Wait();
+            }
         }
         catch (Exception ex)
         {
@@ -29,16 +33,21 @@ class Program
             File.AppendAllText("C:\\temp\\log.txt", ex.Message);
 #endif
         }
+#pragma warning restore CS0168 // Variable is declared but never used
     }
 
     // Used by anyone else who can call a DLL entrypoint
     [UnmanagedCallersOnly(EntryPoint = "Open")]
     public static void Open(IntPtr cmdLinePtr)
     {
+#pragma warning disable CS0168 // Variable is declared but never used
         try
         {
             var cmdLine = Marshal.PtrToStringUni(cmdLinePtr);
-            Main(cmdLine.Split(" ")).Wait();
+            if (!string.IsNullOrWhiteSpace(cmdLine))
+            {
+                Main(cmdLine.Split(" ")).Wait();
+            }
         }
         catch (Exception ex)
         {
@@ -46,6 +55,7 @@ class Program
             File.AppendAllText("C:\\temp\\log.txt", ex.Message);
 #endif
         }
+#pragma warning restore CS0168 // Variable is declared but never used
     }
 
 #if DEBUG

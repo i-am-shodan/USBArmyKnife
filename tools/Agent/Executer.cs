@@ -118,6 +118,7 @@ namespace Agent
         {
             _ = Task.Run(async () =>
             {
+#pragma warning disable CS0168 // Variable is declared but never used
                 try
                 {
                     var output = await Run("cmd.exe", "/c "+command, token);
@@ -146,6 +147,7 @@ namespace Agent
                     Console.WriteLine("OUT ExecuteResult) " + ex.Message);
 #endif
                 }
+#pragma warning restore CS0168 // Variable is declared but never used
             }, token);
         }
 
@@ -201,6 +203,7 @@ namespace Agent
                     },
                     async (buffer) =>
                     {
+#pragma warning disable CS0168 // Variable is declared but never used
                         try
                         {
                             int dataSent = 0;
@@ -227,6 +230,7 @@ namespace Agent
                             cts.Cancel();
                             throw;
                         }
+#pragma warning restore CS0168 // Variable is declared but never used
                     });
                     currentCts = cts;
                     vnc.Start(vncStream);

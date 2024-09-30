@@ -1,7 +1,3 @@
-ATTACKMODE HID VID_046D PID_C31C
-REM SERIAL 115200
-WEB_ON
-
 GUI
 DELAY 1000
 STRING https://www.youtube.com/watch?v=xvFZjo5PgG0
@@ -10,3 +6,21 @@ ENTER
 
 REM Now blast the lyrics over WiFI
 ESP32M attack -t rickroll
+
+VAR $INDEX = 1
+WHILE (TRUE)
+    IF ($INDEX == 1)
+        DISPLAY_PNG /1.png
+    ELSE IF ($INDEX == 2)
+        DISPLAY_PNG /2.png
+    ELSE IF ($INDEX == 3)
+        DISPLAY_PNG /3.png
+    END_IF
+
+    $INDEX = ( $INDEX + 1 )
+    IF ($INDEX == 4)
+        $INDEX = 1
+    END_IF
+    
+    DELAY 500
+END_WHILE

@@ -2,7 +2,8 @@
 
 #include <Adafruit_TinyUSB.h>
 
-#include "SD_MMC.h"
+#include "../../Devices/Storage/SDMMCFS2.h"
+using namespace fs;
 
 #include "driver/sdmmc_host.h"
 #include "driver/sdspi_host.h"
@@ -52,7 +53,7 @@ static void msc_flush_cb()
 
 static size_t open_msc(const char *path)
 {
-    mscFile = SD_MMC.open(path);
+    mscFile = SD_MMC_2.open(path);
     if (!mscFile)
     {
         return 0;
@@ -61,56 +62,26 @@ static size_t open_msc(const char *path)
     return mscFile.size();
 }
 
-static size_t open_internal_msc()
+static int32_t msc_raw_read(uint32_t lba, void *buffer, uint32_t bufsize)
 {
-    SD_MMC.end();
-
-    sdmmc_host_t host = {
-        .flags = SDMMC_HOST_FLAG_4BIT | SDMMC_HOST_FLAG_DDR,
-        .slot = SDMMC_HOST_SLOT_1,
-        .max_freq_khz = SDMMC_FREQ_DEFAULT,
-        .io_voltage = 3.3f,
-        .init = &sdmmc_host_init,
-        .set_bus_width = &sdmmc_host_set_bus_width,
-        .get_bus_width = &sdmmc_host_get_slot_width,
-        .set_bus_ddr_mode = &sdmmc_host_set_bus_ddr_mode,
-        .set_card_clk = &sdmmc_host_set_card_clk,
-        .do_transaction = &sdmmc_host_do_transaction,
-        .deinit = &sdmmc_host_deinit,
-        .io_int_enable = sdmmc_host_io_int_enable,
-        .io_int_wait = sdmmc_host_io_int_wait,
-        .command_timeout_ms = 0,
-    };
-    sdmmc_slot_config_t slot_config = {
-        .clk = (gpio_num_t)SD_MMC_CLK_PIN,
-        .cmd = (gpio_num_t)SD_MMC_CMD_PIN,
-        .d0 = (gpio_num_t)SD_MMC_D0_PIN,
-        .d1 = (gpio_num_t)SD_MMC_D1_PIN,
-        .d2 = (gpio_num_t)SD_MMC_D2_PIN,
-        .d3 = (gpio_num_t)SD_MMC_D3_PIN,
-        .cd = SDMMC_SLOT_NO_CD,
-        .wp = SDMMC_SLOT_NO_WP,
-        .width = 4, // SDMMC_SLOT_WIDTH_DEFAULT,
-        .flags = SDMMC_SLOT_FLAG_INTERNAL_PULLUP,
-    };
-
-    gpio_set_pull_mode((gpio_num_t)SD_MMC_CMD_PIN, GPIO_PULLUP_ONLY); // CMD, needed in 4- and 1- line modes
-    gpio_set_pull_mode((gpio_num_t)SD_MMC_D0_PIN, GPIO_PULLUP_ONLY);  // D0, needed in 4- and 1-line modes
-    gpio_set_pull_mode((gpio_num_t)SD_MMC_D1_PIN, GPIO_PULLUP_ONLY);  // D1, needed in 4-line mode only
-    gpio_set_pull_mode((gpio_num_t)SD_MMC_D2_PIN, GPIO_PULLUP_ONLY);  // D2, needed in 4-line mode only
-    gpio_set_pull_mode((gpio_num_t)SD_MMC_D3_PIN, GPIO_PULLUP_ONLY);  // D3, needed in 4- and 1-line modes
-
-    const char mount_point[] = "/sdcard";
-    esp_vfs_fat_sdmmc_mount_config_t mount_config = {.format_if_mount_failed = false, .max_files = 5, .allocation_unit_size = 16 * 1024};
-
-    auto mountret = esp_vfs_fat_sdmmc_mount(mount_point, &host, &slot_config, &mount_config, &card);
-
-    if (mountret != ESP_OK || card == NULL)
+    if (card == NULL)
     {
-        return 0;
+        return -1;
     }
 
-    return card->csd.capacity;
+    uint32_t count = (bufsize / card->csd.sector_size);
+    return sdmmc_read_sectors(card, buffer, lba, count) == ESP_OK ? LOGICAL_BLOCK_SIZE : -1;
+}
+
+static int32_t msc_raw_write(uint32_t lba, uint8_t *buffer, uint32_t bufsize)
+{
+    if (card == NULL)
+    {
+        return -1;
+    }
+
+    uint32_t count = (bufsize / card->csd.sector_size);
+    return sdmmc_write_sectors(card, buffer, lba, count) == ESP_OK ? LOGICAL_BLOCK_SIZE : -1;
 }
 
 static size_t getinternalMMCSectorSize()
@@ -120,6 +91,42 @@ static size_t getinternalMMCSectorSize()
         return 0;
     }
     return card->csd.sector_size;
+}
+
+static void msc_raw_flush()
+{
+    // nothing to do
+}
+
+bool USBMSC::mountSD()
+{
+    if (card == NULL)
+    {
+        card = SD_MMC_2.getCard();
+
+        // Set disk vendor id, product id and revision with string up to 8, 16, 4 characters respectively
+        usb_msc.setID("Adafruit", "Mass Storage", "1.0");
+
+        auto sectorSize = getinternalMMCSectorSize();
+
+        usb_msc.setCapacity(card->csd.capacity, sectorSize);
+
+        // Set callback
+        usb_msc.setReadWriteCallback(msc_raw_read, msc_raw_write, msc_raw_flush);
+
+        // Set Lun ready (disk is always ready)
+        usb_msc.setUnitReady(true);
+
+        // FIXME: This shouldn't cause an issue but the device doesn't appear
+        //Devices::USB::Core.reset();
+
+        return usb_msc.begin();
+    }
+    else
+    {
+        Debug::Log.info(TAG_USB, "Device already mounted");
+        return false;
+    }
 }
 
 USBMSC::USBMSC()
@@ -157,16 +164,15 @@ bool USBMSC::mountDiskImage(const std::string &imageLocation)
         // Set callback
         usb_msc.setReadWriteCallback(msc_read_cb, msc_write_cb, msc_flush_cb);
 
-        // Set Lun ready (RAM disk is always ready)
+        // Set Lun ready (disk is always ready)
         usb_msc.setUnitReady(true);
 
-        usb_msc.begin();
+        Devices::USB::Core.reset();
 
-        if (TinyUSBDevice.mounted())
+        if (!usb_msc.begin())
         {
-            TinyUSBDevice.detach();
-            delay(10);
-            TinyUSBDevice.attach();
+            Debug::Log.info(TAG_USB, "Failed to start USB MSC");
+            return false;
         }
 
         Debug::Log.info(TAG_USB, "Disk image mounted");
@@ -174,7 +180,7 @@ bool USBMSC::mountDiskImage(const std::string &imageLocation)
     }
     else
     {
-        Debug::Log.info(TAG_USB, "Could not load "+imageLocation);
+        Debug::Log.info(TAG_USB, "Could not load " + imageLocation);
         return false;
     }
 }

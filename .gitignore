@@ -44,3 +44,4 @@ packages/
 /src/html/stylesMinCss.h
 /src/html/**
 /ui/content/data.json
+/example/covertstorage/disk.img
