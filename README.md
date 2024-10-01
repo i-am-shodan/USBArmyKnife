@@ -27,6 +27,11 @@ This is why I decided to create the USB Army Knife.
 * What to connect to other bits of hardware, motion sensors and alike? USB Army Knife.
 * Want to view what’s on the victim's screen over WiFi? USB Army Knife.
 
+## Video
+[This video shows how the ultimate rick roll works](./examples/rickroll/)
+
+https://github.com/user-attachments/assets/f373e18e-5cad-4871-9f2a-17523fa33398
+
 ## Features
 This project implements a variety of attacks based around an easily concealable USB/WiFi/BT dongle. The attacks include sending BadUSB (USB HID commands using DuckyScript), appearing as mass storage devices, appearing as USB network devices, and performing WiFi and Bluetooth attacks with ESP32 Marauder. Attacks are deployed using a Ducky-like language you probably already know and love. This language has been agumented with a raft of custom commands and even the entire ESP32 Marauder capability. Attacks include:
 
