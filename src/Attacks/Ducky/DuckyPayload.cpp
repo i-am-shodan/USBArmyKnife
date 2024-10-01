@@ -273,6 +273,7 @@ void DuckyPayload::loop(Preferences &prefs)
         if (restartPayload)
         {
             nextLineNumberToExecute = 0;
+            restartPayload = false;
         }
     }
     else if (!localCmdLineToExecute.empty())
