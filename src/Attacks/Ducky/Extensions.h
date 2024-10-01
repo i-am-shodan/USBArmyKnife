@@ -263,7 +263,7 @@ static int handleButtonPress(const std::string &str, std::unordered_map<std::str
 
 static int handleRunPayload(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
 {
-    std::string arg = str.substr(str.find(' ') + 1);
+    const std::string arg = str.substr(str.find(' ') + 1);
     if (arg.ends_with(".ds"))
     {
         Attacks::Ducky.setPayload(arg);
