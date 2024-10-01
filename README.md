@@ -85,7 +85,7 @@ This project implements a variety of attacks based around an easily concealable 
 
 1. (Remove the dongle if it was inserted) **Press and hold the hardware button**, insert the LilyGo dongle, wait 1s and **release the button**.
 
-1. Under 'ESO32-S3-DevKitC-1' Select upload
+1. Under 'LILYGO-T-Dongle-S3' Select upload
 
 1. When the upload has finished successfully, remove the dongle and insert the micro SD card
 
