@@ -1,9 +1,12 @@
+REM Remember you need to set the device to be USB NCM at boot
+
+DISPLAY_CLEAR
 DISPLAY_TEXT 0 0 Starting PCAP
 USB_NCM_PCAP_ON
 
 DELAY 10000
 
 USB_NCM_PCAP_OFF
-DISPLAY_TEXT 0 0 PCAP Stopped
+DISPLAY_TEXT 0 10 PCAP Stopped
 
 REM You'll now have a pcap in /usbncm_0.pcap
