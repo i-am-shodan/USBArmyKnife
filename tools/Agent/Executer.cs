@@ -211,7 +211,7 @@ namespace Agent
                             {
                                 var amountOfDataToSend = buffer.Length - dataSent > 2048 ? 2048 : buffer.Length - dataSent;
                                 await TLVHandling.WriteTLVToStream((byte)Command.WSDATARECV, buffer, dataSent, amountOfDataToSend, stream, cts.Token);
-                                await Task.Delay(50); // processing time
+                                await Task.Delay(100); // processing time to ensure we can push the buffer out over WiFi before we get another one
                                 dataSent += amountOfDataToSend;
 #if DEBUG
                                 Console.WriteLine("OUT WSDATARECV)" + amountOfDataToSend);
