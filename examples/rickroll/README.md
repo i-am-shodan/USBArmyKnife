@@ -4,6 +4,10 @@ This DuckyScript payload is designed to deliver the ultimate Rick Roll experienc
 
 https://github.com/justcallmekoko/ESP32Marauder/wiki/rick-roll-beacon
 
+
+https://github.com/user-attachments/assets/f373e18e-5cad-4871-9f2a-17523fa33398
+
+
 ## Set up
 1. Copy autorun.ds onto the SD card
 2. Copy all the PNG files onto the SD card
