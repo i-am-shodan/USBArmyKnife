@@ -39,13 +39,13 @@ This project implements a variety of attacks based around an easily concealable 
 
 | Name      | Description   |
 | ------------- | ------------- |
-| [Covert Storage](./examplescovertstorage/autorun.ds) | Example showing how to masquerade as two different USB mass storage devices. The first time the device is plugged in the devices appears with the full contents of the micro SD card. In all subsequence attempts a different 'benign' drive appears. |
-| [Progress Bar](./examples/progressbar/autorun.ds) | Images are displayed on the devices LCD screen showing a progress bar. Great for those Hollywood style attacks or if you want a visual indicator to show an attack has deployed. |
-| [Ultimate RickRoll](./examples/rickroll/autorun.ds) | Inject keystrokes to display the famous rickroll video but also uses ESP32 Marauder to blast the lyrics over WiFi. |
-| [USB Ethernet PCAP](./examples/usb_ethernet_pcap/autorun.ds) | Turns the device into a USB network adapter and collects a PCAP of the first few seconds of network traffic. |
-| [Deploy the serial agent](./examples/install_agent_and_run_command/autorun.ds) | Deploys the agent if it isn't already installed and sends commands over the serial port. Command output can be seen in the web interface|
-| [Pull the screen](./examples/vnc/autorun.ds) | Deploys the agent, the agent includes a tiny VNC server. Now the screen can be viewed via the web interface|
-| [Simple UI](./examples/simple_ui/autorun.ds) | A simple yet powerful UI to select scripts/images and run these using the hardware button. Shows how you can build complex UI interactions simply.  |
+| [Covert Storage](./examples/covertstorage/) | Example showing how to masquerade as two different USB mass storage devices. The first time the device is plugged in the devices appears with the full contents of the micro SD card. In all subsequence attempts a different 'benign' drive appears. |
+| [Progress Bar](./examples/progressbar/) | Images are displayed on the devices LCD screen showing a progress bar. Great for those Hollywood style attacks or if you want a visual indicator to show an attack has deployed. |
+| [Ultimate RickRoll](./examples/rickroll/) | Inject keystrokes to display the famous rickroll video but also uses ESP32 Marauder to blast the lyrics over WiFi. |
+| [USB Ethernet PCAP](./examples/usb_ethernet_pcap/) | Turns the device into a USB network adapter and collects a PCAP of the first few seconds of network traffic. |
+| [Deploy the serial agent](./examples/install_agent_and_run_command/) | Deploys the agent if it isn't already installed and sends commands over the serial port. Command output can be seen in the web interface|
+| [Pull the screen](./examples/vnc/) | Deploys the agent, the agent includes a tiny VNC server. Now the screen can be viewed via the web interface|
+| [Simple UI](./examples/simple_ui/) | A simple yet powerful UI to select scripts/images and run these using the hardware button. Shows how you can build complex UI interactions simply.  |
 
 ## Supported Hardware
 
