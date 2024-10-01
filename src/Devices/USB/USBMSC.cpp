@@ -28,8 +28,26 @@ static int32_t msc_read_cb(uint32_t lba, void *buffer, uint32_t bufsize)
 {
     Devices::USB::MSC.setActivityStateState(true);
 
-    mscFile.seek(lba * LOGICAL_BLOCK_SIZE);
-    return mscFile.readBytes((char *)buffer, bufsize) >= 0 ? LOGICAL_BLOCK_SIZE : -1;
+    if (card == NULL)
+    {
+        mscFile.seek(lba * LOGICAL_BLOCK_SIZE);
+        if (mscFile.readBytes((char *)buffer, bufsize) == bufsize)
+        {
+            // bufSize should always be a multiple of LOGICAL_BLOCK_SIZE so on read success return that
+            return bufsize;
+        }
+    }
+    else
+    {
+        uint32_t sectors = (bufsize / card->csd.sector_size);
+        if (sdmmc_read_sectors(card, buffer, lba, sectors) == ESP_OK)
+        {
+            // bufSize should always be a multiple of LOGICAL_BLOCK_SIZE so on read success return that
+            return bufsize;
+        }
+    }
+
+    return -1;
 }
 
 // Callback invoked when received WRITE10 command.
@@ -39,16 +57,28 @@ static int32_t msc_write_cb(uint32_t lba, uint8_t *buffer, uint32_t bufsize)
 {
     Devices::USB::MSC.setActivityStateState(true);
 
-    mscFile.seek(lba * LOGICAL_BLOCK_SIZE);
-    return mscFile.write(buffer, bufsize) >= 0 ? LOGICAL_BLOCK_SIZE : -1;
+    if (card == NULL)
+    {
+        // writing to file images is not currently supported, we lie and say the
+        // write occured as that will make it look like everything is ok to the OS
+        // fs cache manager
+        return bufsize;
+    }
+    else
+    {
+        uint32_t count = (bufsize / card->csd.sector_size);
+        return sdmmc_write_sectors(card, buffer, lba, count) == ESP_OK ? bufsize : -1;
+    }
 }
 
 // Callback invoked when WRITE10 command is completed (status received and accepted by host).
 // used to flush any pending cache.
 static void msc_flush_cb()
 {
-    // nothing to do
-    mscFile.flush();
+    if (card == NULL)
+    {
+        mscFile.flush();
+    }
 }
 
 static size_t open_msc(const char *path)
@@ -62,28 +92,6 @@ static size_t open_msc(const char *path)
     return mscFile.size();
 }
 
-static int32_t msc_raw_read(uint32_t lba, void *buffer, uint32_t bufsize)
-{
-    if (card == NULL)
-    {
-        return -1;
-    }
-
-    uint32_t count = (bufsize / card->csd.sector_size);
-    return sdmmc_read_sectors(card, buffer, lba, count) == ESP_OK ? LOGICAL_BLOCK_SIZE : -1;
-}
-
-static int32_t msc_raw_write(uint32_t lba, uint8_t *buffer, uint32_t bufsize)
-{
-    if (card == NULL)
-    {
-        return -1;
-    }
-
-    uint32_t count = (bufsize / card->csd.sector_size);
-    return sdmmc_write_sectors(card, buffer, lba, count) == ESP_OK ? LOGICAL_BLOCK_SIZE : -1;
-}
-
 static size_t getinternalMMCSectorSize()
 {
     if (card == NULL)
@@ -91,11 +99,6 @@ static size_t getinternalMMCSectorSize()
         return 0;
     }
     return card->csd.sector_size;
-}
-
-static void msc_raw_flush()
-{
-    // nothing to do
 }
 
 bool USBMSC::mountSD()
@@ -112,15 +115,22 @@ bool USBMSC::mountSD()
         usb_msc.setCapacity(card->csd.capacity, sectorSize);
 
         // Set callback
-        usb_msc.setReadWriteCallback(msc_raw_read, msc_raw_write, msc_raw_flush);
+        usb_msc.setReadWriteCallback(msc_read_cb, msc_write_cb, msc_flush_cb);
 
         // Set Lun ready (disk is always ready)
         usb_msc.setUnitReady(true);
 
         // FIXME: This shouldn't cause an issue but the device doesn't appear
-        //Devices::USB::Core.reset();
+        Devices::USB::Core.reset();
 
-        return usb_msc.begin();
+        if (!usb_msc.begin())
+        {
+            Debug::Log.info(TAG_USB, "Failed to start USB MSC");
+            return false;
+        }
+
+        Debug::Log.info(TAG_USB, "SD mounted");
+        return true;
     }
     else
     {

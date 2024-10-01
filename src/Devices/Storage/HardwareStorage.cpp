@@ -222,7 +222,7 @@ void HardwareStorage::loop(Preferences &prefs)
 void HardwareStorage::begin(Preferences &prefs)
 {
     SD_MMC_2.setPins(SD_MMC_CLK_PIN, SD_MMC_CMD_PIN, SD_MMC_D0_PIN, SD_MMC_D1_PIN, SD_MMC_D2_PIN, SD_MMC_D3_PIN);
-    if (!SD_MMC_2.begin())
+    if (!SD_MMC_2.begin("/sdcard", false, false, SDMMC_FREQ_52M))
     {
         Debug::Log.info(LOG_MMC, "MMC lib could not be started");
     }
