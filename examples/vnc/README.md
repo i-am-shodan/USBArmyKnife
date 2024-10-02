@@ -2,6 +2,10 @@
 
 The USB Army Knife agent includes a tiny VNC server, this can only be accessed over the serial connection. The web interface includes a JavaScript client which you can use to view the screen of the victim box.
 
+
+https://github.com/user-attachments/assets/3c866d29-ef26-4eaf-943b-1206b8c40101
+
+
 ## Set up
 1. Install the serial agent, see other examples for help
 
