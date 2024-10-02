@@ -45,6 +45,10 @@ https://github.com/user-attachments/assets/f373e18e-5cad-4871-9f2a-17523fa33398
 
 https://github.com/user-attachments/assets/0d5b1485-b808-46c6-aaf7-7cf016088b8f
 
+[This video shows how to pull the victims machine once the agent has been installed](./examples/vnc/) 
+
+https://github.com/user-attachments/assets/3c866d29-ef26-4eaf-943b-1206b8c40101
+
 ## Features
 This project implements a variety of attacks based around an easily concealable USB/WiFi/BT dongle. The attacks include sending BadUSB (USB HID commands using DuckyScript), appearing as mass storage devices, appearing as USB network devices, and performing WiFi and Bluetooth attacks with ESP32 Marauder. Attacks are deployed using a Ducky-like language you probably already know and love. This language has been agumented with a raft of custom commands and even the entire ESP32 Marauder capability. Attacks include:
 
