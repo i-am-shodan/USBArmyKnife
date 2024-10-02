@@ -20,7 +20,7 @@ Want more? Deploy the agent and execute commands even when the machine is locked
 Equip yourself with the USB Army Knife and elevate your local access toolkit to the next level.
 
 ## Intro
-Their is a problem with physical access/USB attacks today. On their own, each attack doesn't provide enough of a solution to meet most objectives.
+There is a problem with physical access/USB attacks today. On their own, each attack doesn't provide enough of a solution to meet most objectives.
 * USB keyboard attacks (Ducky, HID&Run) require a logged on machine and even the best tools don’t provide a solution to this.
 * Networking attacks (poison tap and alike) might get you a password hash but often require something complex hanging out of an Ethernet port to get this back for offline cracking.
 * When you get on a box, what options do you still have for exfiltrating data when anything that opens a socket is getting sent to VT.
