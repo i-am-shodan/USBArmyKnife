@@ -6,7 +6,10 @@
 
 # USB Army Knife
 
-*Introducing the USB Army Knife – the ultimate tool for penetration testers and red teamers.*
+<div align="center">
+  Introducing the USB Army Knife – the ultimate tool for penetration testers and red teamers.
+    <img src="./docs/images/t-dongle-s3-side.png" width="400px"</img> 
+</div>
 
 Compact and versatile, this device packs a punch with its extensive capabilities, including USB HID attacks, mass storage emulation, network device impersonation and WiFi/Bluetooth exploits (using ESP32 Marauder).
 
