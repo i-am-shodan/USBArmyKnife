@@ -95,7 +95,10 @@ This project implements a variety of attacks based around an easily concealable 
     ```sh
     git clone https://github.com/i-am-shodan/usb-army-knife
     ```
-
+1. Now you've cloned the repo you need to pull down the submodules
+    ```sh
+    git submodule update --init 
+    ```
 1. Open the project in Visual Studio Code
 
 1. Click the PlatformIO icon (Alien icon)
