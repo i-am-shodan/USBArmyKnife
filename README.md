@@ -112,8 +112,10 @@ This project implements a variety of attacks based around an easily concealable 
 ### Usage
 
 1. Connect the USB dongle to your computer.
-2. Access the web interface by navigating to the device's IP address in your browser.
-3. Use the web interface to create and manage your attacks using DuckyScript.
+1. Connect to the WiF access point (iPhone14) with the password of 'password'
+1. Access the web interface (http://4.3.2.1:8080) by navigating to the URL with your browser.
+1. Ensure the web interface has correctly loaded. You should see thr currently running status and uptime. If not refresh the page.
+1. Use the web interface to create and manage your attacks using DuckyScript.
 
 ### Future plans
 
