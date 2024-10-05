@@ -93,9 +93,9 @@ This project implements a variety of attacks based around an easily concealable 
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/i-am-shodan/usb-army-knife
+    git clone https://github.com/i-am-shodan/usb-army-knife.git
     ```
-1. Now you've cloned the repo you need to pull down the submodules
+1. Now you've cloned the repo you need to pull down the submodules. Run this command in the directory you just cloned to.
     ```sh
     git submodule update --init 
     ```
