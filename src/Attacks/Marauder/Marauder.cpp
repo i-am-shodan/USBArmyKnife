@@ -23,41 +23,44 @@ SDInterface sd_obj;
 LedInterface led_obj;
 
 const String PROGMEM version_number = MARAUDER_VERSION;
-static uint32_t currentTime  = 0;
+static uint32_t currentTime = 0;
 
 static std::string nextMarauderCommandToRun;
+static bool marauderActivated = false;
 
 namespace Attacks
 {
-    ESP32Marauder Marauder;
+  ESP32Marauder Marauder;
 }
 
 ESP32Marauder::ESP32Marauder()
 {
-
 }
 
-void ESP32Marauder::begin(Preferences& prefs)
+void ESP32Marauder::begin(Preferences &prefs)
 {
   led_obj.RunSetup();
   buffer_obj = Buffer();
   sd_obj.initSD();
-  settings_obj.begin();
-  wifi_scan_obj.RunSetup();
-  buffer_obj = Buffer();
-  evil_portal_obj.setup();
-  cli_obj.RunSetup();
-
   sd_obj.supported = true;
   sd_obj.cardType = SD_MMC_2.cardType();
   sd_obj.cardSizeMB = SD_MMC_2.cardSize();
   sd_obj.card_sz = std::to_string(SD_MMC_2.cardSize() / 1024 / 1024).c_str();
   sd_obj.sd_files = new LinkedList<String>();
   sd_obj.sd_files->add("Back");
+
+  settings_obj.begin();
+  wifi_scan_obj.RunSetup();
+  evil_portal_obj.setup();
+  cli_obj.RunSetup();
 }
 
-void ESP32Marauder::loop(Preferences& prefs)
+void ESP32Marauder::loop(Preferences &prefs)
 {
+  // whilst we init the esp32 marauder code to save ram/cycles we don't
+  // start to do work until we receive our first command
+  if (marauderActivated)
+  {
     currentTime = millis();
     wifi_scan_obj.main(currentTime);
 
@@ -67,14 +70,16 @@ void ESP32Marauder::loop(Preferences& prefs)
 
     if (!nextMarauderCommandToRun.empty())
     {
-      Debug::Log.info(LOG_MARAUDER, std::string("Running cmd ")+nextMarauderCommandToRun);
+      Debug::Log.info(LOG_MARAUDER, std::string("Running cmd ") + nextMarauderCommandToRun);
       cli_obj.runCommand(nextMarauderCommandToRun.c_str());
       nextMarauderCommandToRun.clear();
-      Debug::Log.info(LOG_MARAUDER, std::string("Finished cmd ")+nextMarauderCommandToRun);
+      Debug::Log.info(LOG_MARAUDER, std::string("Finished cmd ") + nextMarauderCommandToRun);
     }
+  }
 }
 
-void ESP32Marauder::run(const std::string& cmd)
+void ESP32Marauder::run(const std::string &cmd)
 {
+  marauderActivated = true;
   nextMarauderCommandToRun = cmd;
 }
