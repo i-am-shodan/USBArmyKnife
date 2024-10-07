@@ -1,5 +1,4 @@
 #include "HardwareStorage.h"
-#include "../TFT/HardwareTFT.h"
 #include "../../Debug/Logging.h"
 #include "../../pin_config.h"
 
@@ -225,8 +224,6 @@ void HardwareStorage::begin(Preferences &prefs)
     SD_MMC_2.setPins(SD_MMC_CLK_PIN, SD_MMC_CMD_PIN, SD_MMC_D0_PIN, SD_MMC_D1_PIN, SD_MMC_D2_PIN, SD_MMC_D3_PIN);
     if (!SD_MMC_2.begin("/sdcard", false, false, SDMMC_FREQ_52M))
     {
-        Devices::TFT.clearScreen();
-        Devices::TFT.display(0, 0, "Could not start SD driver");
         Debug::Log.info(LOG_MMC, "SD_MMC_2 could not be started");
     }
     else
@@ -234,8 +231,6 @@ void HardwareStorage::begin(Preferences &prefs)
         uint8_t cardType = SD_MMC_2.cardType();
         if (cardType == CARD_NONE)
         {
-            Devices::TFT.clearScreen();
-            Devices::TFT.display(0, 0, "Could not find SD card");
             Debug::Log.info(LOG_MMC, "Could not find SD Card");
         }
         else
