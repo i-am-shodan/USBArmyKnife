@@ -238,5 +238,9 @@ void HardwareStorage::begin(Preferences &prefs)
             Devices::TFT.display(0, 0, "Could not find SD card");
             Debug::Log.info(LOG_MMC, "Could not find SD Card");
         }
+        else
+        {
+            running = true;
+        }
     }
 }

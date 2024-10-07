@@ -32,6 +32,11 @@ void setup()
   Debug::Log.begin(prefs);
 
   Devices::Storage.begin(prefs);
+  if (!Devices::Storage.isRunning())
+  {
+    delay(60 * 1000);
+    ESP.restart();
+  }
 
   // ESP32 Marauder uses a BT library that gets stuck in an infinite loop if it
   // fails to init. We init Marauder early as this means we should have as few tasks
