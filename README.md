@@ -84,6 +84,14 @@ This project implements a variety of attacks based around an easily concealable 
 
 1. When the upload has finished successfully, remove the dongle and insert the micro SD card
 
+### Updating the codebase to the latest version
+
+If you want to update an existing install you need to:
+1. Use `git pull` to grab the latest changes to this repository
+1. Run `git submodule update --recursive` to make sure all the submodules are up to date
+1. Click 'Full Clean' in the PlatformIO build menu.
+At this point all your code and dependencies will be up to date and you can continue with the build steps above.
+
 ### Usage
 
 1. Connect the USB dongle to your computer.
