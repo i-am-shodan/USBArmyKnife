@@ -399,15 +399,43 @@ static int handleRawHid(const std::string &str, std::unordered_map<std::string, 
         }
         else
         {
-            Debug::Log.info(LOG_DUCKY, "Invalid value");
+            Debug::Log.error(LOG_DUCKY, "Invalid value");
         }
     }
     else
     {
-        Debug::Log.info(LOG_DUCKY, "Invalid value, must start with 0x");
+        Debug::Log.error(LOG_DUCKY, "Invalid value, must start with 0x");
     }
 
     return ret;
+}
+
+static int handleKeyboardLayout(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+{
+    const std::string arg = str.substr(str.find(' ') + 1);
+
+    const auto entries = Ducky::SplitString(arg);
+    if (entries.size() == 1)
+    {
+        auto ret = duckyCmdLineParser.SetKeyboardLayout(entries[0]);
+        ret &= duckyFileParser.SetKeyboardLayout(entries[0]);
+
+        if (!ret)
+        {
+            Debug::Log.error(LOG_DUCKY, "Invalid keyboard layout value");
+        }
+        else
+        {
+            Debug::Log.info(LOG_DUCKY, "Keyboard layout set to "+entries[0]);
+            return true;
+        }
+    }
+    else
+    {
+        Debug::Log.error(LOG_DUCKY, "Invalid value, too many tokens");
+    }
+    
+    return false;
 }
 
 void addDuckyScriptExtensions(
@@ -444,6 +472,7 @@ void addDuckyScriptExtensions(
     extCommands["USB_NCM_PCAP_OFF"] = handleUsbNcmPcapOff;
     extCommands["WAIT_FOR_USB_STORAGE_ACTIVITY"] = handleWaitForUSBStorageActivity;
     extCommands["WAIT_FOR_USB_STORAGE_ACTIVITY_TO_STOP"] = handleWaitForUSBStorageActivityToStop;
+    extCommands["KEYBOARD_LAYOUT"] = handleKeyboardLayout;
 
     // Agent
     extCommands["AGENT_RUN"] = handleAgentRun;

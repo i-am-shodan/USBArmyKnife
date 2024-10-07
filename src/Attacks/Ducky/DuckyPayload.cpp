@@ -60,8 +60,6 @@ static bool wasLastPressLong = false;
 
 static std::string readCmdLine(const std::string &filename, int lineNum);
 
-#include "Extensions.h"
-
 namespace Attacks
 {
     DuckyPayload Ducky;
@@ -177,6 +175,8 @@ static DuckyInterpreter duckyCmdLineParser = DuckyInterpreter(
     waitForButton,
     changeUSBMode,
     reset);
+
+#include "Extensions.h"
 
 uint8_t DuckyPayload::getTotalErrors()
 {
