@@ -11,6 +11,9 @@ This example shows you how to install the agent and run commands against it. It 
 2. Copy autorun.ds onto the SD card
 
 ## Usage
+
+**WARNING The current script is intended to be run on a machine with a UK keyboard layout** You may need to change the script's RAW_HID commands for other keyboard layouts.
+
 1. Plug in device
 2. Wait for the device to reset / USB drive to disappear
 3. Connect to the device's WiFi access point
