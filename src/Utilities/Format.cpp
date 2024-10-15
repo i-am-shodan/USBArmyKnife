@@ -24,7 +24,7 @@ void FormatStatusUpdateTask(void *arg)
         Devices::TFT.display(count, 20, ".");
         count++;
 
-        if (count >= DISPLAY_WIDTH)
+        if (count >= DISPLAY_WIDTH -1)
         {
             Devices::TFT.clearScreen();
             Devices::TFT.display(0, 0, line1);
