@@ -283,7 +283,7 @@ static void webRequestHandler(AsyncWebServerRequest *request)
     {
       const char *mime = GetMimeType(url.isEmpty() || url.length() == 1 ? "/index.html" : url.c_str());
 
-      AsyncWebServerResponse *response = request->beginResponse_P(200, mime != nullptr ? mime : unknown, data.first, data.second, nullptr);
+      AsyncWebServerResponse *response = request->beginResponse(200, mime != nullptr ? mime : unknown, data.first, data.second);
       response->addHeader("Content-Encoding", "gzip");
       response->addHeader("Cache-Control", "max-age=6000");
       request->send(response);
