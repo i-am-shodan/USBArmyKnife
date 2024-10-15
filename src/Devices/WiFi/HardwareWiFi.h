@@ -8,6 +8,7 @@ public:
 
   virtual void loop(Preferences& prefs);
   virtual void begin(Preferences& prefs);
+  virtual void end();
   void setWiFi(const bool& state);
 };
 

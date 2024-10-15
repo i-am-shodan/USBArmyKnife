@@ -9,6 +9,7 @@ public:
 
   virtual void loop(Preferences& prefs);
   virtual void begin(Preferences& prefs);
+  void begin(Preferences& prefs, bool format);
 
   bool isRunning() { return running; }
   virtual uint8_t usedPercentage();
