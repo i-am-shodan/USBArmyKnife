@@ -102,7 +102,7 @@ The USB Army Knife may not run correctly with large SD cards or those with newer
     ```sh
     git clone https://github.com/i-am-shodan/USBArmyKnife.git
     ```
-1. Now you've cloned the repo you need to pull down the submodules. Run this command in the directory you just cloned to.
+1. Now you've cloned the repo you need to pull down the submodules. Run this command in the directory you just cloned to. If you don't do this you will get errors related to ESP32Maurauder
     ```sh
     git submodule update --init 
     ```
