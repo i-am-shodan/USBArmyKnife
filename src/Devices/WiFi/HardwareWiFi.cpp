@@ -66,3 +66,8 @@ void HardwareWiFi::loop(Preferences& prefs)
     begin(prefs);
   }
 }
+
+void HardwareWiFi::end()
+{
+  WiFi.mode(WIFI_OFF);
+}

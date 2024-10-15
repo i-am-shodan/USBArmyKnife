@@ -22,6 +22,8 @@ void loop() {}
 
 #include "Debug/Logging.h"
 
+#include "Utilities/Format.h"
+
 static Preferences prefs;
 
 void setup()
@@ -52,9 +54,7 @@ void setup()
 
   if (!Devices::Storage.isRunning())
   {
-    Devices::TFT.display(0, 0, "Could not find SD card"); 
-    delay(60 * 1000);
-    ESP.restart();
+    AskFormatSD(prefs);
   }
 
   Devices::TFT.display(0, 0, "Device now running");

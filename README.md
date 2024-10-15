@@ -83,11 +83,18 @@ This project implements a variety of attacks based around an easily concealable 
 
 - **Hardware**:
    * LilyGo T-Dongle S3 with screen (or compatible hardware).
-   * FAT32 formatted micro SD card (beware some micro SD cards seem incompatible).
+   * FAT32 formatted micro SD card. For large cards this should have *at most* a single 32GB partition.
 - **Software**: 
   * [Visual Studio Code](https://code.visualstudio.com/Download)
   * [PlatformIO Visual Studio Code extension](https://platformio.org/platformio-ide)
   * GIT
+
+### Preparing your SD card
+
+The USB Army Knife may not run correctly with large SD cards or those with newer filesystems. We recommend using one with at most one 32GB FAT32 partition for maximum compatibility. Smaller capacities can also be used.
+[This article on partitioning an SD card](https://www.instructables.com/Repartition-SD-Card-Windows/) can help with the process of doing this on Windows.
+
+**Note** On first run, if an SD card cannot be found with a supported filesystem the device will offer to format it for you. If you use this option the filesystem created on the SD card may not work under Windows. As such it is advised to create a suitable SD card off device.
 
 ### Installation
 
@@ -100,6 +107,8 @@ This project implements a variety of attacks based around an easily concealable 
     git submodule update --init 
     ```
 1. Open the project in Visual Studio Code
+
+1. *Optional: add any additional keyboard layouts you need by editing the platform.ini file* 
 
 1. Click the PlatformIO icon (Alien icon)
 

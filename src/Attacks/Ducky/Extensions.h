@@ -422,7 +422,7 @@ static int handleKeyboardLayout(const std::string &str, std::unordered_map<std::
 
         if (!ret)
         {
-            Debug::Log.error(LOG_DUCKY, "Invalid keyboard layout value");
+            Debug::Log.error(LOG_DUCKY, "Invalid keyboard layout, did you forget to compile it in?");
         }
         else
         {
@@ -432,7 +432,7 @@ static int handleKeyboardLayout(const std::string &str, std::unordered_map<std::
     }
     else
     {
-        Debug::Log.error(LOG_DUCKY, "Invalid value, too many tokens");
+        Debug::Log.error(LOG_DUCKY, "Invalid layout, too many tokens");
     }
     
     return false;
