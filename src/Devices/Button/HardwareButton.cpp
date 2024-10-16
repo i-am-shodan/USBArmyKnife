@@ -1,8 +1,8 @@
+#ifndef NO_BUTTON
 #include <OneButton.h>
 
 #include "HardwareButton.h"
 #include "../../Debug/Logging.h"
-#include "../../pin_config.h"
 
 static OneButton button(BTN_PIN, true);
 
@@ -30,3 +30,4 @@ void HardwareButton::begin(Preferences &prefs)
     Devices::Button.setButtonPressState(true, true);
   });
 }
+#endif

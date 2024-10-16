@@ -1,7 +1,6 @@
+#ifndef NO_LED
 #include "HardwareLED.h"
 #include <APA102.h>
-
-#include "../../pin_config.h"
 
 namespace Devices
 {
@@ -63,3 +62,4 @@ void HardwareLED::begin(Preferences &prefs)
 {
   changeLEDState(true, 100, 100, 100, 200);
 }
+#endif

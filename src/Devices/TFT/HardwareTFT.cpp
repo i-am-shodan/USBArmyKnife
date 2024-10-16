@@ -1,6 +1,6 @@
+#ifndef NO_TFT
 #include "HardwareTFT.h"
 
-#include "../../pin_config.h"
 #include "../../Debug/Logging.h"
 
 #include <LovyanGFX.hpp>
@@ -166,3 +166,4 @@ void HardwareTFT::begin(Preferences &prefs)
     lcd.clear(TFT_BLACK);
     lcd.display();
 }
+#endif

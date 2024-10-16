@@ -1,9 +1,14 @@
 #include "HardwareStorage.h"
 #include "../../Debug/Logging.h"
-#include "../../pin_config.h"
 
-#include "SDMMCFS2.h"
-using namespace fs;
+#ifdef NO_SD
+    #include <SPIFFS.h>
+    #define FILE_INTERFACE SPIFFS
+#else
+    #include "SDMMCFS2.h"
+    using namespace fs;
+    #define FILE_INTERFACE SD_MMC_2
+#endif
 
 #define LOG_MMC "MMC"
 
@@ -32,7 +37,7 @@ std::string HardwareStorage::readFile(fs::FS &fs, const char *path)
 
 void HardwareStorage::writeFileData(const std::string& filename, const uint8_t *buffer, const size_t size)
 {
-    File file = SD_MMC_2.open(filename.c_str(), FILE_WRITE);
+    File file = FILE_INTERFACE.open(filename.c_str(), FILE_WRITE);
     if (!file)
     {
         Debug::Log.info(LOG_MMC, "Could not open file");
@@ -49,7 +54,7 @@ void HardwareStorage::writeFileData(const std::string& filename, const uint8_t *
 
 std::size_t HardwareStorage::getFileSize(const std::string& filename)
 {
-    File file = SD_MMC_2.open(filename.c_str());
+    File file = FILE_INTERFACE.open(filename.c_str());
     if (!file)
     {
         Debug::Log.info(LOG_MMC, "Could not open file: " + filename);
@@ -64,12 +69,12 @@ std::size_t HardwareStorage::getFileSize(const std::string& filename)
 
 bool HardwareStorage::doesFileExist(const std::string& filename)
 {
-    return SD_MMC_2.exists(filename.c_str());
+    return FILE_INTERFACE.exists(filename.c_str());
 }
 
 uint8_t* HardwareStorage::readFileAsBinary(const std::string& filename)
 {
-    File file = SD_MMC_2.open(filename.c_str());
+    File file = FILE_INTERFACE.open(filename.c_str());
     if (!file)
     {
         Debug::Log.info(LOG_MMC, "Could not open file: " + filename);
@@ -105,7 +110,7 @@ uint8_t* HardwareStorage::readFileAsBinary(const std::string& filename)
 
 std::string HardwareStorage::readLineFromFile(const std::string &filename, const int lineNumber)
 {
-    File file = SD_MMC_2.open(filename.c_str());
+    File file = FILE_INTERFACE.open(filename.c_str());
     if (!file)
     {
         Debug::Log.info(LOG_MMC, "Could not open file: " + filename);
@@ -174,9 +179,9 @@ std::vector<std::string> HardwareStorage::listFiles()
         return filesCache;
     }
 
-    if (SD_MMC_2.cardType() != CARD_NONE)
+    if (running)
     {
-        listDir(filesCache, SD_MMC_2, "/");
+        listDir(filesCache, FILE_INTERFACE, "/");
     }
 
     return filesCache;
@@ -188,13 +193,13 @@ uint8_t HardwareStorage::usedPercentage()
     {
         return cachedCapacity;
     }
-    cachedCapacity = (SD_MMC_2.usedBytes() / SD_MMC_2.totalBytes()) * 100;
+    cachedCapacity = (FILE_INTERFACE.usedBytes() / FILE_INTERFACE.totalBytes()) * 100;
     return cachedCapacity;
 }
 
 bool HardwareStorage::createEmptyFile(const std::string &filename)
 {
-    File file = SD_MMC_2.open(filename.c_str(), FILE_WRITE);
+    File file = FILE_INTERFACE.open(filename.c_str(), FILE_WRITE);
     if (!file)
     {
         return false;
@@ -207,12 +212,14 @@ bool HardwareStorage::createEmptyFile(const std::string &filename)
 bool HardwareStorage::deleteFile(const std::string& filename)
 {
     filesCache.clear();
-    return SD_MMC_2.remove(filename.c_str());
+    return FILE_INTERFACE.remove(filename.c_str());
 }
 
 HardwareStorage::HardwareStorage()
 {
-    SD_MMC = SD_MMC_2;
+#ifndef NO_SD
+    SD_MMC = FILE_INTERFACE;
+#endif
 }
 
 void HardwareStorage::loop(Preferences &prefs)
@@ -226,14 +233,15 @@ void HardwareStorage::begin(Preferences &prefs)
 
 void HardwareStorage::begin(Preferences &prefs, bool format)
 {
-    SD_MMC_2.setPins(SD_MMC_CLK_PIN, SD_MMC_CMD_PIN, SD_MMC_D0_PIN, SD_MMC_D1_PIN, SD_MMC_D2_PIN, SD_MMC_D3_PIN);
-    if (!SD_MMC_2.begin("/sdcard", false, format, SDMMC_FREQ_52M))
+#ifndef NO_SD
+    FILE_INTERFACE.setPins(SD_MMC_CLK_PIN, SD_MMC_CMD_PIN, SD_MMC_D0_PIN, SD_MMC_D1_PIN, SD_MMC_D2_PIN, SD_MMC_D3_PIN);
+    if (!FILE_INTERFACE.begin("/sdcard", false, format, SDMMC_FREQ_52M))
     {
-        Debug::Log.info(LOG_MMC, "SD_MMC_2 could not be started");
+        Debug::Log.info(LOG_MMC, "FILE_INTERFACE could not be started");
     }
     else
     {
-        uint8_t cardType = SD_MMC_2.cardType();
+        uint8_t cardType = FILE_INTERFACE.cardType();
         if (cardType == CARD_NONE)
         {
             Debug::Log.info(LOG_MMC, "Could not find SD Card");
@@ -243,4 +251,14 @@ void HardwareStorage::begin(Preferences &prefs, bool format)
             running = true;
         }
     }
+#else
+    if (!FILE_INTERFACE.begin(format, "/sdcard"))
+    {
+        Debug::Log.info(LOG_MMC, "FILE_INTERFACE could not be started");
+    }
+    else
+    {
+        running = true;
+    }
+#endif
 }

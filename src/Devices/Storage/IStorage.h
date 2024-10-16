@@ -3,7 +3,11 @@
 #include <string>
 #include <cstdint>
 
-#include "SDMMCFS2.h"
+#ifdef NO_SD
+  #include <SPIFFS.h>
+#else
+  #include "SDMMCFS2.h"
+#endif
 
 class IStorage {
 public:
