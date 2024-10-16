@@ -9,7 +9,7 @@
     #include <SPIFFS.h>
     #define FILE_INTERFACE SPIFFS
 #else
-    #include "SDMMCFS2.h"
+    #include "../../Devices/Storage/SDMMCFS2.h"
     using namespace fs;
     #define FILE_INTERFACE SD_MMC_2
 #endif
