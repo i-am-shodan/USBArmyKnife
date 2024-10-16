@@ -1,3 +1,4 @@
+#ifndef NO_WEB
 #include "WebServer.h"
 
 #include <AsyncTCP.h>
@@ -323,3 +324,4 @@ void WebSite::loop(Preferences &prefs)
   ws.cleanupClients();
   ElegantOTA.loop();
 }
+#endif

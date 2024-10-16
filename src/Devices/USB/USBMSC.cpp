@@ -16,8 +16,6 @@
 #include "sdmmc_cmd.h"
 #include "esp_vfs_fat.h"
 
-#include "../../pin_config.h"
-
 #include "../../Debug/Logging.h"
 #define TAG_USB "USB"
 

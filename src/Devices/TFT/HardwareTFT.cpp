@@ -1,7 +1,6 @@
 #ifndef NO_TFT
 #include "HardwareTFT.h"
 
-#include "../../pin_config.h"
 #include "../../Debug/Logging.h"
 
 #include <LovyanGFX.hpp>
