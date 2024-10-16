@@ -27,7 +27,7 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build PlatformIO Project
-        run: pio run -t LILYGO-T-Dongle-S3
+        run: pio run --environment LILYGO-T-Dongle-S3 
 
       - name: Upload LILYGO-T-Dongle-S3 artifacts
         uses: actions/upload-artifact@v4
@@ -36,7 +36,7 @@ jobs:
           path: .pio/build/LILYGO-T-Dongle-S3/*.bin
 
       - name: Build PlatformIO Project
-        run: pio run -t Generic-ESP32-S2
+        run: pio run --environment Generic-ESP32-S2
           
       - name: Upload Generic-ESP32-S2 artifact
         uses: actions/upload-artifact@v4
