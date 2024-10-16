@@ -1,0 +1,9 @@
+REM This file is only used on platforms without an SD card
+
+GUI
+DELAY 1000
+STRING https://www.youtube.com/watch?v=xvFZjo5PgG0
+DELAY 1000
+ENTER
+
+ESP32M attack -t rickroll
