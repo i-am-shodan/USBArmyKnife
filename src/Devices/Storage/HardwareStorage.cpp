@@ -1,6 +1,5 @@
 #include "HardwareStorage.h"
 #include "../../Debug/Logging.h"
-#include "../../pin_config.h"
 
 #ifdef NO_SD
     #include <SPIFFS.h>

@@ -3,7 +3,6 @@
 
 #include "HardwareButton.h"
 #include "../../Debug/Logging.h"
-#include "../../pin_config.h"
 
 static OneButton button(BTN_PIN, true);
 

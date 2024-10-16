@@ -2,8 +2,6 @@
 #include "HardwareLED.h"
 #include <APA102.h>
 
-#include "../../pin_config.h"
-
 namespace Devices
 {
     HardwareLED LED;
