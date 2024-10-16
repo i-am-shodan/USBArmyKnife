@@ -1,3 +1,4 @@
+#ifndef NO_BUTTON
 #include <OneButton.h>
 
 #include "HardwareButton.h"
@@ -30,3 +31,4 @@ void HardwareButton::begin(Preferences &prefs)
     Devices::Button.setButtonPressState(true, true);
   });
 }
+#endif
