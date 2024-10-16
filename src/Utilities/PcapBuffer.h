@@ -1,6 +1,10 @@
 #pragma once
 
-#include <SD_MMC.h>
+#ifdef NO_SD
+  #include <SPIFFS.h>
+#else
+  #include <SD_MMC.h>
+#endif
 
 #include <string>
 #include <queue>

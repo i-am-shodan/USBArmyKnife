@@ -54,7 +54,9 @@ void setup()
 
   if (!Devices::Storage.isRunning())
   {
+#ifndef NO_SD
     AskFormatSD(prefs);
+#endif
   }
 
   Devices::TFT.display(0, 0, "Device now running");

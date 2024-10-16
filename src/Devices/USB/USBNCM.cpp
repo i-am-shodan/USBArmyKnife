@@ -5,8 +5,14 @@
 #include <usb_ncm.h>
 #include <tcp_server.h>
 
-#include "../../Devices/Storage/SDMMCFS2.h"
-using namespace fs;
+#ifdef NO_SD
+    #include <SPIFFS.h>
+    #define FILE_INTERFACE SPIFFS
+#else
+    #include "../../Devices/Storage/SDMMCFS2.h"
+    using namespace fs;
+    #define FILE_INTERFACE SD_MMC_2
+#endif
 
 #include "../../Utilities/PcapBuffer.h"
 
@@ -32,9 +38,9 @@ extern "C" void createPcap(uint8_t *buffer, uint32_t len, bool received)
 
 void USBNCM::startPacketCollection()
 {
-    if (Devices::USB::Core.currentDeviceType() == USBDeviceType::NCM && SD_MMC_2.cardType() != CARD_NONE && buf == nullptr)
+    if (Devices::USB::Core.currentDeviceType() == USBDeviceType::NCM && buf == nullptr)
     {
-        buf = new PcapBuffer(std::string("usbncm"), &SD_MMC_2);
+        buf = new PcapBuffer(std::string("usbncm"), &FILE_INTERFACE);
         set_packet_handler(&createPcap);
         Debug::Log.info("NCM", "Started PCAP");
     }

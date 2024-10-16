@@ -1,9 +1,9 @@
+#ifndef NO_SD
 #include "../Devices/Button/HardwareButton.h"
 #include "../Devices/LED/HardwareLED.h"
 #include "../Devices/TFT/HardwareTFT.h"
 #include "../Devices/Storage/HardwareStorage.h"
 #include "../Devices/WiFi/HardwareWiFi.h"
-#include "../pin_config.h"
 
 static bool running = false;
 
@@ -82,3 +82,4 @@ void AskFormatSD(Preferences &prefs)
 
     ESP.restart();
 }
+#endif

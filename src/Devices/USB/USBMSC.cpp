@@ -2,15 +2,19 @@
 
 #include <Adafruit_TinyUSB.h>
 
-#include "../../Devices/Storage/SDMMCFS2.h"
-using namespace fs;
+#ifndef NO_SD
+    #include "../../Devices/Storage/SDMMCFS2.h"
+    using namespace fs;
+    #define FILE_INTERFACE SD_MMC_2
+#else
+    #include <SPIFFS.h>
+    #define FILE_INTERFACE SPIFFS
+#endif
 
 #include "driver/sdmmc_host.h"
 #include "driver/sdspi_host.h"
 #include "sdmmc_cmd.h"
 #include "esp_vfs_fat.h"
-
-#include "../../pin_config.h"
 
 #include "../../Debug/Logging.h"
 #define TAG_USB "USB"
@@ -83,7 +87,7 @@ static void msc_flush_cb()
 
 static size_t open_msc(const char *path)
 {
-    mscFile = SD_MMC_2.open(path);
+    mscFile = FILE_INTERFACE.open(path);
     if (!mscFile)
     {
         return 0;
@@ -92,6 +96,7 @@ static size_t open_msc(const char *path)
     return mscFile.size();
 }
 
+#ifndef NO_SD
 static size_t getinternalMMCSectorSize()
 {
     if (card == NULL)
@@ -100,12 +105,14 @@ static size_t getinternalMMCSectorSize()
     }
     return card->csd.sector_size;
 }
+#endif
 
 bool USBMSC::mountSD()
 {
+#ifndef NO_SD
     if (card == NULL)
     {
-        card = SD_MMC_2.getCard();
+        card = FILE_INTERFACE.getCard();
 
         // Set disk vendor id, product id and revision with string up to 8, 16, 4 characters respectively
         usb_msc.setID("Adafruit", "Mass Storage", "1.0");
@@ -137,6 +144,10 @@ bool USBMSC::mountSD()
         Debug::Log.info(TAG_USB, "Device already mounted");
         return false;
     }
+#else
+    Debug::Log.error(TAG_USB, "Mounting the SD card is only supported when a physical SD card is present");
+    return false;
+#endif
 }
 
 USBMSC::USBMSC()

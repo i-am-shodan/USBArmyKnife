@@ -5,8 +5,12 @@
 #include <esp32_marauder/settings.h>
 #include <esp32_marauder/Buffer.h>
 
-#include "../../Devices/Storage/SDMMCFS2.h"
-using namespace fs;
+#ifndef NO_SD
+  #include "../../Devices/Storage/SDMMCFS2.h"
+  using namespace fs;
+#else
+  #include <sd_defines.h>
+#endif
 
 #include "Marauder.h"
 
@@ -43,9 +47,15 @@ void ESP32Marauder::begin(Preferences &prefs)
   buffer_obj = Buffer();
   sd_obj.initSD();
   sd_obj.supported = true;
+#ifndef NO_SD // todo this should prob be an API call
   sd_obj.cardType = SD_MMC_2.cardType();
-  sd_obj.cardSizeMB = SD_MMC_2.cardSize();
-  sd_obj.card_sz = std::to_string(SD_MMC_2.cardSize() / 1024 / 1024).c_str();
+  sd_obj.cardSizeMB = SD_MMC_2.cardSize() / 1024 / 1024;
+#else
+  sd_obj.cardType = CARD_SD;
+  sd_obj.cardSizeMB = SPIFFS.totalBytes() / 1024 / 1024;
+#endif
+  sd_obj.card_sz = std::to_string(sd_obj.cardSizeMB).c_str();
+
   sd_obj.sd_files = new LinkedList<String>();
   sd_obj.sd_files->add("Back");
 
