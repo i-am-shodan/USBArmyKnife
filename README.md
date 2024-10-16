@@ -71,19 +71,19 @@ This project implements a variety of attacks based around an easily concealable 
 
 ## Supported Hardware
 
-| **LilyGo T-Dongle S3**     | Supported      |
+| Hardware     | Supported      |
 | ------------- | ------------- |
-| ![screenshot](./docs/images/t-dongle-s3.png) | The LilyGo T-Dongle S3 is a USB pen drive shaped ESP32-S3 development board. It features a colour LCD screen, physical button, hidden/covert micro SD card adapter (inside the USB-A connector) as well as a SPI adapter. It has 16MB of flash. It is based on the ESP32-S3 chipset which enables it to host a WiFi station as well as support a range of WiFi and Bluetooth attacks. *It is incredibly cheap!* There are two versions of this device with and without the screen. Only the version with the screen has been tested.  |
-
-
+| **LilyGo T-Dongle S3**  (Recommended)![screenshot](./docs/images/t-dongle-s3.png) | The LilyGo T-Dongle S3 is a USB pen drive shaped ESP32-S3 development board. It features a colour LCD screen, physical button, hidden/covert micro SD card adapter (inside the USB-A connector) as well as a SPI adapter. It has 16MB of flash. It is based on the ESP32-S3 chipset which enables it to host a WiFi station as well as support a range of WiFi and Bluetooth attacks. *It is incredibly cheap!* There are two versions of this device with and without the screen. Only the version with the screen has been tested.  |
+| **Pure ESP32-S2** ![screenshot](./docs/images/esp32-udisk.png) | The most basic device that can run the USB Army Knife code is a ESP32-S2 chip connected to a USB port. Often you can find these sold in a very similar enclosures to the T-Dongle S3 and tend to advertised on sites like AliExpress as Playstation 4 jailbreaks under the name 'USB Dongle Udisk for P4'. These devices lack RAM, a screen, SD card, Bluetooth, LEDs and a good hardware button. Instead of an SD card, flash memory is used to store tiny files. These devices are incredibly cheap and are often good at running HID+WiFi payloads (like the rick roll). **Warning** They are too underpowered to run the webserver. When buying these **beware** that they can often be confused with a very similar looking device that includes a CH343P chipset and no reset button. **Make sure the device you buy has a button that can be pushed with a paperclip.** |
 
 ## Getting Started
 
 ### Prerequisites
 
 - **Hardware**:
-   * LilyGo T-Dongle S3 with screen (or compatible hardware).
-   * FAT32 formatted micro SD card. For large cards this should have *at most* a single 32GB partition.
+   * A supported device, ideally the LilyGo T-Dongle S3 with screen.
+   * For device with an SD card you'll need a FAT32 formatted micro SD card.
+      * For large cards this should have *at most* a single 32GB partition.
 - **Software**: 
   * [Visual Studio Code](https://code.visualstudio.com/Download)
   * [PlatformIO Visual Studio Code extension](https://platformio.org/platformio-ide)
@@ -112,11 +112,22 @@ The USB Army Knife may not run correctly with large SD cards or those with newer
 
 1. Click the PlatformIO icon (Alien icon)
 
-1. (Remove the dongle if it was inserted) **Press and hold the hardware button**, insert the LilyGo dongle, wait 1s and **release the button**.
+1. (Remove the dongle if it was inserted) **Press and hold the hardware button**, insert the device, wait 1s and **release the button**.
+   * You should now seen a new COM port/serial device attached to your machine 
 
-1. Under 'LILYGO-T-Dongle-S3' Select upload
+1. In the menu expand the device you want to flash.
+   * For the T-Dongle S3 you should expand 'LILYGO-T-Dongle-S3'
+   * For a generic ESP32-S2 you should expand 'Generic-ESP32-S2'
+   * It may take a few seconds to populate the build menu after you've selected your device
 
-1. When the upload has finished successfully, remove the dongle and insert the micro SD card
+1. Press 'Upload'
+
+1. *Only if your device does NOT have an SD card.*
+   1. *Edit the files for the flash filesystem, these are stored in the 'data' directory.*
+   1. *Expand the Platform folder in the build menu from the previous step.*
+   1. *Click 'Upload Filesystem Image'.*
+
+1. When the upload has finished successfully, remove the dongle and insert the micro SD card if you have one
 
 ### Updating the codebase to the latest version
 
@@ -129,10 +140,12 @@ At this point all your code and dependencies will be up to date and you can cont
 ### Usage
 
 1. Connect the USB dongle to your computer.
-1. Connect to the WiF access point (iPhone14) with the password of 'password'
+1. Connect to the WiFi access point (iPhone14) with the password of 'password'
 1. Access the web interface (http://4.3.2.1:8080) by navigating to the URL with your browser.
 1. Ensure the web interface has correctly loaded. You should see thr currently running status and uptime. If not refresh the page.
 1. Use the web interface to create and manage your attacks using DuckyScript.
+
+*ESP-S2 based devices have WiFi support but do not have a web interface. Attacks are managed via DuckyScript files.*
 
 ### Future plans
 
