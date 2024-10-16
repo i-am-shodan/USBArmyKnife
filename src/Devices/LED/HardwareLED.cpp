@@ -1,3 +1,4 @@
+#ifndef NO_LED
 #include "HardwareLED.h"
 #include <APA102.h>
 
@@ -63,3 +64,4 @@ void HardwareLED::begin(Preferences &prefs)
 {
   changeLEDState(true, 100, 100, 100, 200);
 }
+#endif

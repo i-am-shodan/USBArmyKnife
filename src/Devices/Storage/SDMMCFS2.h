@@ -1,3 +1,4 @@
+#ifndef NO_SD
 #pragma once
 
 #include <SD_MMC.h>
@@ -12,3 +13,4 @@ public:
 extern fs::SDMMCFS2 SD_MMC_2;
 
 }
+#endif

@@ -1,3 +1,4 @@
+#ifndef NO_TFT
 #include "HardwareTFT.h"
 
 #include "../../pin_config.h"
@@ -166,3 +167,4 @@ void HardwareTFT::begin(Preferences &prefs)
     lcd.clear(TFT_BLACK);
     lcd.display();
 }
+#endif
