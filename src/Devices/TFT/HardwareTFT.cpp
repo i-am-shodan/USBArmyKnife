@@ -63,7 +63,7 @@ public:
             cfg.dummy_read_bits = 1;          // Number of dummy read bits before non-pixel data read
 #elif  DISPLAY_TYPE_ST7789
             cfg.offset_x = 34;                // Panel offset in X direction
-            cfg.offset_y = 3;                 // Y direction offset amount of the panel
+            cfg.offset_y = -0;                 // Y direction offset amount of the panel
             cfg.dummy_read_pixel = 8;         // Number of bits for dummy read before pixel read
             cfg.dummy_read_bits = 1;          // Number of dummy read bits before non-pixel data read          
 #endif
