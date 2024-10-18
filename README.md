@@ -188,3 +188,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - Inspired by various BadUSB projects and the ESP32 Marauder project.
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=i-am-shodan/USBArmyKnife&type=Date)](https://star-history.com/#i-am-shodan/USBArmyKnife&Date)
