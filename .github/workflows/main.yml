@@ -36,6 +36,15 @@ jobs:
           path: .pio/build/LILYGO-T-Dongle-S3/*.bin
 
       - name: Build PlatformIO Project
+        run: pio run --environment Waveshare-ESP32-S3-LCD-1_47
+            
+      - name: Upload Waveshare-ESP32-S3-LCD-1_47 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Waveshare-ESP32-S3-LCD-1_47 Firmware binaries
+          path: .pio/build/Waveshare-ESP32-S3-LCD-1_47/*.bin
+
+      - name: Build PlatformIO Project
         run: pio run --environment Generic-ESP32-S2
           
       - name: Upload Generic-ESP32-S2 artifact
