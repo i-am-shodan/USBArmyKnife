@@ -6,7 +6,7 @@ Running the following sets with create you a 16MB USB disk image which contains 
 
 The agent is compiled, by default, into Windows native instructions. Cross compilation is not currently supported by dotnet so you'll need to run these steps on a Windows machine.
 
-1. Check out he code
+1. Check out the code
 2. Install [Dotnet 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 3. Open up a Terminal and run
 
