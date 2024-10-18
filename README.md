@@ -74,8 +74,19 @@ This project implements a variety of attacks based around an easily concealable 
 | Hardware     | Supported      |
 | ------------- | ------------- |
 | **LilyGo T-Dongle S3**  (Recommended)![screenshot](./docs/images/t-dongle-s3.png) | The LilyGo T-Dongle S3 is a USB pen drive shaped ESP32-S3 development board. It features a colour LCD screen, physical button, hidden/covert micro SD card adapter (inside the USB-A connector) as well as a SPI adapter. It has 16MB of flash. It is based on the ESP32-S3 chipset which enables it to host a WiFi station as well as support a range of WiFi and Bluetooth attacks. *It is incredibly cheap!* There are two versions of this device with and without the screen. Only the version with the screen has been tested.  |
-| **ESP32-S3 1.47inch** ![screenshot](./docs/images/waveshare-147.png) | This device is similar in design, size and features to the LilyGo T-Dongle S3 and uses the same chipset. It is clearly a dev board as it doesn't come with a case and has exposed circuitry on the underside. Where this device betters the T-Dongle S3 is that it has a very large high quality screen and 8MB of additional RAM. |
+| **Waveshare ESP32-S3 1.47inch** ![screenshot](./docs/images/waveshare-147.png) | This device is similar in design, size and features to the LilyGo T-Dongle S3 and uses the same chipset. It is clearly a dev board as it doesn't come with a case and has exposed circuitry on the underside. Where this device betters the T-Dongle S3 is that it has a very large high quality screen and 8MB of additional RAM. |
 | **Pure ESP32-S2** ![screenshot](./docs/images/esp32-udisk.png) | The most basic device that can run the USB Army Knife code is a ESP32-S2 chip connected to a USB port. Often you can find these sold in a very similar enclosures to the T-Dongle S3 and tend to advertised on sites like AliExpress as Playstation 4 jailbreaks under the name 'USB Dongle Udisk for P4'. These devices lack RAM, a screen, SD card, Bluetooth, LEDs and a good hardware button. Instead of an SD card, flash memory is used to store tiny files. These devices are incredibly cheap and are often good at running HID+WiFi payloads (like the rick roll). **Warning** They are too underpowered to run the webserver. When buying these **beware** that they can often be confused with a very similar looking device that includes a CH343P chipset and no reset button. **Make sure the device you buy has a button that can be pushed with a paperclip.** |
+
+## Purchase links
+
+### LilyGo T-Dongle S3
+* [Amazon UK](https://amzn.to/3YuNCg3)
+
+### Waveshare ESP32-S3 1.47inch
+* TODO
+
+### Generic ESP32-S2
+* [Amazon UK](https://amzn.to/3Y4hrCE)
 
 ## Getting Started
 
