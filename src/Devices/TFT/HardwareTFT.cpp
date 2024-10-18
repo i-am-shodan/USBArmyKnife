@@ -58,7 +58,7 @@ public:
             cfg.panel_height = DISPLAY_WIDTH; // Actual displayable height Note: width/height swapped due to the rotation
 #ifdef DISPLAY_TYPE_ST7735S
             cfg.offset_x = 26;                // Panel offset in X direction
-            cfg.offset_y = 0;                 // Y direction offset amount of the panel
+            cfg.offset_y = 1;                 // Y direction offset amount of the panel
             cfg.dummy_read_pixel = 8;         // Number of bits for dummy read before pixel read
             cfg.dummy_read_bits = 1;          // Number of dummy read bits before non-pixel data read
 #elif  DISPLAY_TYPE_ST7789
