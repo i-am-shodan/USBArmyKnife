@@ -81,12 +81,14 @@ This project implements a variety of attacks based around an easily concealable 
 
 ### LilyGo T-Dongle S3
 * [Amazon UK](https://amzn.to/3YuNCg3)
+* [Amazon US](https://amzn.to/4f4AqUk)
 
 ### Waveshare ESP32-S3 1.47inch
 * TODO
 
 ### Generic ESP32-S2
 * [Amazon UK](https://amzn.to/3Y4hrCE)
+* [Amazon US](https://amzn.to/4h98Jf4)
 
 ## Getting Started
 
