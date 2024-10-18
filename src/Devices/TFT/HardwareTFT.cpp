@@ -8,14 +8,24 @@
 
 #define LOG_TFT "TFT"
 
-class LGFX_LiLyGo_TDongleS3 : public lgfx::LGFX_Device
+// In the future if you are trying to add another board configuration here it would make sense
+// To have multiple lgfx::LGFX_Device objects wrapped in ifdefs rather that they single instance we have now
+// Right now we are using DISPLAY_TYPE_ST7735S to refer to a device instead of a panel. As such if a new
+// board with a ST7735S comes on board we might not have the right x,y offsets
+class LGFX_Panel : public lgfx::LGFX_Device
 {
-    PANEL_TYPE _panel_instance; // PANEL_TYPE defined in platformio.ini file
+#ifdef DISPLAY_TYPE_ST7735S
+    lgfx::Panel_ST7735S _panel_instance;
+#elif DISPLAY_TYPE_ST7789
+    lgfx::Panel_ST7789 _panel_instance;
+#else
+    #error Invalid display type // Full list here: https://github.com/lovyan03/LovyanGFX/tree/master/src/lgfx/v1/panel
+#endif
     lgfx::Bus_SPI _bus_instance;
     lgfx::Light_PWM _light_instance;
 
 public:
-    LGFX_LiLyGo_TDongleS3(void)
+    LGFX_Panel(void)
     {
         {
             auto cfg = _bus_instance.config();
@@ -46,11 +56,18 @@ public:
 
             cfg.panel_width = DISPLAY_HEIGHT; // actual displayable width. Note: width/height swapped due to the rotation
             cfg.panel_height = DISPLAY_WIDTH; // Actual displayable height Note: width/height swapped due to the rotation
+#ifdef DISPLAY_TYPE_ST7735S
             cfg.offset_x = 26;                // Panel offset in X direction
             cfg.offset_y = 1;                 // Y direction offset amount of the panel
-            cfg.offset_rotation = 1;          // Rotation direction value offset 0~7 (4~7 are upside down)
             cfg.dummy_read_pixel = 8;         // Number of bits for dummy read before pixel read
             cfg.dummy_read_bits = 1;          // Number of dummy read bits before non-pixel data read
+#elif  DISPLAY_TYPE_ST7789
+            cfg.offset_x = 34;                // Panel offset in X direction
+            cfg.offset_y = 0;                 // Y direction offset amount of the panel
+            cfg.dummy_read_pixel = 8;         // Number of bits for dummy read before pixel read
+            cfg.dummy_read_bits = 1;          // Number of dummy read bits before non-pixel data read          
+#endif
+            cfg.offset_rotation = 1;          // Rotation direction value offset 0~7 (4~7 are upside down)
             cfg.readable = true;              // set to true if data can be read
             cfg.invert = true;
             cfg.rgb_order = false;
@@ -58,9 +75,10 @@ public:
             cfg.bus_shared = true;  // If the bus is shared with the SD card, set to true (bus control with drawJpgFile etc.)
 
             // Please set the following only when the display is shifted with a driver with a variable number of pixels such as ST7735 or ILI9163.
+#ifdef DISPLAY_TYPE_ST7735S
             cfg.memory_width = 132;  // Maximum width supported by driver IC
             cfg.memory_height = 160; // Maximum height supported by driver IC
-
+#endif
             _panel_instance.config(cfg);
         }
 
@@ -80,7 +98,7 @@ public:
     }
 };
 
-static LGFX_LiLyGo_TDongleS3 lcd;
+static LGFX_Panel lcd;
 static PNG png; // PNG decoder instance
 static int16_t xpos = 0;
 static int16_t ypos = 0;
