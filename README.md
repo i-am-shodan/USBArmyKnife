@@ -80,14 +80,17 @@ This project implements a variety of attacks based around an easily concealable 
 ## Purchase links
 
 ### LilyGo T-Dongle S3
+* [AliExpress](https://s.click.aliexpress.com/e/_DCMq0ZX)
 * [Amazon UK](https://amzn.to/3YuNCg3)
 * [Amazon US](https://amzn.to/4f4AqUk)
 * [eBay UK](https://ebay.us/3TJVed)
 
 ### Waveshare ESP32-S3 1.47inch
+* [AliExpress](https://s.click.aliexpress.com/e/_DmlJI3x)
 * [eBay UK](https://ebay.us/E4gFr5])
 
 ### Generic ESP32-S2
+* [AliExpress](https://s.click.aliexpress.com/e/_Dn5wXe5)
 * [Amazon UK](https://amzn.to/3Y4hrCE)
 * [Amazon US](https://amzn.to/4h98Jf4)
 * [eBay UK](https://ebay.us/AVZcK0)
