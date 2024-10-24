@@ -46,17 +46,15 @@ extern void DuckyInterpreterLog(uint8_t level, const char *format, ...)
 #endif
 
 static std::string currentlyExecutingFile;
-static int nextLineNumberToExecute = 0;
 static uint8_t totalErrors = 0;
+static int lastExecutionResult = 0;
 static volatile uint32_t timeToWait = 0; // volatile to try and prevent dirty reads
 static bool firstRun = true;
 static bool requiresReset = false;
 static std::unordered_map<std::string, std::function<int(std::string, std::unordered_map<std::string, std::string>, std::unordered_map<std::string, int>)>> extCommands;
 static std::vector<std::function<std::pair<std::string, std::string>()>> consts;
 static std::string localCmdLineToExecute;
-static bool restartPayload = false;
-// For buttons
-static bool wasLastPressLong = false;
+static bool wasLastPressLong = false; // For buttons
 
 static std::string readCmdLine(const std::string &filename, int lineNum);
 
@@ -71,9 +69,23 @@ static void reset()
     requiresReset = true;
 }
 
-static std::string readLineFromFile(const std::string &filename, const int lineNumber)
+static std::string readLineFromFileOrCmdLine(const std::string &filename, const int lineNumber)
 {
-    return Devices::Storage.readLineFromFile(filename, lineNumber);
+    if (filename.length() == 0)
+    {
+        // we are reading the a given cmdline
+        Debug::Log.info(LOG_DUCKY, "Reading cmd line " + std::to_string(lineNumber));
+
+        auto temp = std::string(localCmdLineToExecute);
+        localCmdLineToExecute.clear();
+
+        return temp;
+    }
+    else
+    {
+        // we are reading a file
+        return Devices::Storage.readLineFromFile(filename, lineNumber);
+    }
 }
 
 static void keyboard_press(const uint8_t modifiers, const uint8_t key1, const uint8_t key2, const uint8_t key3, const uint8_t key4, const uint8_t key5, const uint8_t key6)
@@ -158,17 +170,7 @@ static void requestDelay(uint32_t time)
 
 static DuckyInterpreter duckyFileParser = DuckyInterpreter(
     requestDelay,
-    readLineFromFile,
-    keyboard_press,
-    keyboard_release,
-    changeLEDState,
-    waitForButton,
-    changeUSBMode,
-    reset);
-
-static DuckyInterpreter duckyCmdLineParser = DuckyInterpreter(
-    requestDelay,
-    readCmdLine,
+    readLineFromFileOrCmdLine,
     keyboard_press,
     keyboard_release,
     changeLEDState,
@@ -185,11 +187,11 @@ uint8_t DuckyPayload::getTotalErrors()
 
 std::string DuckyPayload::getPayloadRunningStatus()
 {
-    if (nextLineNumberToExecute == DuckyInterpreter::END_OF_FILE)
+    if (lastExecutionResult == DuckyInterpreter::END_OF_FILE)
     {
         return "Complete";
     }
-    else if (nextLineNumberToExecute == DuckyInterpreter::SCRIPT_ERROR)
+    else if (lastExecutionResult == DuckyInterpreter::SCRIPT_ERROR)
     {
         return "Error";
     }
@@ -207,7 +209,6 @@ void DuckyPayload::setPayload(const std::string &path)
 {
     // Convert to std::string
     std::string newFileToExecute(path.c_str(), path.length());
-    nextLineNumberToExecute = 0;
     currentlyExecutingFile = newFileToExecute;
     Debug::Log.info(LOG_DUCKY, "Setting payload to - '" + currentlyExecutingFile + "'");
 }
@@ -215,16 +216,6 @@ void DuckyPayload::setPayload(const std::string &path)
 void DuckyPayload::setPayloadCmdLine(const std::string &cmdLine)
 {
     localCmdLineToExecute = std::string(cmdLine.c_str(), cmdLine.length());
-}
-
-static std::string readCmdLine(const std::string &filename, int lineNum)
-{
-    Debug::Log.info(LOG_DUCKY, "Reading cmd line " + std::to_string(lineNum));
-
-    auto temp = std::string(localCmdLineToExecute);
-    localCmdLineToExecute.clear();
-
-    return temp;
 }
 
 DuckyPayload::DuckyPayload()
@@ -252,47 +243,35 @@ void DuckyPayload::loop(Preferences &prefs)
         Devices::USB::Core.end();
         ESP.restart();
     }
-    else if (!currentlyExecutingFile.empty() && nextLineNumberToExecute >= 0)
+    else if (!currentlyExecutingFile.empty() || !localCmdLineToExecute.empty())
     {
-        auto lineWeWereAskedToExecute = nextLineNumberToExecute;
-        Debug::Log.info(LOG_DUCKY, "Executing " + currentlyExecutingFile + " line " + std::to_string(nextLineNumberToExecute + 1));
-        auto ret = duckyFileParser.Execute(currentlyExecutingFile, nextLineNumberToExecute, extCommands, consts);
-        nextLineNumberToExecute = ret;
-        if (ret == DuckyInterpreter::SCRIPT_ERROR)
+        const bool executeFile = !currentlyExecutingFile.empty();
+
+        if (!executeFile)
         {
-            Debug::Log.error(LOG_DUCKY, "Script error near line " + std::to_string(lineWeWereAskedToExecute + 1));
-            totalErrors++;
-            currentlyExecutingFile.clear();
-        }
-        else if (ret == DuckyInterpreter::END_OF_FILE)
-        {
-            Debug::Log.info(LOG_DUCKY, "Script finished execution");
-            currentlyExecutingFile.clear();
+            Debug::Log.info(LOG_DUCKY, "Executing cmdline: " + localCmdLineToExecute);
         }
 
-        if (restartPayload)
+        lastExecutionResult = duckyFileParser.Execute(executeFile ? currentlyExecutingFile : "", extCommands, consts);
+        const bool executionHasCompleted = lastExecutionResult == DuckyInterpreter::SCRIPT_ERROR || lastExecutionResult == DuckyInterpreter::END_OF_FILE;
+
+        if (executionHasCompleted)
         {
-            nextLineNumberToExecute = 0;
-            restartPayload = false;
+            // we are safe to clear both of these in whatever mode we are running in
+            currentlyExecutingFile.clear(); 
+            localCmdLineToExecute.clear();
         }
-    }
-    else if (!localCmdLineToExecute.empty())
-    {
-        Debug::Log.info(LOG_DUCKY, "Executing cmdline: " + localCmdLineToExecute);
-        auto ret = duckyCmdLineParser.Execute("invalid", 0, extCommands, consts);
-        nextLineNumberToExecute = ret;
-        if (ret == DuckyInterpreter::SCRIPT_ERROR)
+
+        if (lastExecutionResult == DuckyInterpreter::SCRIPT_ERROR)
         {
-            Debug::Log.error(LOG_DUCKY, "Error executing command");
+            Debug::Log.error(LOG_DUCKY, executeFile ? ("Script error near line " + std::to_string(lastExecutionResult + 1)) : "Error executing command");
             totalErrors++;
-            localCmdLineToExecute.clear();
+            
         }
-        else if (ret == DuckyInterpreter::END_OF_FILE)
+        else if (lastExecutionResult == DuckyInterpreter::END_OF_FILE)
         {
-            Debug::Log.info(LOG_DUCKY, "Script executed");
-            localCmdLineToExecute.clear();
-        }
-        nextLineNumberToExecute = 0;
+            Debug::Log.info(LOG_DUCKY, "Script finished execution");
+        }       
     }
     else if (firstRun)
     {
