@@ -267,12 +267,11 @@ static int handleRunPayload(const std::string &str, std::unordered_map<std::stri
     if (arg.ends_with(".ds"))
     {
         Attacks::Ducky.setPayload(arg);
-        restartPayload = true;
+        duckyFileParser.Restart();
     }
     else if (arg.ends_with(".png"))
     {
         currentlyExecutingFile.clear();
-        nextLineNumberToExecute = 0;
         Attacks::Ducky.setPayloadCmdLine("DISPLAY_PNG " + arg);
     }
 
@@ -417,8 +416,7 @@ static int handleKeyboardLayout(const std::string &str, std::unordered_map<std::
     const auto entries = Ducky::SplitString(arg);
     if (entries.size() == 1)
     {
-        auto ret = duckyCmdLineParser.SetKeyboardLayout(entries[0]);
-        ret &= duckyFileParser.SetKeyboardLayout(entries[0]);
+        const auto& ret = duckyFileParser.SetKeyboardLayout(entries[0]);
 
         if (!ret)
         {
