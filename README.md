@@ -71,29 +71,14 @@ This project implements a variety of attacks based around an easily concealable 
 
 ## Supported Hardware
 
-| Hardware     | Supported      |
-| ------------- | ------------- |
-| **LilyGo T-Dongle S3**  (Recommended)![screenshot](./docs/images/t-dongle-s3.png) | The LilyGo T-Dongle S3 is a USB pen drive shaped ESP32-S3 development board. It features a colour LCD screen, physical button, hidden/covert micro SD card adapter (inside the USB-A connector) as well as a SPI adapter. It has 16MB of flash. It is based on the ESP32-S3 chipset which enables it to host a WiFi station as well as support a range of WiFi and Bluetooth attacks. *It is incredibly cheap!* There are two versions of this device with and without the screen. Only the version with the screen has been tested.  |
-| **Waveshare ESP32-S3 1.47inch** ![screenshot](./docs/images/waveshare-147.png) | This device is similar in design, size and features to the LilyGo T-Dongle S3 and uses the same chipset. It is clearly a dev board as it doesn't come with a case and has exposed circuitry on the underside. Where this device betters the T-Dongle S3 is that it has a very large high quality screen and 8MB of additional RAM. |
-| **Pure ESP32-S2** ![screenshot](./docs/images/esp32-udisk.png) | The most basic device that can run the USB Army Knife code is a ESP32-S2 chip connected to a USB port. Often you can find these sold in a very similar enclosures to the T-Dongle S3 and tend to advertised on sites like AliExpress as Playstation 4 jailbreaks under the name 'USB Dongle Udisk for P4'. These devices lack RAM, a screen, SD card, Bluetooth, LEDs and a good hardware button. Instead of an SD card, flash memory is used to store tiny files. These devices are incredibly cheap and are often good at running HID+WiFi payloads (like the rick roll). **Warning** They are too underpowered to run the webserver. When buying these **beware** that they can often be confused with a very similar looking device that includes a CH343P chipset and no reset button. **Make sure the device you buy has a button that can be pushed with a paperclip.** |
+| Hardware     | Supported      | Purchase Links |
+| ------------ | -------------- | -------------- |
+| **LilyGo T-Dongle S3**  (Recommended)![screenshot](./docs/images/t-dongle-s3.png) | The LilyGo T-Dongle S3 is a USB pen drive shaped ESP32-S3 development board. It features a colour LCD screen, physical button, hidden/covert micro SD card adapter (inside the USB-A connector) as well as a SPI adapter. It has 16MB of flash. It is based on the ESP32-S3 chipset which enables it to host a WiFi station as well as support a range of WiFi and Bluetooth attacks. *It is incredibly cheap!* There are two versions of this device with and without the screen. Only the version with the screen has been tested.  | <ul><li>[AliExpress](https://s.click.aliexpress.com/e/_DCMq0ZX)</li><li>[Amazon UK](https://amzn.to/3YuNCg3)</li><li>[Amazon US](https://amzn.to/4f4AqUk)</li><li>[eBay UK](https://ebay.us/3TJVed)</li></ul>
+| **Waveshare ESP32-S3 1.47inch** ![screenshot](./docs/images/waveshare-147.png) | This device is similar in design, size and features to the LilyGo T-Dongle S3 and uses the same chipset. It is clearly a dev board as it doesn't come with a case and has exposed circuitry on the underside. Where this device betters the T-Dongle S3 is that it has a very large high quality screen and 8MB of additional RAM. | <ul><li>[AliExpress](https://s.click.aliexpress.com/e/_DmlJI3x)</li><li>[eBay UK](https://ebay.us/E4gFr5])</li></ul>
+| **ESP32 Udisk** ![screenshot](./docs/images/esp32-udisk.png) | The most basic device that can run the USB Army Knife code is a ESP32-S2 chip connected to a USB port. Often you can find these sold in a very similar enclosures to the T-Dongle S3 and tend to advertised on sites like AliExpress as Playstation 4 jailbreaks under the name 'USB Dongle Udisk for P4'. These devices lack RAM, a screen, SD card, Bluetooth, LEDs and a good hardware button. Instead of an SD card, flash memory is used to store tiny files. These devices are incredibly cheap and are often good at running HID+WiFi payloads (like the rick roll). **Warning** They are too underpowered to run the webserver. When buying these **beware** that they can often be confused with a very similar looking device that includes a CH343P chipset and no reset button. **Make sure the device you buy has a button that can be pushed with a paperclip.** Ensure you flash this device with the Generic-ESP32-S2 configuration.  | <ul><li>[AliExpress](https://s.click.aliexpress.com/e/_Dn5wXe5)</li><li>[Amazon UK](https://amzn.to/3Y4hrCE)</li><li>[Amazon US](https://amzn.to/4h98Jf4)</li><li>[eBay UK](https://ebay.us/AVZcK0)</li></ul>
+| **ESP32 Key** ![screenshot](./docs/images/esp32-key.png) | Very similar to the ESP32 UDisk this is an ESP32-S2 on a circuit board. It is probably the cheapest device that can just about run USB Army Knife and has a price point to match. You'll need to hold down the button when you plug it in to get the device into flashing mode. Ensure you flash this device with the Generic-ESP32-S2 configuration. | <ul><li>[AliExpress](https://s.click.aliexpress.com/e/_EyliW13)</li></ul>
 
-## Purchase links
 
-### LilyGo T-Dongle S3
-* [AliExpress](https://s.click.aliexpress.com/e/_DCMq0ZX)
-* [Amazon UK](https://amzn.to/3YuNCg3)
-* [Amazon US](https://amzn.to/4f4AqUk)
-* [eBay UK](https://ebay.us/3TJVed)
-
-### Waveshare ESP32-S3 1.47inch
-* [AliExpress](https://s.click.aliexpress.com/e/_DmlJI3x)
-* [eBay UK](https://ebay.us/E4gFr5])
-
-### Generic ESP32-S2
-* [AliExpress](https://s.click.aliexpress.com/e/_Dn5wXe5)
-* [Amazon UK](https://amzn.to/3Y4hrCE)
-* [Amazon US](https://amzn.to/4h98Jf4)
-* [eBay UK](https://ebay.us/AVZcK0)
 
 ## Getting Started
 
@@ -136,7 +121,7 @@ The USB Army Knife may not run correctly with large SD cards or those with newer
 
 1. In the menu expand the device you want to flash.
    * For the T-Dongle S3 you should expand 'LILYGO-T-Dongle-S3'
-   * For a generic ESP32-S2 you should expand 'Generic-ESP32-S2'
+   * For any generic ESP32-S2 you should expand 'Generic-ESP32-S2'
    * It may take a few seconds to populate the build menu after you've selected your device
 
 1. Press 'Upload'
