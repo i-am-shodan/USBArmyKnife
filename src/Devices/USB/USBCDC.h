@@ -10,6 +10,7 @@
 
 enum HostCommand : uint8_t
 {
+    MIN = 0,
     Execute = 1,
     DebugMsg = 2,
     WSCONNECT = 3,
@@ -18,7 +19,8 @@ enum HostCommand : uint8_t
     WSDATARECV = 6,
     RequestAgentStatus = 7,
     AgentStatus = 8,
-    ExecuteResult = 9
+    ExecuteResult = 9,
+    MAX = 10
 };
 
 class USBCDCWrapper : USBArmyKnifeCapability {

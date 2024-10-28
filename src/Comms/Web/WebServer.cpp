@@ -208,6 +208,14 @@ static void webRequestHandler(AsyncWebServerRequest *request)
     Attacks::Ducky.setPayloadCmdLine(cmdline.c_str());
     request->redirect("/index.html"); // redirect to our main page
   }
+  else if (url == "/runagentcmd" && request->hasParam("rawCommand"))
+  {
+    const String cmdline = request->getParam("rawCommand")->value();
+    Debug::Log.info(LOG_WEB, std::string("Running cmd with agent ") + cmdline.c_str());
+
+    Attacks::Ducky.setPayloadCmdLine(std::string("AGENT_RUN ") + cmdline.c_str());
+    request->redirect("/index.html"); // redirect to our main page
+  }
   else if (url == "/showimage" && request->hasParam("filename"))
   {
     const String filename = request->getParam("filename")->value();
