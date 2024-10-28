@@ -12,7 +12,7 @@ The agent is compiled, by default, into Windows native instructions. Cross compi
 
 
 ```
-cd tools\SerialAgent
+cd tools\Agent
 dotnet publish -r win-x64
 ```
 Your PATH_TO_AGENT_EXECUTABLE value is `.\bin\Release\net8.0-windows\win-x64\publish\`
