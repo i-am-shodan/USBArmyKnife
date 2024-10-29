@@ -3,12 +3,13 @@
 [![.NET](https://github.com/i-am-shodan/USBArmyKnife/actions/workflows/dotnet.yml/badge.svg)](https://github.com/i-am-shodan/USBArmyKnife/actions/workflows/dotnet.yml)
 <a href="https://twitter.com/intent/follow?screen_name=therealshodan"><img src="https://img.shields.io/twitter/follow/therealshodan?style=social&logo=twitter" alt="Twitter"></a>
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/O5O8145AVW)
+<a href="https://www.buymeacoffee.com/therealshodan" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
 # USB Army Knife
 
 <div align="center">
   Introducing the USB Army Knife – the ultimate tool for penetration testers and red teamers.
-    <img src="./docs/images/t-dongle-s3-side.png" width="400px"</img> 
+    <img src="./docs/images/t-dongle-s3-side.png" width="400px"</img>
 </div>
 
 Compact and versatile, this device packs a punch with its extensive capabilities, including USB HID attacks, mass storage emulation, network device impersonation and WiFi/Bluetooth exploits (using ESP32 Marauder).
