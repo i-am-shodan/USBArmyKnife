@@ -1,3 +1,18 @@
+#include "Marauder.h"
+
+#define LOG_MARAUDER "ESP32M"
+#include "../../Debug/Logging.h"
+
+namespace Attacks
+{
+  ESP32Marauder Marauder;
+}
+
+ESP32Marauder::ESP32Marauder()
+{
+}
+
+#ifndef NO_ESP_MARAUDER
 #include <esp32_marauder/EvilPortal.h>
 #include <esp32_marauder/CommandLine.h>
 #include <esp32_marauder/SDInterface.h>
@@ -12,12 +27,6 @@
   #include <sd_defines.h>
 #endif
 
-#include "Marauder.h"
-
-#define LOG_MARAUDER "ESP32M"
-
-#include "../../Debug/Logging.h"
-
 WiFiScan wifi_scan_obj;
 EvilPortal evil_portal_obj;
 Buffer buffer_obj;
@@ -31,15 +40,6 @@ static uint32_t currentTime = 0;
 
 static std::string nextMarauderCommandToRun;
 static bool marauderActivated = false;
-
-namespace Attacks
-{
-  ESP32Marauder Marauder;
-}
-
-ESP32Marauder::ESP32Marauder()
-{
-}
 
 void ESP32Marauder::begin(Preferences &prefs)
 {
@@ -93,3 +93,20 @@ void ESP32Marauder::run(const std::string &cmd)
   marauderActivated = true;
   nextMarauderCommandToRun = cmd;
 }
+#else
+void ESP32Marauder::begin(Preferences &prefs)
+{
+
+}
+
+void ESP32Marauder::loop(Preferences &prefs)
+{
+
+}
+
+void ESP32Marauder::run(const std::string &cmd)
+{
+  Debug::Log.info(LOG_MARAUDER, "ESP32Marauder is not supported on this platform");
+}
+
+#endif

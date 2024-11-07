@@ -7,6 +7,7 @@
 
 static bool running = false;
 
+#ifdef ARDUINO_ARCH_ESP32
 void FormatStatusUpdateTask(void *arg)
 {
     const std::string line1 = "Formatting";
@@ -34,6 +35,7 @@ void FormatStatusUpdateTask(void *arg)
     }
     vTaskDelete(NULL);
 }
+#endif
 
 void AskFormatSD(Preferences &prefs)
 {
@@ -59,6 +61,7 @@ void AskFormatSD(Preferences &prefs)
         {
             running = true;
 
+#ifdef ARDUINO_ARCH_ESP32
             xTaskCreate(
                 FormatStatusUpdateTask, // Function that should be called
                 "FormatStatus",         // Name of the task (for debugging)
@@ -67,7 +70,10 @@ void AskFormatSD(Preferences &prefs)
                 1,                      // Task priority
                 NULL            // Task handle
             );
-
+#else
+            Devices::TFT.clearScreen();
+            Devices::TFT.display(0, 0, "Formatting...");
+#endif
             Devices::Storage.begin(prefs, true);
             running = false;
             delay(1500); // rubbish way to wait for the task
@@ -80,6 +86,10 @@ void AskFormatSD(Preferences &prefs)
         }
     }
 
+#ifdef ARDUINO_ARCH_ESP32
     ESP.restart();
+#elif defined(ARDUINO_ARCH_RP2040)
+    watchdog_reboot(0, SRAM_END, 0);
+#endif
 }
 #endif

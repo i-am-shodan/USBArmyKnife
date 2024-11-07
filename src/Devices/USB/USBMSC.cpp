@@ -2,27 +2,36 @@
 
 #include <Adafruit_TinyUSB.h>
 
-#ifndef NO_SD
-    #include "../../Devices/Storage/SDMMCFS2.h"
+#ifdef NO_SD
+    #include <SPIFFS.h>
+    #include "driver/sdmmc_host.h"
+    #include "driver/sdspi_host.h"
+    #include "sdmmc_cmd.h"
+    #include "esp_vfs_fat.h"
+    #define FILE_INTERFACE SPIFFS
+    static int *card = NULL; // raw card access - fake
+#elif defined ARDUINO_ARCH_RP2040
+    #include "../../Devices/Storage/RP2040/SDClassWrapper.h"
+    using namespace fs;
+    #define FILE_INTERFACE SDCard
+    static int *card = NULL; // raw card access - fake
+#else
+    #include "../../Devices/Storage/ESP32/SDMMCFS2.h"
+    #include "driver/sdmmc_host.h"
+    #include "driver/sdspi_host.h"
+    #include "sdmmc_cmd.h"
+    #include "esp_vfs_fat.h"
     using namespace fs;
     #define FILE_INTERFACE SD_MMC_2
-#else
-    #include <SPIFFS.h>
-    #define FILE_INTERFACE SPIFFS
+    #define SUPPORTS_RAW_SD_ACCESS
+    static sdmmc_card_t *card = NULL; // raw card access
 #endif
-
-#include "driver/sdmmc_host.h"
-#include "driver/sdspi_host.h"
-#include "sdmmc_cmd.h"
-#include "esp_vfs_fat.h"
 
 #include "../../Debug/Logging.h"
 #define TAG_USB "USB"
 
 #define LOGICAL_BLOCK_SIZE 512
 static Adafruit_USBD_MSC usb_msc;
-static sdmmc_card_t *card = NULL; // raw card access
-
 static File mscFile;
 
 // Callback invoked when received READ10 command.
@@ -43,14 +52,15 @@ static int32_t msc_read_cb(uint32_t lba, void *buffer, uint32_t bufsize)
     }
     else
     {
+#ifdef SUPPORTS_RAW_SD_ACCESS
         uint32_t sectors = (bufsize / card->csd.sector_size);
         if (sdmmc_read_sectors(card, buffer, lba, sectors) == ESP_OK)
         {
             // bufSize should always be a multiple of LOGICAL_BLOCK_SIZE so on read success return that
             return bufsize;
         }
+#endif
     }
-
     return -1;
 }
 
@@ -70,9 +80,12 @@ static int32_t msc_write_cb(uint32_t lba, uint8_t *buffer, uint32_t bufsize)
     }
     else
     {
+#ifdef SUPPORTS_RAW_SD_ACCESS
         uint32_t count = (bufsize / card->csd.sector_size);
         return sdmmc_write_sectors(card, buffer, lba, count) == ESP_OK ? bufsize : -1;
+#endif
     }
+    return -1;
 }
 
 // Callback invoked when WRITE10 command is completed (status received and accepted by host).
@@ -87,7 +100,7 @@ static void msc_flush_cb()
 
 static size_t open_msc(const char *path)
 {
-    mscFile = FILE_INTERFACE.open(path);
+    mscFile = FILE_INTERFACE.open(path, "r");
     if (!mscFile)
     {
         return 0;
@@ -96,7 +109,7 @@ static size_t open_msc(const char *path)
     return mscFile.size();
 }
 
-#ifndef NO_SD
+#ifdef SUPPORTS_RAW_SD_ACCESS
 static size_t getinternalMMCSectorSize()
 {
     if (card == NULL)
@@ -109,7 +122,7 @@ static size_t getinternalMMCSectorSize()
 
 bool USBMSC::mountSD()
 {
-#ifndef NO_SD
+#ifdef SUPPORTS_RAW_SD_ACCESS
     if (card == NULL)
     {
         card = FILE_INTERFACE.getCard();
@@ -145,7 +158,7 @@ bool USBMSC::mountSD()
         return false;
     }
 #else
-    Debug::Log.error(TAG_USB, "Mounting the SD card is only supported when a physical SD card is present");
+    Debug::Log.error(TAG_USB, "Mounting the SD card is only supported on ESP32 when a physical SD card is present");
     return false;
 #endif
 }

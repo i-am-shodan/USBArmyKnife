@@ -91,13 +91,13 @@ void USBCore::changeUSBMode(DuckyInterpreter::USB_MODE &mode, const uint16_t &vi
   else if (mode & DuckyInterpreter::USB_MODE::HID)
   {
     Debug::Log.info(LOG_USB, "Changing USB mode to HID");
-    curDeviceType = USBDeviceType::USBSerial;
+    curDeviceType = USBDeviceType::Serial;
     curClassType = USBClassType::HID;
   }
   else if (mode & DuckyInterpreter::USB_MODE::STORAGE)
   {
     Debug::Log.info(LOG_USB, "Changing USB mode to STORAGE");
-    curDeviceType = USBDeviceType::USBSerial;
+    curDeviceType = USBDeviceType::Serial;
     curClassType = USBClassType::Storage;
   }
 
@@ -184,7 +184,11 @@ void USBCore::reset()
     delay(100);
     tud_connect();
 
+#ifdef ARDUINO_ARCH_ESP32 
     TinyUSB_Device_Init(0, curDeviceType == USBDeviceType::NCM);
+#else
+    TinyUSB_Device_Init(0);
+#endif
 
     TinyUSBDevice.attach();
   }

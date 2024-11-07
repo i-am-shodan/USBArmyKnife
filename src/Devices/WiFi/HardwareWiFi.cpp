@@ -23,6 +23,7 @@ namespace Devices
     HardwareWiFi WiFi;
 }
 
+#ifndef NO_WIFI
 HardwareWiFi::HardwareWiFi()
 {
   registerUserConfigurableSetting(CATEGORY_WIFI, WIFI_AP_NAME, USBArmyKnifeCapability::SettingType::String, WIFI_AP_NAME_DEFAULT);
@@ -49,8 +50,8 @@ void HardwareWiFi::begin(Preferences& prefs)
     WiFi.softAP(wiFiApName, wiFiApPwd);
     #if defined(LOLIN_WIFI_FIX) && (defined(ARDUINO_ARCH_ESP32C3) || defined(ARDUINO_ARCH_ESP32S2) || defined(ARDUINO_ARCH_ESP32S3))
       WiFi.setTxPower(WIFI_POWER_8_5dBm);
+      WiFi.setSleep(false);
     #endif
-    WiFi.setSleep(false);
     wiFiUp = true;
   } 
 }
@@ -71,3 +72,24 @@ void HardwareWiFi::end()
 {
   WiFi.mode(WIFI_OFF);
 }
+#else
+HardwareWiFi::HardwareWiFi()
+{
+}
+
+void HardwareWiFi::setWiFi(const bool& state)
+{
+}
+
+void HardwareWiFi::begin(Preferences& prefs)
+{
+}
+
+void HardwareWiFi::loop(Preferences& prefs)
+{
+}
+
+void HardwareWiFi::end()
+{
+}
+#endif

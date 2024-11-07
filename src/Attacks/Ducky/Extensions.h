@@ -278,11 +278,11 @@ static int handleRunPayload(const std::string &str, std::unordered_map<std::stri
     return true;
 }
 
-void MSCActivityWaitTask(void *arg)
+void doMSCActivityWait(const std::function<void(const int&)> &delay)
 {
     while (true)
     {
-        vTaskDelay(pdMS_TO_TICKS(150));
+        delay(150);
         if (Devices::USB::MSC.hasActivity())
         {
             Devices::USB::MSC.resetActivityState();
@@ -291,8 +291,15 @@ void MSCActivityWaitTask(void *arg)
     }
 
     timeToWait = 0;
+}
+
+#ifdef ARDUINO_ARCH_ESP32 
+void MSCActivityWaitTask(void *arg)
+{
+    doMSCActivityWait(esp32_task_delay);
     vTaskDelete(NULL);
 }
+#endif
 
 static int handleWaitForUSBStorageActivity(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
 {
@@ -303,6 +310,7 @@ static int handleWaitForUSBStorageActivity(const std::string &str, std::unordere
 
     timeToWait = -1;
 
+#ifdef ARDUINO_ARCH_ESP32 
     xTaskCreate(
         MSCActivityWaitTask, // Function that should be called
         "MSCWait",           // Name of the task (for debugging)
@@ -311,17 +319,20 @@ static int handleWaitForUSBStorageActivity(const std::string &str, std::unordere
         1,                   // Task priority
         NULL                 // Task handle
     );
+#else
+    doMSCActivityWait([](const uint32_t &time) { loop(); });
+#endif
 
     return true;
 }
 
-void MSCActivityWaitToStopTask(void *arg)
+static void doMSCActivityWaitToStop(const std::function<void(const int&)> &delay)
 {
     uint8_t numberOfPeriodsOfZeroActivity = 0;
 
     while (true)
     {
-        vTaskDelay(pdMS_TO_TICKS(100));
+        delay(100);
         if (Devices::USB::MSC.hasActivity())
         {
             Devices::USB::MSC.resetActivityState();
@@ -339,8 +350,15 @@ void MSCActivityWaitToStopTask(void *arg)
     }
 
     timeToWait = 0;
+}
+
+#ifdef ARDUINO_ARCH_ESP32 
+void MSCActivityWaitToStopTask(void *arg)
+{
+    doMSCActivityWaitToStop(esp32_task_delay);
     vTaskDelete(NULL);
 }
+#endif
 
 static int handleWaitForUSBStorageActivityToStop(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
 {
@@ -351,6 +369,7 @@ static int handleWaitForUSBStorageActivityToStop(const std::string &str, std::un
 
     timeToWait = -1;
 
+#ifdef ARDUINO_ARCH_ESP32 
     xTaskCreate(
         MSCActivityWaitToStopTask, // Function that should be called
         "MSCWait",           // Name of the task (for debugging)
@@ -359,6 +378,9 @@ static int handleWaitForUSBStorageActivityToStop(const std::string &str, std::un
         1,                   // Task priority
         NULL                 // Task handle
     );
+#else
+    doMSCActivityWaitToStop([](const uint32_t &time) { loop(); });
+#endif
 
     return true;
 }
