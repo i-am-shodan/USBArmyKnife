@@ -1,3 +1,4 @@
+#ifdef ARDUINO_ARCH_ESP32
 #include "USBNCM.h"
 #include "../../Debug/Logging.h"
 
@@ -109,3 +110,4 @@ void USBNCM::end()
         stopPacketCollection();
     }
 }
+#endif

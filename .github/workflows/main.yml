@@ -52,3 +52,12 @@ jobs:
         with:
           name: Generic-ESP32-S2 Firmware binaries
           path: .pio/build/Generic-ESP32-S2/*.bin
+
+      - name: Build PlatformIO Project
+        run: pio run --environment Waveshare-RP2040-GEEK
+            
+      - name: Upload Waveshare-RP2040-GEEK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Waveshare-RP2040-GEEK Firmware binaries
+          path: .pio/build/Waveshare-RP2040-GEEK/*.bin

@@ -5,8 +5,10 @@
 
 #ifdef NO_SD
   #include <SPIFFS.h>
+#elif ARDUINO_ARCH_RP2040
+  #include <SD.h>
 #else
-  #include "SDMMCFS2.h"
+  #include <SD_MMC.h>
 #endif
 
 class IStorage {

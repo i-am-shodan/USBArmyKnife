@@ -4,6 +4,26 @@ import os
 staticFiles = {}
 headerFiles = []
 
+Import("env")
+
+def skip_esp32_libs_from_pi_builds(node):
+    """
+    `node.name` - a name of File System Node
+    `node.get_path()` - a relative path
+    `node.get_abspath()` - an absolute path
+     to ignore file from a build process, just return None
+    """
+
+    if ("usb-ncm" in node.get_path() or "ESP32Marauder" in node.get_path()) and "raspberrypi" in env.GetProjectOption("platform"):
+        # Return None for exclude
+        print ("Ignoring /lib dir as platform is raspberrypi")
+        return None
+
+    return node
+
+# Register callback
+env.AddBuildMiddleware(skip_esp32_libs_from_pi_builds, "*")
+
 def compress_to_c_array(srcFile, dstFile, varName, dataConvertFunc=None):
     try:
         # Read the contents of the source file
