@@ -26,7 +26,6 @@ static PcapBuffer* buf = nullptr;
 
 USBNCM::USBNCM()
 {
-    registerUserConfigurableSetting(CATEGORY_USB, USBNCM_PCAPONSTART, USBArmyKnifeCapability::SettingType::Bool, USBNCM_PCAPONSTART_DEFAULT);
 }
 
 extern "C" void createPcap(uint8_t *buffer, uint32_t len, bool received)
@@ -64,6 +63,8 @@ void USBNCM::stopPacketCollection()
 
 void USBNCM::begin(Preferences &prefs)
 {
+    registerUserConfigurableSetting(CATEGORY_USB, USBNCM_PCAPONSTART, USBArmyKnifeCapability::SettingType::Bool, USBNCM_PCAPONSTART_DEFAULT);
+
     if (Devices::USB::Core.currentDeviceType() == USBDeviceType::NCM)
     {
         if (readyForPackets == false && usb_ncm_init(&usbnet_hasNewPacket, &usbnet_getPacket, &usbnet_releasePacket, &usbnet_transmitPacket) == ESP_OK)

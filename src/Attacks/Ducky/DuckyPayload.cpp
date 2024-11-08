@@ -174,7 +174,7 @@ void WaitTask(void *arg)
 }
 #endif
 
-static void requestDelay(uint32_t time)
+static void requestDelay(const uint32_t &time)
 {
     // We can do other things while we are waiting so we kick off a task to wait
     // return, which causes us to loop again
@@ -193,11 +193,21 @@ static void requestDelay(uint32_t time)
         NULL      // Task handle
     );
 #else
-    const int timeToWaitInMs = 150;
-    for (int x = 0; x < time; x = x + timeToWaitInMs)
+    const uint16_t timeToWaitInMs = 150;
+    for (uint32_t totalTimeSpentWaiting = 0; totalTimeSpentWaiting < time;)
     {
+        const auto before = millis();
         loop(); // as timeToWait is != 0 we can call this
-        delay(timeToWaitInMs);
+        const auto after = millis();
+
+        const auto timeSpentInLoop = after - before;
+        totalTimeSpentWaiting += timeSpentInLoop;
+        if (timeSpentInLoop < 150)
+        {
+            const auto remainingTimeToDelay = 150 - timeSpentInLoop;
+            delay(remainingTimeToDelay);
+            totalTimeSpentWaiting += remainingTimeToDelay;
+        }
     }
     timeToWait = 0;
 #endif

@@ -22,12 +22,13 @@ static unsigned long previousMillis = 0;
 
 SerialAgent::SerialAgent()
 {
-    registerUserConfigurableSetting(CATEGORY_USB, USB_AGENT_POLLING_ENABLED, USBArmyKnifeCapability::SettingType::Bool, USB_AGENT_POLLING_ENABLED_DEFAULT);
-    registerUserConfigurableSetting(CATEGORY_USB, USB_AGENT_POLLING_TIME_IN_SEC, USBArmyKnifeCapability::SettingType::Int16, (int16_t)USB_AGENT_POLLING_TIME_IN_SEC_DEFAULT);
 }
 
 void SerialAgent::begin(Preferences &prefs)
 {
+    registerUserConfigurableSetting(CATEGORY_USB, USB_AGENT_POLLING_ENABLED, USBArmyKnifeCapability::SettingType::Bool, USB_AGENT_POLLING_ENABLED_DEFAULT);
+    registerUserConfigurableSetting(CATEGORY_USB, USB_AGENT_POLLING_TIME_IN_SEC, USBArmyKnifeCapability::SettingType::Int16, (int16_t)USB_AGENT_POLLING_TIME_IN_SEC_DEFAULT);
+
     agentPollingEnabled = prefs.getBool(USB_AGENT_POLLING_ENABLED, USB_AGENT_POLLING_ENABLED_DEFAULT);
     agentPollingIntervalInSec = prefs.getInt(USB_AGENT_POLLING_TIME_IN_SEC, USB_AGENT_POLLING_TIME_IN_SEC_DEFAULT);
 
