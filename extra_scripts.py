@@ -48,7 +48,7 @@ def compress_to_c_array(srcFile, dstFile, varName, dataConvertFunc=None):
         except:
             pass
         with open(dstFile, 'w') as f:
-            f.write(f"#pragma once\n\nconst uint8_t PROGMEM {varName}[{len(compressed_data)}] = {{ {c_array_string} }};")
+            f.write(f"#pragma once\n\n#ifndef NO_WEB\n\nconst uint8_t PROGMEM {varName}[{len(compressed_data)}] = {{ {c_array_string} }};\n\n#endif")
 
         print(f"Compressed data written to {dstFile}")
 
@@ -92,7 +92,7 @@ for root, dirs, files in os.walk(directory_path):
         # Call the compress_to_c_array function
         compress_to_c_array(file_path, f"src/html/vnc/{file_name}.h", f"noVNC{file_name}Gz")
 
-cpp_vector_code = "#include <string>\n#include <unordered_map>\n#include <cstdint>\n#include <pgmspace.h>\n\n";
+cpp_vector_code = "#ifndef NO_WEB\n\n#include <string>\n#include <unordered_map>\n#include <cstdint>\n#include <pgmspace.h>\n\n";
 for header in headerFiles:
     cpp_vector_code += '#include "'+header.replace("src/html/", "")+'"\n'
 
@@ -105,7 +105,7 @@ for key, value in staticFiles.items():
         cpp_vector_code += ",\n"
     else:
         cpp_vector_code += "\n"
-cpp_vector_code += "};"
+cpp_vector_code += "};\n\n#endif"
 
 with open("src/html/htmlFiles.cpp", "w") as file:
     file.write(cpp_vector_code)
