@@ -23,7 +23,6 @@ static uint8_t errorCount = 0;
 
 USBCDCWrapper::USBCDCWrapper()
 {
-    registerUserConfigurableSetting(CATEGORY_USB, USB_SERIALRAW, USBArmyKnifeCapability::SettingType::Bool, USB_SERIALRAW_DEFAULT);
 }
 
 void USBCDCWrapper::setCallback(const HostCommand &tag, std::function<void(uint8_t *, const size_t)> callback)
@@ -33,6 +32,8 @@ void USBCDCWrapper::setCallback(const HostCommand &tag, std::function<void(uint8
 
 void USBCDCWrapper::begin(const unsigned long &baud)
 {
+    registerUserConfigurableSetting(CATEGORY_USB, USB_SERIALRAW, USBArmyKnifeCapability::SettingType::Bool, USB_SERIALRAW_DEFAULT);
+
     // ensure this can be called multiple times without error
     if (Devices::USB::Core.currentDeviceType() != USBDeviceType::Serial)
     {

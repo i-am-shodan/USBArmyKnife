@@ -26,9 +26,6 @@ namespace Devices
 #ifndef NO_WIFI
 HardwareWiFi::HardwareWiFi()
 {
-  registerUserConfigurableSetting(CATEGORY_WIFI, WIFI_AP_NAME, USBArmyKnifeCapability::SettingType::String, WIFI_AP_NAME_DEFAULT);
-  registerUserConfigurableSetting(CATEGORY_WIFI, WIFI_AP_PWD, USBArmyKnifeCapability::SettingType::String, WIFI_AP_PWD_DEFAULT);
-  registerUserConfigurableSetting(CATEGORY_WIFI, WIFI_DESIRED_BOOT_STATE, USBArmyKnifeCapability::SettingType::Bool, WIFI_DESIRED_BOOT_STATE_DEFAULT);
 }
 
 void HardwareWiFi::setWiFi(const bool& state)
@@ -38,6 +35,10 @@ void HardwareWiFi::setWiFi(const bool& state)
 
 void HardwareWiFi::begin(Preferences& prefs)
 {
+  registerUserConfigurableSetting(CATEGORY_WIFI, WIFI_AP_NAME, USBArmyKnifeCapability::SettingType::String, WIFI_AP_NAME_DEFAULT);
+  registerUserConfigurableSetting(CATEGORY_WIFI, WIFI_AP_PWD, USBArmyKnifeCapability::SettingType::String, WIFI_AP_PWD_DEFAULT);
+  registerUserConfigurableSetting(CATEGORY_WIFI, WIFI_DESIRED_BOOT_STATE, USBArmyKnifeCapability::SettingType::Bool, WIFI_DESIRED_BOOT_STATE_DEFAULT);
+
   wiFiApName = prefs.getString(WIFI_AP_NAME, WIFI_AP_NAME_DEFAULT);
   wiFiApPwd = prefs.getString(WIFI_AP_PWD, WIFI_AP_PWD_DEFAULT);
   desiredWiFiState = prefs.getBool(WIFI_DESIRED_BOOT_STATE, WIFI_DESIRED_BOOT_STATE_DEFAULT);

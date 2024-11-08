@@ -4,6 +4,7 @@
 
 #include <unordered_map>
 #include <vector>
+#include <algorithm>
 #include <ArduinoJson.h>
 
 #define LOG_SETTINGS "Settings"
@@ -17,7 +18,16 @@ void registerSettingName(const uint8_t group, const std::string &name, const USB
         settingLookup[group] = std::vector<std::tuple<std::string, USBArmyKnifeCapability::SettingType, std::string>>();
     }
 
-    settingLookup[group].emplace_back(name, type, defaultValue);
+    // ensure we can't register the same name in the same group twice
+    const bool notFound = std::none_of(settingLookup[group].cbegin(), settingLookup[group].cend(),
+        [&name](const std::tuple<std::string, USBArmyKnifeCapability::SettingType, std::string> &item){
+            return std::get<0>(item) == name;
+        });
+
+    if (notFound)
+    {
+        settingLookup[group].emplace_back(name, type, defaultValue);
+    }
 }
 
 bool setSettingValue(Preferences &prefs, const std::string &name, const std::string &value)

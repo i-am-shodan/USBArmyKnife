@@ -56,14 +56,6 @@ USBCore::USBCore()
     : curDeviceType(USBDeviceType::None),
       curClassType(USBClassType::None)
 {
-  registerUserConfigurableSetting(CATEGORY_USB, USB_DeviceType, USBArmyKnifeCapability::SettingType::UInt16, USB_DeviceType_Default);
-  registerUserConfigurableSetting(CATEGORY_USB, USB_ClassType, USBArmyKnifeCapability::SettingType::UInt16, USB_ClassType_Default);
-  registerUserConfigurableSetting(CATEGORY_USB, USB_DeviceVID, USBArmyKnifeCapability::SettingType::UInt16, USB_DeviceVID_Default);
-  registerUserConfigurableSetting(CATEGORY_USB, USB_DevicePID, USBArmyKnifeCapability::SettingType::UInt16, USB_DevicePID_Default);
-  registerUserConfigurableSetting(CATEGORY_USB, USB_Version, USBArmyKnifeCapability::SettingType::UInt16, USB_Version_Default);
-  registerUserConfigurableSetting(CATEGORY_USB, USB_DeviceVersion, USBArmyKnifeCapability::SettingType::UInt16, USB_DeviceVersion_Default);
-  registerUserConfigurableSetting(CATEGORY_USB, USB_DeviceManufacturer, USBArmyKnifeCapability::SettingType::String, USB_DeviceManufacturer_Default);
-  registerUserConfigurableSetting(CATEGORY_USB, USB_DeviceProductDescriptor, USBArmyKnifeCapability::SettingType::String, USB_DeviceProductDescriptor_Default);
 }
 
 void USBCore::changeUSBMode(DuckyInterpreter::USB_MODE &mode, const uint16_t &vidValue, const uint16_t &pidValue, const std::string &man, const std::string &prod, const std::string &serial)
@@ -130,6 +122,15 @@ void USBCore::changeUSBMode(DuckyInterpreter::USB_MODE &mode, const uint16_t &vi
 
 void USBCore::begin(Preferences &prefs)
 {
+  registerUserConfigurableSetting(CATEGORY_USB, USB_DeviceType, USBArmyKnifeCapability::SettingType::UInt16, USB_DeviceType_Default);
+  registerUserConfigurableSetting(CATEGORY_USB, USB_ClassType, USBArmyKnifeCapability::SettingType::UInt16, USB_ClassType_Default);
+  registerUserConfigurableSetting(CATEGORY_USB, USB_DeviceVID, USBArmyKnifeCapability::SettingType::UInt16, USB_DeviceVID_Default);
+  registerUserConfigurableSetting(CATEGORY_USB, USB_DevicePID, USBArmyKnifeCapability::SettingType::UInt16, USB_DevicePID_Default);
+  registerUserConfigurableSetting(CATEGORY_USB, USB_Version, USBArmyKnifeCapability::SettingType::UInt16, USB_Version_Default);
+  registerUserConfigurableSetting(CATEGORY_USB, USB_DeviceVersion, USBArmyKnifeCapability::SettingType::UInt16, USB_DeviceVersion_Default);
+  registerUserConfigurableSetting(CATEGORY_USB, USB_DeviceManufacturer, USBArmyKnifeCapability::SettingType::String, USB_DeviceManufacturer_Default);
+  registerUserConfigurableSetting(CATEGORY_USB, USB_DeviceProductDescriptor, USBArmyKnifeCapability::SettingType::String, USB_DeviceProductDescriptor_Default);
+
   curDeviceType = (USBDeviceType)prefs.getUShort(USB_DeviceType, USB_DeviceType_Default);
   curClassType = (USBClassType)prefs.getUShort(USB_ClassType, USB_ClassType_Default);
 
