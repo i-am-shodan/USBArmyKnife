@@ -21,7 +21,7 @@ ESP32Marauder::ESP32Marauder()
 #include <esp32_marauder/Buffer.h>
 
 #ifndef NO_SD
-  #include "../../Devices/Storage/SDMMCFS2.h"
+  #include "../../Devices/Storage/ESP32/SDMMCFS2.h"
   using namespace fs;
 #else
   #include <sd_defines.h>
