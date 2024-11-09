@@ -10,7 +10,7 @@
     #include <SPIFFS.h>
     #define FILE_INTERFACE SPIFFS
 #else
-    #include "../../Devices/Storage/SDMMCFS2.h"
+    #include "../../Devices/Storage/ESP32/SDMMCFS2.h"
     using namespace fs;
     #define FILE_INTERFACE SD_MMC_2
 #endif

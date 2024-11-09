@@ -44,8 +44,6 @@ void USBCDCWrapper::begin(const unsigned long &baud)
     {
 #ifdef ARDUINO_ARCH_ESP32 
         TinyUSB_Device_Init(0, false);
-#else
-        TinyUSB_Device_Init(0);
 #endif
         usbInitCalled = true;
     }
