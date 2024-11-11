@@ -26,7 +26,7 @@ jobs:
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Build PlatformIO Project
+      - name: Build PlatformIO Project LILYGO-T-Dongle-S3 
         run: pio run --environment LILYGO-T-Dongle-S3 
 
       - name: Upload LILYGO-T-Dongle-S3 artifacts
@@ -35,7 +35,7 @@ jobs:
           name: LILYGO-T-Dongle-S3 Firmware binaries
           path: .pio/build/LILYGO-T-Dongle-S3/*.bin
 
-      - name: Build PlatformIO Project
+      - name: Build PlatformIO Project aveshare-ESP32-S3-LCD-1_47
         run: pio run --environment Waveshare-ESP32-S3-LCD-1_47
             
       - name: Upload Waveshare-ESP32-S3-LCD-1_47 artifact
@@ -44,7 +44,7 @@ jobs:
           name: Waveshare-ESP32-S3-LCD-1_47 Firmware binaries
           path: .pio/build/Waveshare-ESP32-S3-LCD-1_47/*.bin
 
-      - name: Build PlatformIO Project
+      - name: Build PlatformIO Project Generic-ESP32-S2
         run: pio run --environment Generic-ESP32-S2
           
       - name: Upload Generic-ESP32-S2 artifact
@@ -53,7 +53,7 @@ jobs:
           name: Generic-ESP32-S2 Firmware binaries
           path: .pio/build/Generic-ESP32-S2/*.bin
 
-      - name: Build PlatformIO Project
+      - name: Build PlatformIO Project Waveshare-RP2040-GEEK
         run: pio run --environment Waveshare-RP2040-GEEK
             
       - name: Upload Waveshare-RP2040-GEEK artifact
