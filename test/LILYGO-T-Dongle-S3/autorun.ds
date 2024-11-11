@@ -1,0 +1,105 @@
+REM This is the system test for LILYGO-T-Dongle-S3 based boards
+REM These having most of the USB Army Knife capabilities
+
+REM To run these tests copy this file and disk.img from the covert storage example to the SD
+REM You'll also need to have the agent running. You should see:
+REM * Test card with correct colours
+REM * Pulsing heartbeat in the lower right of the TFT
+REM * Web page loaded via badUSB
+REM * Disk mounted
+
+REM At this point you should connect to the device over WiFi and check
+REM * The web interface loads
+REM * VNC works
+REM * You can see logs
+
+REM Now press the button and ensure the LED cycles
+REM * RED
+REM * GREEN
+REM * BLUE
+
+REM Press the button again and the device will do an ESP32 Maurader rick roll
+REM * Ensure that the lyrics can be seen over WiFi
+
+REM Press once more for a reset
+REM * Device resetting
+
+REM Wait for the agent, this also allows us to see some debug if we are monitoring
+WHILE (AGENT_CONNECTED() == FALSE)
+  DELAY 2000
+END_WHILE
+
+REM Turn TFT off and on
+TFT_OFF
+DELAY 2000
+TFT_ON
+
+REM This is the system test for RP2040 based boards
+REM At time of writing these don't have WiFi, LED or a button
+
+REM To run these tests copy this file and disk.img from the covert storage example to the SD
+REM You'll also need to have the agent running. You should see:
+REM * Test card with correct colours
+REM * Pulsing heartbeat in the lower right of the TFT
+REM * Web page loaded via badUSB
+REM * Disk mounted
+REM * Device resetting
+
+DISPLAY_CLEAR
+DISPLAY_TEXT 0 0 Agent connected
+DELAY 3000
+
+REM Load a test card to test TFT PNG decoding and colours
+DISPLAY_PNG /testcard.png
+DELAY 10000
+DISPLAY_CLEAR
+DISPLAY_TEXT 0 0 Agent connected
+DISPLAY_TEXT 0 10 Test card
+
+REM Run a command to ensure we can handle the results
+AGENT_RUN dir
+WAIT_FOR_AGENT_RUN_RESULT
+
+DISPLAY_TEXT 0 20 Agent run command
+REM Load a webpage to ensure USB + HID is working
+GUI
+DELAY 1000
+STRING https://github.com/i-am-shodan/USBArmyKnife/blob/master/docs/images/interface-status.png
+ENTER
+
+DISPLAY_TEXT 0 30 Turning services off
+REM Turn some services off and mount as a disk, some devices won't support this but must not error
+LED_OFF
+
+DISPLAY_CLEAR
+DISPLAY_TEXT 0 0 Do WiFI check
+DISPLAY_TEXT 0 10 Then press button
+WAIT_FOR_BUTTON_PRESS
+DISPLAY_CLEAR
+
+DISPLAY_TEXT 0 0 Agent connected
+DISPLAY_TEXT 0 10 Test card
+DISPLAY_TEXT 0 20 Agent run command
+DISPLAY_TEXT 0 30 Turning services off
+
+DISPLAY_TEXT 0 40 Mounting USB disk
+USB_MOUNT_DISK_READ_ONLY /disk.img
+WAIT_FOR_BUTTON_PRESS
+
+LED_R
+WAIT_FOR_BUTTON_PRESS
+LED_G
+WAIT_FOR_BUTTON_PRESS
+LED_B
+WAIT_FOR_BUTTON_PRESS
+DISPLAY_TEXT 0 50 LEDs and buttons
+
+WIFI_OFF
+ESP32M attack -t rickroll
+DISPLAY_TEXT 0 60 ESP32 Maurader
+WAIT_FOR_BUTTON_PRESS
+
+REM reset the device and do it all again
+DISPLAY_TEXT 0 70 Reset in 5s
+DELAY 5000
+RESET
