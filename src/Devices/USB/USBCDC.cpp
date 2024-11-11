@@ -23,7 +23,6 @@ static uint8_t errorCount = 0;
 
 USBCDCWrapper::USBCDCWrapper()
 {
-    registerUserConfigurableSetting(CATEGORY_USB, USB_SERIALRAW, USBArmyKnifeCapability::SettingType::Bool, USB_SERIALRAW_DEFAULT);
 }
 
 void USBCDCWrapper::setCallback(const HostCommand &tag, std::function<void(uint8_t *, const size_t)> callback)
@@ -33,6 +32,8 @@ void USBCDCWrapper::setCallback(const HostCommand &tag, std::function<void(uint8
 
 void USBCDCWrapper::begin(const unsigned long &baud)
 {
+    registerUserConfigurableSetting(CATEGORY_USB, USB_SERIALRAW, USBArmyKnifeCapability::SettingType::Bool, USB_SERIALRAW_DEFAULT);
+
     // ensure this can be called multiple times without error
     if (Devices::USB::Core.currentDeviceType() != USBDeviceType::Serial)
     {
@@ -41,7 +42,9 @@ void USBCDCWrapper::begin(const unsigned long &baud)
 
     if (usbInitCalled == false)
     {
+#ifdef ARDUINO_ARCH_ESP32 
         TinyUSB_Device_Init(0, false);
+#endif
         usbInitCalled = true;
     }
 
@@ -90,7 +93,8 @@ void USBCDCWrapper::loop(Preferences &prefs)
                 break;
             }
 
-            const uint32_t len = *((uint32_t *)(serialPortRecvBuffer + 1));
+            uint32_t len = 0;
+            memcpy(&len, serialPortRecvBuffer + 1, sizeof(uint32_t));
 
             if (len > MAX_SERIAL_BUFFER_SIZE)
             {

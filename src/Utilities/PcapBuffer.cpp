@@ -43,7 +43,7 @@ PcapBuffer::PcapBuffer(std::string baseName, fs::FS* fs, uint32_t dataLinkType)
         auto filename = "/" + baseName + "_" + std::to_string(counter) + ".pcap";
         if (!fs->exists(filename.c_str()))
         {
-            m_file = fs->open(filename.c_str(), FILE_WRITE);
+            m_file = fs->open(filename.c_str(), "w");
             if (m_file)
             {
                 break;

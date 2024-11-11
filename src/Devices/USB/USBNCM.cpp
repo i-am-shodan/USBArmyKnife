@@ -1,3 +1,4 @@
+#ifdef ARDUINO_ARCH_ESP32
 #include "USBNCM.h"
 #include "../../Debug/Logging.h"
 
@@ -9,7 +10,7 @@
     #include <SPIFFS.h>
     #define FILE_INTERFACE SPIFFS
 #else
-    #include "../../Devices/Storage/SDMMCFS2.h"
+    #include "../../Devices/Storage/ESP32/SDMMCFS2.h"
     using namespace fs;
     #define FILE_INTERFACE SD_MMC_2
 #endif
@@ -25,7 +26,6 @@ static PcapBuffer* buf = nullptr;
 
 USBNCM::USBNCM()
 {
-    registerUserConfigurableSetting(CATEGORY_USB, USBNCM_PCAPONSTART, USBArmyKnifeCapability::SettingType::Bool, USBNCM_PCAPONSTART_DEFAULT);
 }
 
 extern "C" void createPcap(uint8_t *buffer, uint32_t len, bool received)
@@ -63,6 +63,8 @@ void USBNCM::stopPacketCollection()
 
 void USBNCM::begin(Preferences &prefs)
 {
+    registerUserConfigurableSetting(CATEGORY_USB, USBNCM_PCAPONSTART, USBArmyKnifeCapability::SettingType::Bool, USBNCM_PCAPONSTART_DEFAULT);
+
     if (Devices::USB::Core.currentDeviceType() == USBDeviceType::NCM)
     {
         if (readyForPackets == false && usb_ncm_init(&usbnet_hasNewPacket, &usbnet_getPacket, &usbnet_releasePacket, &usbnet_transmitPacket) == ESP_OK)
@@ -109,3 +111,4 @@ void USBNCM::end()
         stopPacketCollection();
     }
 }
+#endif

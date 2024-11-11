@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../USBArmyKnifeCapability.h"
+#include <string>
 
 class ESP32Marauder : USBArmyKnifeCapability {
 public:
