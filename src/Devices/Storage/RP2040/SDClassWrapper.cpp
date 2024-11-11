@@ -15,26 +15,40 @@ bool SDClassWrapper::begin(const bool &format)
     SPI.setRX(SD_MISO);
     SPI.setTX(SD_MOSI);
     SPI.setSCK(SD_SCLK);
-    SPI.setMOSI(SD_MOSI);
-    SPI.setMISO(SD_MISO);
+    //SPI.setMOSI(SD_MOSI);
+    //SPI.setMISO(SD_MISO);
 
-    sdInitialized = SD.begin(SD_CS, 5000000, SPI);
+    sdInitialized = SD.begin(SD_CS, SPI);
 
     return sdInitialized;
 }
 
 File SDClassWrapper::open(const char *path, const char *mode)
 {
+    if (!sdInitialized)
+    {
+        return File();
+    }
+
     return SD.open(path, mode);
 }
 
 bool SDClassWrapper::exists(const char *path)
 {
+    if (!sdInitialized)
+    {
+        return false;
+    }
     return SD.exists(path);
 }
 
 bool SDClassWrapper::remove(const char *path)
 {
+    if (!sdInitialized)
+    {
+        return false;
+    }
+
     return SD.remove(path);
 }
 
@@ -45,6 +59,11 @@ int SDClassWrapper::usedBytes()
 
 int SDClassWrapper::totalBytes()
 {
+    if (!sdInitialized)
+    {
+        return 1;
+    }
+
     return SD.size();
 }
 
