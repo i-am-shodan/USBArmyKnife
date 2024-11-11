@@ -35,7 +35,7 @@ jobs:
           name: LILYGO-T-Dongle-S3 Firmware binaries
           path: .pio/build/LILYGO-T-Dongle-S3/*.bin
 
-      - name: Build PlatformIO Project aveshare-ESP32-S3-LCD-1_47
+      - name: Build PlatformIO Project Waveshare-ESP32-S3-LCD-1_47
         run: pio run --environment Waveshare-ESP32-S3-LCD-1_47
             
       - name: Upload Waveshare-ESP32-S3-LCD-1_47 artifact
