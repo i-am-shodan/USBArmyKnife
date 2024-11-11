@@ -5,11 +5,11 @@
     #include <SPIFFS.h>
     #define FILE_INTERFACE SPIFFS
 #elif ARDUINO_ARCH_RP2040
-    #include "RP2040\SDClassWrapper.h"
+    #include "RP2040/SDClassWrapper.h"
     using namespace fs;
     #define FILE_INTERFACE SDCard
 #else
-    #include "ESP32\SDMMCFS2.h"
+    #include "ESP32/SDMMCFS2.h"
     using namespace fs;
     #define FILE_INTERFACE SD_MMC_2
 #endif
