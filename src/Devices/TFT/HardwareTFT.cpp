@@ -4,7 +4,6 @@
 #include "../../Debug/Logging.h"
 
 #include <LovyanGFX.hpp>
-#include <PNGdec.h>
 
 #define LOG_TFT "TFT"
 #define MAX_RADIUS 4
@@ -105,20 +104,12 @@ public:
 };
 
 static LGFX_Panel lcd;
-static PNG png; // PNG decoder instance
 static int16_t xpos = 0;
 static int16_t ypos = 0;
 
 namespace Devices
 {
     HardwareTFT TFT;
-}
-
-static void pngDraw(PNGDRAW *pDraw)
-{
-    uint16_t lineBuffer[TFT_HEIGHT];
-    png.getLineAsRGB565(pDraw, lineBuffer, PNG_RGB565_BIG_ENDIAN, 0xffffffff);
-    lcd.pushImage(xpos, ypos + pDraw->y, pDraw->iWidth, 1, lineBuffer);
 }
 
 void HardwareTFT::display(const int &x, const int &y, const std::string &str)
@@ -161,16 +152,7 @@ void HardwareTFT::displayPng(HardwareStorage &storage, const std::string &filena
         return;
     }
 
-    int16_t rc = png.openFLASH((uint8_t *)data, size, pngDraw);
-    if (rc == PNG_SUCCESS)
-    {
-        rc = png.decode(NULL, 0);
-        lcd.display();
-    }
-    else
-    {
-        Debug::Log.info(LOG_TFT, "Could not write PNG");
-    }
+    lcd.drawPng((uint8_t *) data, size);
 
     free(data);
 }
