@@ -133,6 +133,13 @@ void HardwareTFT::powerOff()
     lcd.sleep();
 }
 
+void HardwareTFT::powerOn()
+{
+    lcd.wakeup();
+    lcd.powerSaveOff();
+    lcd.setBrightness(255);
+}
+
 void HardwareTFT::displayPng(HardwareStorage &storage, const std::string &filename)
 {
     xpos = 0;

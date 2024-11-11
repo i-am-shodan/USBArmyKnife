@@ -93,7 +93,8 @@ void USBCDCWrapper::loop(Preferences &prefs)
                 break;
             }
 
-            const uint32_t len = *((uint32_t *)(serialPortRecvBuffer + 1));
+            uint32_t len = 0;
+            memcpy(&len, serialPortRecvBuffer + 1, sizeof(uint32_t));
 
             if (len > MAX_SERIAL_BUFFER_SIZE)
             {

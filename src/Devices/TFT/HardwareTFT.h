@@ -15,6 +15,7 @@ public:
   void display(const int &x, const int &y, const std::string &str);
   void clearScreen();
   void powerOff();
+  void powerOn();
 };
 
 namespace Devices
