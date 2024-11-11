@@ -117,6 +117,12 @@ static int handleLED(const std::string &str, std::unordered_map<std::string, std
     return true;
 }
 
+static int handleLEDBlue(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+{
+    Devices::LED.changeLEDState(true, 240, 100, 100, 255);
+    return true;
+}
+
 static int handleFileExists(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
 {
     // str is the current line, we need to peak in the constant #FILE
@@ -524,6 +530,7 @@ void addDuckyScriptExtensions(
     extCommands["DISPLAY_TEXT"] = handleDisplayText;
     extCommands["DISPLAY_CLEAR"] = handleDisplayClear;
     extCommands["LED"] = handleLED;
+    extCommands["LED_B"] = handleLEDBlue;
 
     // Other attacks
     extCommands["CALC"] = handleCalc;
