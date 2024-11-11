@@ -47,6 +47,8 @@ void SerialAgent::begin(Preferences &prefs)
         // for now use the log but limit the size
         const std::string msg = "Agent execution result\n";
         Debug::Log.info(LOG_AGENT, msg + std::string((char*)buffer, size + msg.length() > MAX_LOG_ENTRY_IN_CHARS ? MAX_LOG_ENTRY_IN_CHARS - msg.length() : size));
+
+        agentCmdResult = true;
     });
 }
 

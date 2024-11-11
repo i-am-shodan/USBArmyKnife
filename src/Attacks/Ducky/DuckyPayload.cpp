@@ -60,6 +60,7 @@ static std::unordered_map<std::string, std::function<int(std::string, std::unord
 static std::vector<std::function<std::pair<std::string, std::string>()>> consts;
 static std::string localCmdLineToExecute;
 static bool wasLastPressLong = false; // For buttons
+static int lastSuccessfullyEvaluatedLine = 0;
 
 static std::string readCmdLine(const std::string &filename, int lineNum);
 
@@ -89,6 +90,7 @@ static std::string readLineFromFileOrCmdLine(const std::string &filename, const 
     else
     {
         // we are reading a file
+        lastSuccessfullyEvaluatedLine = lineNumber;
         return Devices::Storage.readLineFromFile(filename, lineNumber);
     }
 }
@@ -193,21 +195,15 @@ static void requestDelay(const uint32_t &time)
         NULL      // Task handle
     );
 #else
-    const uint16_t timeToWaitInMs = 150;
-    for (uint32_t totalTimeSpentWaiting = 0; totalTimeSpentWaiting < time;)
+    uint32_t totalTimeSpentWaiting = 0;
+    while (totalTimeSpentWaiting < time)
     {
         const auto before = millis();
         loop(); // as timeToWait is != 0 we can call this
+        delay(150);
         const auto after = millis();
 
-        const auto timeSpentInLoop = after - before;
-        totalTimeSpentWaiting += timeSpentInLoop;
-        if (timeSpentInLoop < 150)
-        {
-            const auto remainingTimeToDelay = 150 - timeSpentInLoop;
-            delay(remainingTimeToDelay);
-            totalTimeSpentWaiting += remainingTimeToDelay;
-        }
+        totalTimeSpentWaiting += (after - before);
     }
     timeToWait = 0;
 #endif
@@ -255,6 +251,7 @@ void DuckyPayload::setPayload(const std::string &path)
     // Convert to std::string
     std::string newFileToExecute(path.c_str(), path.length());
     currentlyExecutingFile = newFileToExecute;
+    lastSuccessfullyEvaluatedLine = 0;
     Debug::Log.info(LOG_DUCKY, "Setting payload to - '" + currentlyExecutingFile + "'");
 }
 
@@ -313,7 +310,7 @@ void DuckyPayload::loop(Preferences &prefs)
 
         if (lastExecutionResult == DuckyInterpreter::SCRIPT_ERROR)
         {
-            Debug::Log.error(LOG_DUCKY, executeFile ? ("Script error near line " + std::to_string(lastExecutionResult + 1)) : "Error executing command");
+            Debug::Log.error(LOG_DUCKY, executeFile ? ("Script error near line " + std::to_string(lastSuccessfullyEvaluatedLine + 1)) : "Error executing command");
             totalErrors++;
             
         }

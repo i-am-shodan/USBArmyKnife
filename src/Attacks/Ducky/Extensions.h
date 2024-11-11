@@ -46,6 +46,12 @@ static int handleTFT_OFF(const std::string &str, std::unordered_map<std::string,
     return true;
 }
 
+static int handleTFT_ON(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+{
+    Devices::TFT.powerOn();
+    return true;
+}
+
 static int handleDisplayPNG(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
 {
     std::string arg = str.substr(str.find(' ') + 1);
@@ -186,6 +192,51 @@ static int handleAgentRun(const std::string &str, std::unordered_map<std::string
 {
     std::string arg = str.substr(str.find(' ') + 1);
     Attacks::Agent.run(arg);
+    return true;
+}
+
+void doAgentRunResultWait(const std::function<void(const int&)> &delay)
+{
+    while (true)
+    {
+        delay(150);
+        if (Attacks::Agent.hasAgentCmdResult())
+        {
+            Attacks::Agent.resetAgentCmdResultState();
+            break;
+        }
+    }
+
+    timeToWait = 0;
+}
+
+#ifdef ARDUINO_ARCH_ESP32 
+void AgentRunResultWaitTask(void *arg)
+{
+    doAgentRunResultWait(esp32_task_delay);
+    vTaskDelete(NULL);
+}
+#endif
+
+static int handleWaitForhandleAgentRunResult(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+{
+    Debug::Log.info(LOG_DUCKY, "Waiting for agent run result");
+
+    timeToWait = -1;
+
+#ifdef ARDUINO_ARCH_ESP32 
+    xTaskCreate(
+        AgentRunResultWaitTask, // Function that should be called
+        "AgentRunWait",           // Name of the task (for debugging)
+        1000,                // Stack size (bytes)
+        NULL,                // Parameter to pass
+        1,                   // Task priority
+        NULL                 // Task handle
+    );
+#else
+    doAgentRunResultWait([](const uint32_t &time) { loop(); });
+#endif
+
     return true;
 }
 
@@ -468,6 +519,7 @@ void addDuckyScriptExtensions(
 
     // Display/UI related
     extCommands["TFT_OFF"] = handleTFT_OFF;
+    extCommands["TFT_ON"] = handleTFT_ON;
     extCommands["DISPLAY_PNG"] = handleDisplayPNG;
     extCommands["DISPLAY_TEXT"] = handleDisplayText;
     extCommands["DISPLAY_CLEAR"] = handleDisplayClear;
@@ -496,6 +548,7 @@ void addDuckyScriptExtensions(
 
     // Agent
     extCommands["AGENT_RUN"] = handleAgentRun;
+    extCommands["WAIT_FOR_AGENT_RUN_RESULT"] = handleWaitForhandleAgentRunResult;
 
     // Functions
     extCommands["FILE_EXISTS()"] = handleFileExists;

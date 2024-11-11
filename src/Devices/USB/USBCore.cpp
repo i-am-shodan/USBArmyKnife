@@ -197,8 +197,10 @@ void USBCore::reset()
 
 void USBCore::loop(Preferences &prefs)
 {
-#ifdef TINYUSB_NEED_POLLING_TASK
-  // Manual call tud_task since it isn't called by Core's background
+#ifndef ARDUINO_ARCH_ESP32 
+  // Manual call tud_task since on the Rp2040 we call the main loop() directly and need
+  // do ensure it's doing USB stuff. It might end up being called twice, who cares we are
+  // a USB device
   TinyUSBDevice.task();
 #endif
 
