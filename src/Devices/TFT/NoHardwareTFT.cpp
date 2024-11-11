@@ -18,6 +18,10 @@ void HardwareTFT::powerOff()
 {
 }
 
+void HardwareTFT::powerOn()
+{
+}
+
 void HardwareTFT::displayPng(HardwareStorage &storage, const std::string &filename)
 {
 }
