@@ -4,8 +4,12 @@
 #ifdef NO_SD
     #include <SPIFFS.h>
     #define FILE_INTERFACE SPIFFS
+#elif ARDUINO_ARCH_RP2040
+    #include "RP2040/SDClassWrapper.h"
+    using namespace fs;
+    #define FILE_INTERFACE SDCard
 #else
-    #include "SDMMCFS2.h"
+    #include "ESP32/SDMMCFS2.h"
     using namespace fs;
     #define FILE_INTERFACE SD_MMC_2
 #endif
@@ -22,7 +26,7 @@ namespace Devices
 
 std::string HardwareStorage::readFile(fs::FS &fs, const char *path)
 {
-    File file = fs.open(path);
+    File file = fs.open(path, "r");
     if (!file)
     {
         return "";
@@ -37,7 +41,7 @@ std::string HardwareStorage::readFile(fs::FS &fs, const char *path)
 
 void HardwareStorage::writeFileData(const std::string& filename, const uint8_t *buffer, const size_t size)
 {
-    File file = FILE_INTERFACE.open(filename.c_str(), FILE_WRITE);
+    File file = FILE_INTERFACE.open(filename.c_str(), "w");
     if (!file)
     {
         Debug::Log.info(LOG_MMC, "Could not open file");
@@ -54,7 +58,7 @@ void HardwareStorage::writeFileData(const std::string& filename, const uint8_t *
 
 std::size_t HardwareStorage::getFileSize(const std::string& filename)
 {
-    File file = FILE_INTERFACE.open(filename.c_str());
+    File file = FILE_INTERFACE.open(filename.c_str(), "r");
     if (!file)
     {
         Debug::Log.info(LOG_MMC, "Could not open file: " + filename);
@@ -74,7 +78,7 @@ bool HardwareStorage::doesFileExist(const std::string& filename)
 
 uint8_t* HardwareStorage::readFileAsBinary(const std::string& filename)
 {
-    File file = FILE_INTERFACE.open(filename.c_str());
+    File file = FILE_INTERFACE.open(filename.c_str(), "r");
     if (!file)
     {
         Debug::Log.info(LOG_MMC, "Could not open file: " + filename);
@@ -110,7 +114,7 @@ uint8_t* HardwareStorage::readFileAsBinary(const std::string& filename)
 
 std::string HardwareStorage::readLineFromFile(const std::string &filename, const int lineNumber)
 {
-    File file = FILE_INTERFACE.open(filename.c_str());
+    File file = FILE_INTERFACE.open(filename.c_str(), "r");
     if (!file)
     {
         Debug::Log.info(LOG_MMC, "Could not open file: " + filename);
@@ -146,7 +150,7 @@ std::string HardwareStorage::readLineFromFile(const std::string &filename, const
 
 static void listDir(std::vector<std::string> &files, fs::FS &fs, const char *dirname)
 {
-    File root = fs.open(dirname);
+    File root = fs.open(dirname, "r");
     if (!root)
     {
         return;
@@ -161,7 +165,13 @@ static void listDir(std::vector<std::string> &files, fs::FS &fs, const char *dir
     {
         if (file.isDirectory())
         {
-            listDir(files, fs, file.path());
+            const char* path =
+#ifdef ARDUINO_ARCH_RP2040
+            file.fullName();
+#else
+            file.path();
+#endif
+            listDir(files, fs, path);
         }
         else
         {
@@ -199,7 +209,7 @@ uint8_t HardwareStorage::usedPercentage()
 
 bool HardwareStorage::createEmptyFile(const std::string &filename)
 {
-    File file = FILE_INTERFACE.open(filename.c_str(), FILE_WRITE);
+    File file = FILE_INTERFACE.open(filename.c_str(), "r");
     if (!file)
     {
         return false;
@@ -218,7 +228,9 @@ bool HardwareStorage::deleteFile(const std::string& filename)
 HardwareStorage::HardwareStorage()
 {
 #ifndef NO_SD
+#ifndef ARDUINO_ARCH_RP2040
     SD_MMC = FILE_INTERFACE;
+#endif
 #endif
 }
 
@@ -233,7 +245,16 @@ void HardwareStorage::begin(Preferences &prefs)
 
 void HardwareStorage::begin(Preferences &prefs, bool format)
 {
-#ifndef NO_SD
+#ifdef NO_SD
+    if (!FILE_INTERFACE.begin(format, "/sdcard"))
+    {
+        Debug::Log.info(LOG_MMC, "FILE_INTERFACE could not be started");
+    }
+    else
+    {
+        running = true;
+    }
+#elif defined (SD_MMC_D1_PIN)
     FILE_INTERFACE.setPins(SD_MMC_CLK_PIN, SD_MMC_CMD_PIN, SD_MMC_D0_PIN, SD_MMC_D1_PIN, SD_MMC_D2_PIN, SD_MMC_D3_PIN);
     if (!FILE_INTERFACE.begin("/sdcard", false, format, SDMMC_FREQ_52M))
     {
@@ -251,8 +272,8 @@ void HardwareStorage::begin(Preferences &prefs, bool format)
             running = true;
         }
     }
-#else
-    if (!FILE_INTERFACE.begin(format, "/sdcard"))
+#elif defined (ARDUINO_ARCH_RP2040)
+    if (!FILE_INTERFACE.begin(format))
     {
         Debug::Log.info(LOG_MMC, "FILE_INTERFACE could not be started");
     }

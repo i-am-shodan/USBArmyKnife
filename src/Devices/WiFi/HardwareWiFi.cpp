@@ -23,11 +23,9 @@ namespace Devices
     HardwareWiFi WiFi;
 }
 
+#ifndef NO_WIFI
 HardwareWiFi::HardwareWiFi()
 {
-  registerUserConfigurableSetting(CATEGORY_WIFI, WIFI_AP_NAME, USBArmyKnifeCapability::SettingType::String, WIFI_AP_NAME_DEFAULT);
-  registerUserConfigurableSetting(CATEGORY_WIFI, WIFI_AP_PWD, USBArmyKnifeCapability::SettingType::String, WIFI_AP_PWD_DEFAULT);
-  registerUserConfigurableSetting(CATEGORY_WIFI, WIFI_DESIRED_BOOT_STATE, USBArmyKnifeCapability::SettingType::Bool, WIFI_DESIRED_BOOT_STATE_DEFAULT);
 }
 
 void HardwareWiFi::setWiFi(const bool& state)
@@ -37,6 +35,10 @@ void HardwareWiFi::setWiFi(const bool& state)
 
 void HardwareWiFi::begin(Preferences& prefs)
 {
+  registerUserConfigurableSetting(CATEGORY_WIFI, WIFI_AP_NAME, USBArmyKnifeCapability::SettingType::String, WIFI_AP_NAME_DEFAULT);
+  registerUserConfigurableSetting(CATEGORY_WIFI, WIFI_AP_PWD, USBArmyKnifeCapability::SettingType::String, WIFI_AP_PWD_DEFAULT);
+  registerUserConfigurableSetting(CATEGORY_WIFI, WIFI_DESIRED_BOOT_STATE, USBArmyKnifeCapability::SettingType::Bool, WIFI_DESIRED_BOOT_STATE_DEFAULT);
+
   wiFiApName = prefs.getString(WIFI_AP_NAME, WIFI_AP_NAME_DEFAULT);
   wiFiApPwd = prefs.getString(WIFI_AP_PWD, WIFI_AP_PWD_DEFAULT);
   desiredWiFiState = prefs.getBool(WIFI_DESIRED_BOOT_STATE, WIFI_DESIRED_BOOT_STATE_DEFAULT);
@@ -49,8 +51,8 @@ void HardwareWiFi::begin(Preferences& prefs)
     WiFi.softAP(wiFiApName, wiFiApPwd);
     #if defined(LOLIN_WIFI_FIX) && (defined(ARDUINO_ARCH_ESP32C3) || defined(ARDUINO_ARCH_ESP32S2) || defined(ARDUINO_ARCH_ESP32S3))
       WiFi.setTxPower(WIFI_POWER_8_5dBm);
+      WiFi.setSleep(false);
     #endif
-    WiFi.setSleep(false);
     wiFiUp = true;
   } 
 }
@@ -71,3 +73,24 @@ void HardwareWiFi::end()
 {
   WiFi.mode(WIFI_OFF);
 }
+#else
+HardwareWiFi::HardwareWiFi()
+{
+}
+
+void HardwareWiFi::setWiFi(const bool& state)
+{
+}
+
+void HardwareWiFi::begin(Preferences& prefs)
+{
+}
+
+void HardwareWiFi::loop(Preferences& prefs)
+{
+}
+
+void HardwareWiFi::end()
+{
+}
+#endif

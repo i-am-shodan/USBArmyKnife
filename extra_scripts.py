@@ -4,6 +4,26 @@ import os
 staticFiles = {}
 headerFiles = []
 
+Import("env")
+
+def skip_esp32_libs_from_pi_builds(node):
+    """
+    `node.name` - a name of File System Node
+    `node.get_path()` - a relative path
+    `node.get_abspath()` - an absolute path
+     to ignore file from a build process, just return None
+    """
+
+    if ("usb-ncm" in node.get_path() or "ESP32Marauder" in node.get_path()) and "raspberrypi" in env.GetProjectOption("platform"):
+        # Return None for exclude
+        print ("Ignoring /lib dir as platform is raspberrypi")
+        return None
+
+    return node
+
+# Register callback
+env.AddBuildMiddleware(skip_esp32_libs_from_pi_builds, "*")
+
 def compress_to_c_array(srcFile, dstFile, varName, dataConvertFunc=None):
     try:
         # Read the contents of the source file
@@ -28,7 +48,7 @@ def compress_to_c_array(srcFile, dstFile, varName, dataConvertFunc=None):
         except:
             pass
         with open(dstFile, 'w') as f:
-            f.write(f"#pragma once\n\nconst uint8_t PROGMEM {varName}[{len(compressed_data)}] = {{ {c_array_string} }};")
+            f.write(f"#pragma once\n\n#ifndef NO_WEB\n\nconst uint8_t PROGMEM {varName}[{len(compressed_data)}] = {{ {c_array_string} }};\n\n#endif")
 
         print(f"Compressed data written to {dstFile}")
 
@@ -72,7 +92,7 @@ for root, dirs, files in os.walk(directory_path):
         # Call the compress_to_c_array function
         compress_to_c_array(file_path, f"src/html/vnc/{file_name}.h", f"noVNC{file_name}Gz")
 
-cpp_vector_code = "#include <string>\n#include <unordered_map>\n#include <cstdint>\n#include <pgmspace.h>\n\n";
+cpp_vector_code = "#ifndef NO_WEB\n\n#include <string>\n#include <unordered_map>\n#include <cstdint>\n#include <pgmspace.h>\n\n";
 for header in headerFiles:
     cpp_vector_code += '#include "'+header.replace("src/html/", "")+'"\n'
 
@@ -85,7 +105,7 @@ for key, value in staticFiles.items():
         cpp_vector_code += ",\n"
     else:
         cpp_vector_code += "\n"
-cpp_vector_code += "};"
+cpp_vector_code += "};\n\n#endif"
 
 with open("src/html/htmlFiles.cpp", "w") as file:
     file.write(cpp_vector_code)

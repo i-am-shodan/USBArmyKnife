@@ -45,6 +45,11 @@ extern void DuckyInterpreterLog(uint8_t level, const char *format, ...)
 }
 #endif
 
+#ifndef ARDUINO_ARCH_ESP32
+// Platforms without tasks need to be able to call the main loop
+extern void loop();
+#endif
+
 static std::string currentlyExecutingFile;
 static uint8_t totalErrors = 0;
 static int lastExecutionResult = 0;
@@ -55,6 +60,7 @@ static std::unordered_map<std::string, std::function<int(std::string, std::unord
 static std::vector<std::function<std::pair<std::string, std::string>()>> consts;
 static std::string localCmdLineToExecute;
 static bool wasLastPressLong = false; // For buttons
+static int lastSuccessfullyEvaluatedLine = 0;
 
 static std::string readCmdLine(const std::string &filename, int lineNum);
 
@@ -84,6 +90,7 @@ static std::string readLineFromFileOrCmdLine(const std::string &filename, const 
     else
     {
         // we are reading a file
+        lastSuccessfullyEvaluatedLine = lineNumber;
         return Devices::Storage.readLineFromFile(filename, lineNumber);
     }
 }
@@ -103,11 +110,12 @@ static void changeLEDState(bool on, uint8_t hue, uint8_t saturation, uint8_t lum
     Devices::LED.changeLEDState(on, hue, saturation, lum, brightness);
 }
 
-void ButtonWaitTask(void *arg)
+
+static void doButtonWait(const std::function<void(const int&)> &delay)
 {
     while (true)
     {
-        vTaskDelay(pdMS_TO_TICKS(150));
+        delay(150);
         if (Devices::Button.hasButtonBeenPressed())
         {
             wasLastPressLong = Devices::Button.wasLastPressLong();
@@ -117,8 +125,20 @@ void ButtonWaitTask(void *arg)
     }
 
     timeToWait = 0;
+}
+
+#ifdef ARDUINO_ARCH_ESP32 
+static void esp32_task_delay(const uint32_t &timeInMs)
+{
+   vTaskDelay(pdMS_TO_TICKS(timeInMs)); 
+}
+
+void ButtonWaitTask(void *arg)
+{
+    doButtonWait(esp32_task_delay);
     vTaskDelete(NULL);
 }
+#endif
 
 static void waitForButton()
 {
@@ -127,6 +147,7 @@ static void waitForButton()
     // in our loop we check if the task is finished and only continue processing if it has
     timeToWait = -1;
 
+#ifdef ARDUINO_ARCH_ESP32
     xTaskCreate(
         ButtonWaitTask, // Function that should be called
         "ButtonWait",   // Name of the task (for debugging)
@@ -135,6 +156,9 @@ static void waitForButton()
         1,              // Task priority
         NULL            // Task handle
     );
+#else
+    doButtonWait([](const uint32_t &time) { loop(); });
+#endif
 }
 
 static void changeUSBMode(DuckyInterpreter::USB_MODE &mode, const uint16_t &vid, const uint16_t &pid, const std::string &man, const std::string &prod, const std::string &serial)
@@ -142,14 +166,17 @@ static void changeUSBMode(DuckyInterpreter::USB_MODE &mode, const uint16_t &vid,
     Devices::USB::Core.changeUSBMode(mode, vid, pid, man, prod, serial);
 }
 
+#ifdef ARDUINO_ARCH_ESP32
 void WaitTask(void *arg)
 {
-    vTaskDelay(pdMS_TO_TICKS(timeToWait));
+    int waitTime = timeToWait;
+    esp32_task_delay(waitTime);
     timeToWait = 0;
     vTaskDelete(NULL);
 }
+#endif
 
-static void requestDelay(uint32_t time)
+static void requestDelay(const uint32_t &time)
 {
     // We can do other things while we are waiting so we kick off a task to wait
     // return, which causes us to loop again
@@ -158,6 +185,7 @@ static void requestDelay(uint32_t time)
 
     timeToWait = time;
 
+#ifdef ARDUINO_ARCH_ESP32
     xTaskCreate(
         WaitTask, // Function that should be called
         "Wait",   // Name of the task (for debugging)
@@ -166,6 +194,19 @@ static void requestDelay(uint32_t time)
         1,        // Task priority
         NULL      // Task handle
     );
+#else
+    uint32_t totalTimeSpentWaiting = 0;
+    while (totalTimeSpentWaiting < time)
+    {
+        const auto before = millis();
+        loop(); // as timeToWait is != 0 we can call this
+        delay(150);
+        const auto after = millis();
+
+        totalTimeSpentWaiting += (after - before);
+    }
+    timeToWait = 0;
+#endif
 }
 
 static DuckyInterpreter duckyFileParser = DuckyInterpreter(
@@ -210,6 +251,7 @@ void DuckyPayload::setPayload(const std::string &path)
     // Convert to std::string
     std::string newFileToExecute(path.c_str(), path.length());
     currentlyExecutingFile = newFileToExecute;
+    lastSuccessfullyEvaluatedLine = 0;
     Debug::Log.info(LOG_DUCKY, "Setting payload to - '" + currentlyExecutingFile + "'");
 }
 
@@ -241,7 +283,11 @@ void DuckyPayload::loop(Preferences &prefs)
     {
         // perform any other flushing tasks
         Devices::USB::Core.end();
+#ifdef ARDUINO_ARCH_ESP32
         ESP.restart();
+#else
+        watchdog_reboot(0, SRAM_END, 0);
+#endif
     }
     else if (!currentlyExecutingFile.empty() || !localCmdLineToExecute.empty())
     {
@@ -264,7 +310,7 @@ void DuckyPayload::loop(Preferences &prefs)
 
         if (lastExecutionResult == DuckyInterpreter::SCRIPT_ERROR)
         {
-            Debug::Log.error(LOG_DUCKY, executeFile ? ("Script error near line " + std::to_string(lastExecutionResult + 1)) : "Error executing command");
+            Debug::Log.error(LOG_DUCKY, executeFile ? ("Script error near line " + std::to_string(lastSuccessfullyEvaluatedLine + 1)) : "Error executing command");
             totalErrors++;
             
         }
