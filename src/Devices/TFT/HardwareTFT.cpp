@@ -7,6 +7,10 @@
 #include <PNGdec.h>
 
 #define LOG_TFT "TFT"
+#define MAX_RADIUS 4
+static uint8_t radius = MAX_RADIUS;
+static int color = TFT_WHITE;
+static unsigned long previousMillis = 0;
 
 // In the future if you are trying to add another board configuration here it would make sense
 // To have multiple lgfx::LGFX_Device objects wrapped in ifdefs rather that they single instance we have now
@@ -177,6 +181,30 @@ HardwareTFT::HardwareTFT()
 
 void HardwareTFT::loop(Preferences &prefs)
 {
+#ifndef NO_TFT_HEARTBEAT
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis <= 250)
+    {
+        return;
+    }
+
+    previousMillis = currentMillis;
+
+    lcd.drawCircle(DISPLAY_WIDTH - MAX_RADIUS - 1, DISPLAY_HEIGHT - MAX_RADIUS - 1, radius, color);
+
+    radius = color == TFT_WHITE ? radius - 1 : radius + 1;
+
+    if (radius > MAX_RADIUS)
+    {
+        color = TFT_WHITE;
+        radius = MAX_RADIUS;
+    }
+    else if (radius <= 0)
+    {
+        color = TFT_BLACK;
+        radius = 1;
+    }
+#endif
 }
 
 void HardwareTFT::begin(Preferences &prefs)
