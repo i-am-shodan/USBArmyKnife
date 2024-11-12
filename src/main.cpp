@@ -24,6 +24,12 @@ void loop() {}
 
 #include "Utilities/Format.h"
 
+#include "MyLD2410.h"
+// #define sensorSerial Serial1
+HardwareSerial sensorSerial(2);
+MyLD2410 sensor(sensorSerial);
+static bool working = false;
+
 static Preferences prefs;
 
 void setup()
@@ -43,7 +49,7 @@ void setup()
   Devices::LED.begin(prefs);
   Devices::TFT.begin(prefs);
   Devices::Button.begin(prefs);
-  
+
   Devices::USB::Core.begin(prefs);
   Devices::WiFi.begin(prefs);
 
@@ -77,17 +83,67 @@ void setup()
 
   if (Devices::USB::Core.currentClassType() == USBClassType::HID)
   {
-    Devices::TFT.display(0, 8+8, "USB CLASS: HID");
+    Devices::TFT.display(0, 8 + 8, "USB CLASS: HID");
   }
   else if (Devices::USB::Core.currentClassType() == USBClassType::Storage)
   {
-    Devices::TFT.display(0, 8+8, "USB CLASS: Storage");
+    Devices::TFT.display(0, 8 + 8, "USB CLASS: Storage");
   }
   else
   {
-    Devices::TFT.display(0, 8+8, "USB CLASS: None");
+    Devices::TFT.display(0, 8 + 8, "USB CLASS: None");
   }
+
+/*
+  sensorSerial.begin(256000, SERIAL_8N1, 44, 43);
+  if (sensor.begin())
+  {
+    sensor.setBaud(7);
+    sensorSerial.end();
+    sensorSerial.begin(256000, SERIAL_8N1, 44, 43);
+    if (sensor.begin())
+    {
+      Devices::TFT.display(0, 8+8+8, "Working");
+      working = true;
+    }
+  }*/
+
+  
+    uint32_t BAUDS[9]{ 0, 9600, 19200, 38400, 57600, 115200, 230400, 256000, 460800 };
+    for (int x = 1; x < sizeof(BAUDS); x++)
+    {
+      sensorSerial.begin(BAUDS[x], SERIAL_8N1, 44, 43);
+      delay(2000);
+
+      if (!sensor.begin()) {
+        Devices::TFT.clearScreen();
+        Debug::Log.info("Main", "Failed to communicate with sensor");
+        Devices::TFT.display(0, 0, "Sensor error: "+std::to_string(BAUDS[x]));
+      }
+      else
+      {
+        Devices::TFT.clearScreen();
+        Devices::TFT.display(0, 0, "Working with "+std::to_string(BAUDS[x]));
+
+        if (!sensor.setBaud(x))
+        {
+          Devices::TFT.display(0, 8, "Set rate error");
+          break;
+        }
+
+        sensorSerial.end();
+        sensorSerial.begin(BAUDS[x], SERIAL_8N1, 44, 43);
+        if (sensor.begin())
+        {
+          working = true;
+        }
+        break;
+      }
+    }
+    Devices::TFT.display(0, 8+8, "Finished: "+std::to_string(working));
 }
+
+static unsigned long previousMillis = 0;
 
 void loop()
 {
@@ -107,6 +163,17 @@ void loop()
   Attacks::Ducky.loop(prefs);
   Attacks::Marauder.loop(prefs);
   Attacks::Agent.loop(prefs);
+
+  if (working && sensor.check() == MyLD2410::Response::DATA && millis() - previousMillis >= 1000)
+  {
+    unsigned long distance = sensor.detectedDistance();
+    Devices::TFT.clearScreen();
+    Devices::TFT.display(0, 0, sensor.statusString());
+    Devices::TFT.display(0, 8, "Distance: " + std::to_string(distance));
+    Devices::TFT.display(0, 8 + 8, "Light level: " + std::to_string(sensor.getLightLevel()));
+
+    previousMillis = millis();
+  }
 }
 
 #endif /* ARDUINO_USB_MODE */
