@@ -1,0 +1,37 @@
+FUNCTION SELF_DESTRUCT()
+    REM implement your own routine here!
+    DISPLAY_PNG /bomb.png
+    DELAY 3000
+    RESET
+END_FUNCTION
+
+REM wait for device to settle down or for you to retreat
+DELAY 3000
+
+IF (LD2410_CONNECTED() == FALSE)
+    DISPLAY_CLEAR
+    DISPLAY_TEXT 0 0 Error, could not find device
+    DELAY 2000
+    SELF_DESTRUCT()
+END_IF
+
+VAR $UPDATE_COUNT = 0
+
+WHILE (LD2410_CONNECTED())
+    IF (LD2410_DETECTED_MOTION())
+        IF (LD2410_GET_DISTANCE() < 10)
+            SELF_DESTRUCT()
+        END_IF
+    ELSE
+        IF ($UPDATE_COUNT > 10)
+            DISPLAY_CLEAR
+            DISPLAY_TEXT 0 0 Light level #_LD2410_LIGHT_LEVEL_
+            $UPDATE_COUNT = 0
+        ELSE
+            DISPLAY_TEXT $UPDATE_COUNT 50 .
+            $UPDATE_COUNT = ( $UPDATE_COUNT + 1 )
+        END_IF
+    END_IF
+END_WHILE
+
+SELF_DESTRUCT()
