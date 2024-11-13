@@ -94,21 +94,23 @@ void setup()
     Devices::TFT.display(0, 8 + 8, "USB CLASS: None");
   }
 
-/*
+
   sensorSerial.begin(256000, SERIAL_8N1, 44, 43);
+  delay(2000);
   if (sensor.begin())
   {
-    sensor.setBaud(7);
-    sensorSerial.end();
-    sensorSerial.begin(256000, SERIAL_8N1, 44, 43);
-    if (sensor.begin())
+    if (sensor.setBaud(7) && sensor.begin())
     {
       Devices::TFT.display(0, 8+8+8, "Working");
       working = true;
     }
-  }*/
+    else
+    {
+      Devices::TFT.display(0, 8+8+8, "Error");
+    }
+  }
 
-  
+  /*
     uint32_t BAUDS[9]{ 0, 9600, 19200, 38400, 57600, 115200, 230400, 256000, 460800 };
     for (int x = 1; x < sizeof(BAUDS); x++)
     {
@@ -140,7 +142,7 @@ void setup()
         break;
       }
     }
-    Devices::TFT.display(0, 8+8, "Finished: "+std::to_string(working));
+    Devices::TFT.display(0, 8+8, "Finished: "+std::to_string(working));*/
 }
 
 static unsigned long previousMillis = 0;
@@ -164,13 +166,13 @@ void loop()
   Attacks::Marauder.loop(prefs);
   Attacks::Agent.loop(prefs);
 
-  if (working && sensor.check() == MyLD2410::Response::DATA && millis() - previousMillis >= 1000)
+  if (working && sensor.check() == MyLD2410::Response::DATA && millis() - previousMillis >= 500)
   {
     unsigned long distance = sensor.detectedDistance();
     Devices::TFT.clearScreen();
     Devices::TFT.display(0, 0, sensor.statusString());
     Devices::TFT.display(0, 8, "Distance: " + std::to_string(distance));
-    Devices::TFT.display(0, 8 + 8, "Light level: " + std::to_string(sensor.getLightLevel()));
+    Devices::TFT.display(0, 8 + 8, std::string("Firmware: ") + sensor.getFirmware().c_str());
 
     previousMillis = millis();
   }
