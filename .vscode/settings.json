@@ -70,6 +70,10 @@
         "text_encoding": "cpp",
         "charconv": "cpp",
         "future": "cpp",
-        "variant": "cpp"
-    }
+        "variant": "cpp",
+    },
+    "theme-by-language.themes": {
+        "filename:.*\\.ds$": "LightDuckyScript"
+    },
+    "workbench.colorTheme": "PowerShell ISE"
 }
