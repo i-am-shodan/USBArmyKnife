@@ -28,38 +28,38 @@ static const std::string Constant_FileIndexFileName = "#_FILE_INDEX_FILE_NAME_";
 static std::vector<std::string> curListOfFiles;
 static int curFileIndexVariable = 0;
 
-static int handleCalc(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleCalc(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     Devices::USB::HID.consumer_device_keypress(HID_USAGE_CONSUMER_AL_CALCULATOR);
     return true;
 }
 
-static int handleDisplayClear(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleDisplayClear(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     Devices::TFT.clearScreen();
     return true;
 }
 
-static int handleTFT_OFF(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleTFT_OFF(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     Devices::TFT.powerOff();
     return true;
 }
 
-static int handleTFT_ON(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleTFT_ON(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     Devices::TFT.powerOn();
     return true;
 }
 
-static int handleDisplayPNG(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleDisplayPNG(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     std::string arg = str.substr(str.find(' ') + 1);
     Devices::TFT.displayPng(Devices::Storage, arg);
     return true;
 }
 
-static int handleDisplayText(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleDisplayText(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     std::string remainingArgs = str.substr(str.find(' ') + 1);
 
@@ -78,7 +78,7 @@ static int handleDisplayText(const std::string &str, std::unordered_map<std::str
     return true;
 }
 
-static int handleUSBMode(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleUSBMode(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     std::string arg = str.substr(str.find(' ') + 1);
     const auto entries = Ducky::SplitString(arg);
@@ -95,7 +95,7 @@ static int handleUSBMode(const std::string &str, std::unordered_map<std::string,
     return false;
 }
 
-static int handleLED(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleLED(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     std::string arg = str.substr(str.find(' ') + 1);
 
@@ -117,18 +117,18 @@ static int handleLED(const std::string &str, std::unordered_map<std::string, std
     return true;
 }
 
-static int handleLEDBlue(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleLEDBlue(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     Devices::LED.changeLEDState(true, 240, 100, 100, 255);
     return true;
 }
 
-static int handleFileExists(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleFileExists(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     // str is the current line, we need to peak in the constant #FILE
     if (constants.find("#FILE") != constants.cend())
     {
-        auto ret = Devices::Storage.doesFileExist(constants["#FILE"]);
+        auto ret = Devices::Storage.doesFileExist(constants.at("#FILE"));
 
         Debug::Log.info(LOG_DUCKY, "FILE_EXISTS() returned " + std::to_string(ret));
         return ret;
@@ -140,12 +140,12 @@ static int handleFileExists(const std::string &str, std::unordered_map<std::stri
     }
 }
 
-static int handleCreateFile(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleCreateFile(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     // str is the current line, we need to peak in the constant #FILE
     if (constants.find("#FILE") != constants.cend())
     {
-        return Devices::Storage.createEmptyFile(constants["#FILE"]);
+        return Devices::Storage.createEmptyFile(constants.at("#FILE"));
     }
     else
     {
@@ -154,26 +154,26 @@ static int handleCreateFile(const std::string &str, std::unordered_map<std::stri
     }
 }
 
-static int handleESP32Marauder(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleESP32Marauder(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     std::string arg = str.substr(str.find(' ') + 1);
     Attacks::Marauder.run(arg);
     return true;
 }
 
-static int handleWiFiOff(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleWiFiOff(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     Devices::WiFi.setWiFi(false);
     return true;
 }
 
-static int handleWiFiOn(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleWiFiOn(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     Devices::WiFi.setWiFi(true);
     return true;
 }
 
-static int handleSerial(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleSerial(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     std::string arg = str.substr(str.find(' ') + 1);
     auto speed = atol(arg.c_str());
@@ -182,19 +182,19 @@ static int handleSerial(const std::string &str, std::unordered_map<std::string, 
     return true;
 }
 
-static int handleUsbNcmPcapOn(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleUsbNcmPcapOn(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     Devices::USB::NCM.startPacketCollection();
     return true;
 }
 
-static int handleUsbNcmPcapOff(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleUsbNcmPcapOff(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     Devices::USB::NCM.stopPacketCollection();
     return true;
 }
 
-static int handleAgentRun(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleAgentRun(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     std::string arg = str.substr(str.find(' ') + 1);
     Attacks::Agent.run(arg);
@@ -224,7 +224,7 @@ void AgentRunResultWaitTask(void *arg)
 }
 #endif
 
-static int handleWaitForhandleAgentRunResult(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleWaitForhandleAgentRunResult(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     Debug::Log.info(LOG_DUCKY, "Waiting for agent run result");
 
@@ -246,12 +246,12 @@ static int handleWaitForhandleAgentRunResult(const std::string &str, std::unorde
     return true;
 }
 
-static int handleDeleteFile(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleDeleteFile(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     // str is the current line, we need to peak in the constant #FILE
     if (constants.find("#FILE") != constants.cend())
     {
-        auto ret = Devices::Storage.deleteFile(constants["#FILE"]);
+        auto ret = Devices::Storage.deleteFile(constants.at("#FILE"));
 
         Debug::Log.info(LOG_DUCKY, "DELETE_FILE() returned " + std::to_string(ret));
         return ret;
@@ -263,13 +263,13 @@ static int handleDeleteFile(const std::string &str, std::unordered_map<std::stri
     }
 }
 
-static int handleAgentConnected(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleAgentConnected(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     return Attacks::Agent.isAgentConnected();
 }
 
 // handles both LOAD_FILES_FROM_SD() and IS_FILE_INDEX_VALID()
-static int handleFileIndex(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleFileIndex(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     bool ret = false;
 
@@ -290,7 +290,7 @@ static int handleFileIndex(const std::string &str, std::unordered_map<std::strin
         }
         else
         {
-            curFileIndexVariable = variables[varName];
+            curFileIndexVariable = variables.at(varName);
             if (curFileIndexVariable >= curListOfFiles.size())
             {
                 ret = false;
@@ -305,7 +305,7 @@ static int handleFileIndex(const std::string &str, std::unordered_map<std::strin
     return ret;
 }
 
-static int handleButtonPress(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleButtonPress(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     Debug::Log.info(LOG_DUCKY, "handleButtonPress '" + str + "'");
     if (str == "BUTTON_LONG_PRESS()")
@@ -318,7 +318,7 @@ static int handleButtonPress(const std::string &str, std::unordered_map<std::str
     }
 }
 
-static int handleRunPayload(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleRunPayload(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     const std::string arg = str.substr(str.find(' ') + 1);
     if (arg.ends_with(".ds"))
@@ -358,7 +358,7 @@ void MSCActivityWaitTask(void *arg)
 }
 #endif
 
-static int handleWaitForUSBStorageActivity(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleWaitForUSBStorageActivity(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     // We can do other things while we are waiting so we kick off a task to wait
     // return, which causes us to loop again
@@ -417,7 +417,7 @@ void MSCActivityWaitToStopTask(void *arg)
 }
 #endif
 
-static int handleWaitForUSBStorageActivityToStop(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleWaitForUSBStorageActivityToStop(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     // We can do other things while we are waiting so we kick off a task to wait
     // return, which causes us to loop again
@@ -442,7 +442,7 @@ static int handleWaitForUSBStorageActivityToStop(const std::string &str, std::un
     return true;
 }
 
-static int handleRawHid(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleRawHid(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     bool ret = false;
 
@@ -488,7 +488,7 @@ static int handleRawHid(const std::string &str, std::unordered_map<std::string, 
     return ret;
 }
 
-static int handleKeyboardLayout(const std::string &str, std::unordered_map<std::string, std::string> constants, std::unordered_map<std::string, int> variables)
+static int handleKeyboardLayout(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     const std::string arg = str.substr(str.find(' ') + 1);
 
@@ -516,8 +516,8 @@ static int handleKeyboardLayout(const std::string &str, std::unordered_map<std::
 }
 
 void addDuckyScriptExtensions(
-    std::unordered_map<std::string, std::function<int(std::string, std::unordered_map<std::string, std::string>, std::unordered_map<std::string, int>)>> &extCommands,
-    std::vector<std::function<std::pair<std::string, std::string>()>> &consts)
+    ExtensionCommands& extCommands,
+    UserDefinedConstants &consts)
 {
     // Ok so whats the difference here between a command and a function?
     // A command is an action, it performs an action on something

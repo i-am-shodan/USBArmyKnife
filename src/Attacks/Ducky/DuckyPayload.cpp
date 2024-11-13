@@ -56,8 +56,8 @@ static int lastExecutionResult = 0;
 static volatile uint32_t timeToWait = 0; // volatile to try and prevent dirty reads
 static bool firstRun = true;
 static bool requiresReset = false;
-static std::unordered_map<std::string, std::function<int(std::string, std::unordered_map<std::string, std::string>, std::unordered_map<std::string, int>)>> extCommands;
-static std::vector<std::function<std::pair<std::string, std::string>()>> consts;
+static ExtensionCommands extCommands;
+static UserDefinedConstants consts;
 static std::string localCmdLineToExecute;
 static bool wasLastPressLong = false; // For buttons
 static int lastSuccessfullyEvaluatedLine = 0;
@@ -220,6 +220,11 @@ static DuckyInterpreter duckyFileParser = DuckyInterpreter(
     reset);
 
 #include "Extensions.h"
+
+void DuckyPayload::registerExtension(const std::string& command, std::function<int(const std::string&, const std::unordered_map<std::string, std::string>&, const std::unordered_map<std::string, int>&)> callback)
+{
+    extCommands[command] = callback;
+}
 
 uint8_t DuckyPayload::getTotalErrors()
 {
