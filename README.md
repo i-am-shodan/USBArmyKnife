@@ -100,6 +100,10 @@ The USB Army Knife may not run correctly with large SD cards or those with newer
 
 **Note** On first run, if an SD card cannot be found with a supported filesystem the device will offer to format it for you. If you use this option the filesystem created on the SD card may not work under Windows. As such it is advised to create a suitable SD card off device.
 
+### Preparing your script file
+
+Beaware that your script file should have Windows style (CRLF) line endings. If your script is terminating on empty lines convert your script using `unix2dos`.
+
 ### Installation
 
 1. Clone the repository:

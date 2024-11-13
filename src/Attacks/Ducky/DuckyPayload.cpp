@@ -226,6 +226,11 @@ void DuckyPayload::registerExtension(const std::string& command, std::function<i
     extCommands[command] = callback;
 }
 
+void DuckyPayload::registerDynamicVariable(std::function<std::pair<std::string, std::string>()> func)
+{
+    consts.emplace_back(func);
+}
+
 uint8_t DuckyPayload::getTotalErrors()
 {
     return totalErrors;

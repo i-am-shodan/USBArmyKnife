@@ -20,6 +20,7 @@ public:
   std::string getPayloadRunningStatus();
   uint8_t getTotalErrors();
   void registerExtension(const std::string& command, std::function<int(const std::string&, const std::unordered_map<std::string, std::string>&, const std::unordered_map<std::string, int>&)> callback);
+  void registerDynamicVariable(std::function<std::pair<std::string, std::string>()>);
 };
 
 namespace Attacks
