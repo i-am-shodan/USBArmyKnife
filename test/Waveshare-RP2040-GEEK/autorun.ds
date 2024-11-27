@@ -17,26 +17,6 @@ END_WHILE
 REM Turn TFT off and on
 TFT_OFF
 DELAY 2000
-
-REM This is the system test for RP2040 based boards
-REM At time of writing these don't have WiFi, LED or a button
-
-REM To run these tests copy this file and disk.img from the covert storage example to the SD
-REM You'll also need to have the agent running. You should see:
-REM * Test card with correct colours
-REM * Pulsing heartbeat in the lower right of the TFT
-REM * Web page loaded via badUSB
-REM * Disk mounted
-REM * Device resetting
-
-REM Wait for the agent, this also allows us to see some debug if we are monitoring
-WHILE (AGENT_CONNECTED() == FALSE)
-  DELAY 2000
-END_WHILE
-
-REM Turn TFT off and on
-TFT_OFF
-DELAY 2000
 TFT_ON
 
 DISPLAY_CLEAR
@@ -48,42 +28,6 @@ DISPLAY_PNG /testcard.png
 DELAY 10000
 DISPLAY_CLEAR
 DISPLAY_TEXT 0 0 Agent connected
-DISPLAY_TEXT 0 10 Test card
-
-REM Run a command to ensure we can handle the results
-AGENT_RUN dir
-WAIT_FOR_AGENT_RUN_RESULT
-
-DISPLAY_TEXT 0 20 Agent run command
-REM Load a webpage to ensure USB + HID is working
-GUI
-DELAY 1000
-STRING https://github.com/i-am-shodan/USBArmyKnife/blob/master/docs/images/interface-status.png
-ENTER
-
-DISPLAY_TEXT 0 30 Turning services off
-REM Turn some services off and mount as a disk, some devices won't support this but must not error
-WIFI_OFF
-LED_OFF
-
-DISPLAY_TEXT 0 40 Mouting USB disk
-USB_MOUNT_DISK_READ_ONLY /disk.img
-DELAY 20000
-
-REM reset the device and do it all again
-DISPLAY_TEXT 0 50 Reset in 5s
-DELAY 5000
-RESET
-TFT_ON
-
-DISPLAY_CLEAR
-DISPLAY_TEXT 0 0 Agent connected
-DELAY 3000
-
-REM Load a test card to test TFT PNG decoding and colours
-DISPLAY_PNG /testcard.png
-DELAY 10000
-DISPLAY_CLEAR
 DISPLAY_TEXT 0 10 Test card
 
 REM Run a command to ensure we can handle the results

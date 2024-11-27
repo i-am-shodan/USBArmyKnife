@@ -61,3 +61,12 @@ jobs:
         with:
           name: Waveshare-RP2040-GEEK Firmware binaries
           path: .pio/build/Waveshare-RP2040-GEEK/*.bin
+
+      - name: Build PlatformIO Project M5-Atom-S3U
+        run: pio run --environment M5-Atom-S3U
+              
+      - name: Upload M5-Atom-S3U artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: M5-Atom-S3U Firmware binaries
+          path: .pio/build/M5-Atom-S3U/*.bin

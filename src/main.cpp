@@ -21,10 +21,12 @@ void loop() {}
 #include "Attacks/Agent/Agent.h"
 
 #include "Debug/Logging.h"
+#include "AuxiliaryComponent/Auxiliary.h"
 
 #include "Utilities/Format.h"
 
 static Preferences prefs;
+static Auxiliary aux;
 
 void setup()
 {
@@ -87,6 +89,8 @@ void setup()
   {
     Devices::TFT.display(0, 8+8, "USB CLASS: None");
   }
+
+  aux.begin(prefs);
 }
 
 void loop()
@@ -107,6 +111,8 @@ void loop()
   Attacks::Ducky.loop(prefs);
   Attacks::Marauder.loop(prefs);
   Attacks::Agent.loop(prefs);
+
+  aux.loop(prefs);
 }
 
 #endif /* ARDUINO_USB_MODE */
