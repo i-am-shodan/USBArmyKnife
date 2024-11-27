@@ -1,0 +1,55 @@
+REM This is the system test for M5-Atom-S3 based boards
+REM These do not have a screen or SD card.
+
+REM To run these tests copy this file to the data directory and use the upload filesystem command or platformio
+REM You'll also need to have the agent running. You should see:
+
+REM * Web page loaded via badUSB
+
+REM You should connect to the device over WiFi and check
+REM * The web interface loads
+REM * VNC works
+REM * You can see logs
+REM * Results from the agent run are in the logs
+
+REM Now press the button and ensure the LED cycles
+REM * RED
+REM * GREEN
+REM * BLUE
+REM * OFF
+
+REM Press the button again and the device will do an ESP32 Maurader rick roll
+REM * Ensure that the lyrics can be seen over WiFi
+
+REM Press once more for a reset
+REM * Device resetting
+
+WHILE (AGENT_CONNECTED() == FALSE)
+  DELAY 2000
+END_WHILE
+
+REM Run a command to ensure we can handle the results
+AGENT_RUN dir
+WAIT_FOR_AGENT_RUN_RESULT
+
+REM Load a webpage to ensure USB + HID is working
+GUI
+DELAY 1000
+STRING https://github.com/i-am-shodan/USBArmyKnife/blob/master/docs/images/interface-status.png
+ENTER
+
+LED_R
+WAIT_FOR_BUTTON_PRESS
+LED_G
+WAIT_FOR_BUTTON_PRESS
+LED_B
+WAIT_FOR_BUTTON_PRESS
+LED_OFF
+
+WIFI_OFF
+ESP32M attack -t rickroll
+WAIT_FOR_BUTTON_PRESS
+
+REM reset the device and do it all again
+DELAY 5000
+RESET
