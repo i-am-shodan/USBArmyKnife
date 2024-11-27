@@ -25,7 +25,7 @@
 
 namespace Comms
 {
-    WebSite Web;
+  WebSite Web;
 }
 
 static AsyncWebServer controlInterfaceWebServer(8080);
@@ -33,7 +33,6 @@ static AsyncWebSocket ws("/websockify");
 
 extern std::unordered_map<const char *, std::pair<const uint8_t *, size_t>> staticHtmlFilesLookup;
 static const char *remoteAddress = "127.0.0.1:7002";
-
 static Preferences *preferences = nullptr;
 
 static const std::unordered_map<std::string, std::string> mimeTypes = {
@@ -130,7 +129,7 @@ static const char *GetMimeType(const char *fname)
 static void webRequestHandler(AsyncWebServerRequest *request)
 {
   const auto &url = request->url();
-  //Debug::Log.info(LOG_WEB, std::string("webRequestHandler ") + url.c_str());
+  // Debug::Log.info(LOG_WEB, std::string("webRequestHandler ") + url.c_str());
 
   if (url == "/wpad.dat")
   {
@@ -156,9 +155,9 @@ static void webRequestHandler(AsyncWebServerRequest *request)
     root["machineName"] = Attacks::Agent.machineName();
 
     float heapUsed = (float)(ESP.getHeapSize() - ESP.getFreeHeap());
-    float totalHeap = (float) ESP.getHeapSize();
+    float totalHeap = (float)ESP.getHeapSize();
 
-    root["heapUsagePc"] = (int) ((heapUsed / totalHeap) * 100);
+    root["heapUsagePc"] = (int)((heapUsed / totalHeap) * 100);
     root["numCores"] = ESP.getChipCores();
     root["chipModel"] = ESP.getChipModel();
 
@@ -236,7 +235,24 @@ static void webRequestHandler(AsyncWebServerRequest *request)
   }
   else if (url == "/download" && request->hasParam("filename"))
   {
-    request->redirect("/index.html"); // redirect to our main page
+    const String filename = request->getParam("filename")->value();
+    Debug::Log.info(LOG_WEB, std::string("In download, filename: ")+filename.c_str());
+    auto file = Devices::Storage.openFile(filename.c_str(), "r");
+
+    if (file.available())
+    {
+      Debug::Log.info(LOG_WEB, std::string("Sending file"));
+      AsyncWebServerResponse *response = request->beginResponse(file, filename, "application/octet-stream", true);
+      request->send(response);
+      // file.close(); // TODO in order for download to work the file can't be closed
+      // i've had a look at the code and can't see it closed by beginResponse etc
+      // we could be leaking file handles
+    }
+    else
+    {
+      Debug::Log.info(LOG_WEB, std::string("File not found"));
+      request->send(404);
+    }
   }
   else if (url == "/delete" && request->hasParam("filename"))
   {
@@ -253,7 +269,7 @@ static void webRequestHandler(AsyncWebServerRequest *request)
     const String settingName = request->getParam("name")->value();
 
     if (request->hasParam("value"))
-    { 
+    {
       const String settingValue = request->getParam("value")->value();
 
       Debug::Log.info(LOG_WEB, std::string("Set setting") + settingName.c_str() + " to " + settingValue.c_str());
@@ -305,6 +321,39 @@ static void webRequestHandler(AsyncWebServerRequest *request)
   }
 }
 
+void handleUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+{
+  const auto &url = request->url();
+
+  if (url.startsWith("/uploadFile"))
+  {
+    if (!index) {
+    
+      // We need to ensure that if the autorun.ds payload is currently running then we stop it
+      // Otherwise we risk changing the file content while the script is executing
+      if (filename == "autorun.ds")
+      {
+        Attacks::Ducky.setPayload("");
+      }
+
+      request->_tempFile = Devices::Storage.openFile(std::string("/")+filename.c_str(), "w");
+    }
+
+    if (len && request->_tempFile.available())
+    {
+      request->_tempFile.write(data, len);
+    }
+
+    if (final)
+    {
+      // close file
+      Debug::Log.info(LOG_WEB, std::string("File uploaded ")+filename.c_str());
+      request->_tempFile.close();
+    }
+    request->send(200);
+  }
+}
+
 WebSite::WebSite()
 {
 }
@@ -313,7 +362,9 @@ void WebSite::begin(Preferences &prefs)
 {
   preferences = &prefs;
 
+  controlInterfaceWebServer.onFileUpload(handleUpload);
   controlInterfaceWebServer.onNotFound(webRequestHandler);
+  
   ws.onEvent(onWsEvent);
 
   controlInterfaceWebServer.addHandler(&ws);
@@ -324,7 +375,7 @@ void WebSite::begin(Preferences &prefs)
     ws.binaryAll(buffer, size);
   });
 
-  ElegantOTA.begin(&controlInterfaceWebServer);    // Start ElegantOTA
+  ElegantOTA.begin(&controlInterfaceWebServer); // Start ElegantOTA
 }
 
 void WebSite::loop(Preferences &prefs)
