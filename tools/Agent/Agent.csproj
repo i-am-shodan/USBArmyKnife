@@ -41,12 +41,15 @@
   </ItemGroup>
 	
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
     <PackageReference Include="ScreenCapture.NET.DX11" Version="3.0.0" />
     <PackageReference Include="SerialPortStream" Version="2.4.2" />
 	<PackageReference Include="Quamotion.RemoteViewing" Version="1.1.211" />
+	<PackageReference Include="SharpCompress" Version="0.38.0" />
+	<PackageReference Include="System.Net.Http" Version="4.3.4" />
+	<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
 	<PackageReference Include="WebSocketSharp-netstandard" Version="1.0.1" />
-	<PackageReference Include="WmiLight" Version="6.5.2" />
+	<PackageReference Include="WmiLight" Version="6.7.0" />
   </ItemGroup>
 
 </Project>
