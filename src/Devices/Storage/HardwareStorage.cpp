@@ -56,6 +56,18 @@ void HardwareStorage::writeFileData(const std::string& filename, const uint8_t *
     file.close();
 }
 
+File HardwareStorage::openFile(const std::string& filename, const char* mode)
+{
+    File file = FILE_INTERFACE.open(filename.c_str(), mode);
+    if (!file)
+    {
+        Debug::Log.info(LOG_MMC, "Could not open file");
+        return File();
+    }
+
+    return file;
+}
+
 std::size_t HardwareStorage::getFileSize(const std::string& filename)
 {
     File file = FILE_INTERFACE.open(filename.c_str(), "r");
