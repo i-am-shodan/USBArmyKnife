@@ -13,6 +13,7 @@ void loop() {}
 #include "Devices/Storage/HardwareStorage.h"
 #include "Devices/USB/USBCore.h"
 #include "Devices/WiFi/HardwareWiFi.h"
+#include "Devices/Microphone/HardwareMicrophone.h"
 
 #include "Comms/Web/WebServer.h"
 
@@ -45,6 +46,7 @@ void setup()
   Devices::LED.begin(prefs);
   Devices::TFT.begin(prefs);
   Devices::Button.begin(prefs);
+  Devices::Mic.begin(prefs);
   
   Devices::USB::Core.begin(prefs);
   Devices::WiFi.begin(prefs);
@@ -105,6 +107,7 @@ void loop()
   Devices::Button.loop(prefs);
   Devices::LED.loop(prefs);
   Devices::TFT.loop(prefs);
+  Devices::Mic.loop(prefs);
 
   Comms::Web.loop(prefs);
 

@@ -36,6 +36,7 @@ This is why I decided to create the USB Army Knife.
 * Want your attack to destroy itself when it’s been found? USB Army Knife
 * What to connect to other bits of hardware, motion sensors and alike? USB Army Knife.
 * Want to view what’s on the victim's screen over WiFi? USB Army Knife.
+* Want to record what your victim is saying? USB Army Knife.
 
 ## Video
 [This video shows how the ultimate rick roll works](./examples/rickroll/)
@@ -57,6 +58,7 @@ This project implements a variety of attacks based around an easily concealable 
 - **Mass Storage Device**: Emulate a USB mass storage device.
 - **USB Network Device**: Appear as a USB network device.
 - **WiFi and Bluetooth Attacks**: Utilize ESP32 Marauder for WiFi and Bluetooth attacks.
+- **Hot Mic**: Plug in a USB device and stream audio over WiFi
 
 ## Examples
 
@@ -69,6 +71,7 @@ This project implements a variety of attacks based around an easily concealable 
 | [Deploy the serial agent](./examples/install_agent_and_run_command/) | Deploys the agent if it isn't already installed and sends commands over the serial port. Command output can be seen in the web interface|
 | [Pull the screen](./examples/vnc/) | Deploys the agent, the agent includes a tiny VNC server. Now the screen can be viewed via the web interface|
 | [Simple UI](./examples/simple_ui/) | A simple yet powerful UI to select scripts/images and run these using the hardware button. Shows how you can build complex UI interactions simply.  |
+| [Stream Mic audio over WiFi](./examples/hotmic/) | The M5Stack AtomS3U has a microphone that you can stream over WiFi.  |
 
 ## Supported Hardware
 
