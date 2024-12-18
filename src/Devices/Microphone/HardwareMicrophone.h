@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 
 #include "../../USBArmyKnifeCapability.h"
 #include "../Storage/HardwareStorage.h"
