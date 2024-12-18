@@ -18,7 +18,7 @@ void HardwareMicrophone::loop(Preferences &prefs)
 {
 }
 
-void HardwareMicrophone::setCallback(std::function<bool(uint8_t *, const size_t)> callback)
+void HardwareMicrophone::setCallback(const std::function<bool(uint8_t *, const size_t)> &callback)
 {
 }
 #endif
