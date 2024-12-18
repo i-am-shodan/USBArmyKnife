@@ -11,6 +11,7 @@
 #include "../../Devices/TFT/HardwareTFT.h"
 #include "../../Devices/Storage/HardwareStorage.h"
 #include "../../Devices/WiFi/HardwareWiFi.h"
+#include "../../Devices/Microphone/HardwareMicrophone.h"
 #include "../../Devices/USB/USBCore.h"
 #include "../../Devices/USB/USBCDC.h"
 #include "../../Attacks/Agent/Agent.h"
@@ -30,6 +31,7 @@ namespace Comms
 
 static AsyncWebServer controlInterfaceWebServer(8080);
 static AsyncWebSocket ws("/websockify");
+static AsyncWebSocket audio("/audio");
 
 extern std::unordered_map<const char *, std::pair<const uint8_t *, size_t>> staticHtmlFilesLookup;
 static const char *remoteAddress = "127.0.0.1:7002";
@@ -87,6 +89,15 @@ static void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsE
     Devices::USB::CDC.writeDebugString("Got an unhandler websocket event: " + std::to_string(type));
   }
 }
+
+static void onWsAudioEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
+{
+  if (type == WS_EVT_DISCONNECT)
+  {
+    Devices::Mic.stopCapture();
+  }
+}
+
 
 static std::pair<const uint8_t *, size_t> getStaticHtml(const String &url)
 {
@@ -179,6 +190,29 @@ static void webRequestHandler(AsyncWebServerRequest *request)
       enumerateSettingsAsJson(*preferences, settingsCategories);
     }
 
+    auto capabilities = root["capabilities"].to<JsonArray>();
+#ifndef NO_SD
+    capabilities.add("SD");
+#endif
+#ifndef NO_WIFI
+    capabilities.add("WIFI");
+#endif
+#ifndef NO_TFT
+    capabilities.add("TFT");
+#endif
+#ifndef NO_BUTTON
+    capabilities.add("BUTTON");
+#endif
+#ifndef NO_LED
+    capabilities.add("LED");
+#endif
+#ifndef NO_MIC
+    capabilities.add("MIC");
+#endif
+#ifndef NO_ESP_MARAUDER
+    capabilities.add("MARAUDER");
+#endif
+
     response->setLength();
     request->send(response);
   }
@@ -232,6 +266,21 @@ static void webRequestHandler(AsyncWebServerRequest *request)
     Attacks::Marauder.run(cmd.c_str());
 
     request->redirect("/index.html"); // redirect to our main page
+  }
+  else if (url == "/mic" && request->hasParam("enabled"))
+  {
+    const String cmd = request->getParam("enabled")->value();
+    if (cmd == "true")
+    {
+      Debug::Log.info(LOG_WEB, "Starting Mic capture");
+      Devices::Mic.startCapture();
+    }
+    else
+    {
+      Debug::Log.info(LOG_WEB, "Stopping Mic capture");
+      Devices::Mic.stopCapture();
+    }
+    request->send(200);
   }
   else if (url == "/download" && request->hasParam("filename"))
   {
@@ -366,13 +415,27 @@ void WebSite::begin(Preferences &prefs)
   controlInterfaceWebServer.onNotFound(webRequestHandler);
   
   ws.onEvent(onWsEvent);
+  audio.onEvent(onWsAudioEvent);
 
   controlInterfaceWebServer.addHandler(&ws);
+  controlInterfaceWebServer.addHandler(&audio);
   controlInterfaceWebServer.begin();
 
   Devices::USB::CDC.setCallback(HostCommand::WSDATARECV, [](uint8_t *buffer, const size_t size) -> void
   { 
     ws.binaryAll(buffer, size);
+  });
+
+  Devices::Mic.setCallback([](uint8_t *buffer, const size_t size) -> bool
+  {
+    if (ESP.getFreeHeap() < (size * 2)) // double what we need
+    {
+      Debug::Log.info(LOG_WEB, "Could not write data to /audio, not enough free mem");
+      return true;
+    }
+
+    audio.binaryAll(buffer, size);
+    return true;
   });
 
   ElegantOTA.begin(&controlInterfaceWebServer); // Start ElegantOTA
@@ -381,6 +444,7 @@ void WebSite::begin(Preferences &prefs)
 void WebSite::loop(Preferences &prefs)
 {
   ws.cleanupClients();
+  audio.cleanupClients();
   ElegantOTA.loop();
 }
 #endif

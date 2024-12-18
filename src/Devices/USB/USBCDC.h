@@ -20,7 +20,8 @@ enum HostCommand : uint8_t
     RequestAgentStatus = 7,
     AgentStatus = 8,
     ExecuteResult = 9,
-    MAX = 10
+    MicPcmData = 10,
+    MAX = 11
 };
 
 class USBCDCWrapper : USBArmyKnifeCapability {
