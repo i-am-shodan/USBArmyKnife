@@ -46,3 +46,4 @@ packages/
 /ui/content/data.json
 /example/covertstorage/disk.img
 examples/covertstorage/disk.img
+/tools/Agent/mic.pcm
