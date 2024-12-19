@@ -22,7 +22,7 @@ Equip yourself with the USB Army Knife and elevate your local access toolkit to 
 
 ## Testimonials
 
-*"Your device is evil. You are doing evil." - Mr. Peoples via X
+*"Your device is evil. You are doing evil."* - Mr. Peoples via X
 
 ## Intro
 There is a problem with physical access/USB attacks today. On their own, each attack doesn't provide enough of a solution to meet most objectives.
