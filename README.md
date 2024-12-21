@@ -76,6 +76,7 @@ This project implements a variety of attacks based around an easily concealable 
 | [Pull the screen](./examples/vnc/) | Deploys the agent, the agent includes a tiny VNC server. Now the screen can be viewed via the web interface|
 | [Simple UI](./examples/simple_ui/) | A simple yet powerful UI to select scripts/images and run these using the hardware button. Shows how you can build complex UI interactions simply.  |
 | [Stream Mic audio over WiFi](./examples/hotmic/) | The M5Stack AtomS3U has a microphone that you can stream over WiFi.  |
+| [Instantly crash Linux boxes](./examples/linux_panic/) | Deploy a bad filesystem which cause Linux machines which automount to panic. |
 
 ## Supported Hardware
 
