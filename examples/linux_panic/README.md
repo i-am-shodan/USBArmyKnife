@@ -8,6 +8,12 @@ In the right situation you could use this to boot a kiosk into your own OS. Firs
 
 **Beware**, some Linux distros add `errors=remount-ro` when drives are automounted. This overrides the debug value in the header making the attack fail. YMMV.
 
+
+
+https://github.com/user-attachments/assets/7d2a01f1-9987-4cc1-9375-e2d5f7a5900c
+
+
+
 ## Set up
 1. Copy autorun.ds onto the SD card
 2. Copy badfs.img onto the SD card
