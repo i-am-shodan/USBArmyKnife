@@ -2,7 +2,7 @@
 
 There is lots of great information to see by PCAPing a network interface, this example shows you how.
 
-
+**NOTE You need to change the USB mode of your device to NCM for it to appear as a USB network interface.** To do this first connect to the device over WiFi, navigate to the setting tab and change the usbDeviceType setting to NCM. This is shown about 30sec into the video below.
 
 https://github.com/user-attachments/assets/0d5b1485-b808-46c6-aaf7-7cf016088b8f
 
