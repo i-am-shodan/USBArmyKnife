@@ -8,7 +8,7 @@ namespace Attacks
     SerialAgent Agent;
 }
 
-#define LOG_AGENT "agent"
+#define LOG_AGENT "Agent"
 
 #define USB_AGENT_POLLING_ENABLED "agentPollingEnabled"
 #define USB_AGENT_POLLING_ENABLED_DEFAULT true

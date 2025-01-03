@@ -71,6 +71,7 @@
         "charconv": "cpp",
         "future": "cpp",
         "variant": "cpp",
+        "csignal": "cpp"
     },
     "theme-by-language.themes": {
         "filename:.*\\.ds$": "LightDuckyScript"

