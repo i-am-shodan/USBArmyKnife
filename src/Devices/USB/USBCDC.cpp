@@ -133,8 +133,8 @@ void USBCDCWrapper::writeBinary(const HostCommand &tag, const uint8_t *buffer, c
     {
         if (!noSerialDebugErrorPrinted)
         {
-            Debug::Log.warning(LOG_CDC, "Cannot write data to serial, USB mode not set to serial");
             noSerialDebugErrorPrinted = true;
+            Debug::Log.warning(LOG_CDC, "Cannot write data to serial, USB mode not set to serial");
         }
     }
     else if (usbRawMode)
@@ -164,8 +164,8 @@ void USBCDCWrapper::writeDebugString(const std::string &msg)
     {
         if (!noSerialDebugErrorPrinted)
         {
-            Debug::Log.warning(LOG_CDC, "Cannot write debug string to serial, USB mode not set to serial");
             noSerialDebugErrorPrinted = true;
+            Debug::Log.warning(LOG_CDC, "Cannot write debug string to serial, USB mode not set to serial");
         }
     }
     else if (usbRawMode)
