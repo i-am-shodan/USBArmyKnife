@@ -1,6 +1,7 @@
 #include "Marauder.h"
 
 #define LOG_MARAUDER "ESP32M"
+#include <string>
 #include "../../Debug/Logging.h"
 
 namespace Attacks
@@ -19,6 +20,50 @@ ESP32Marauder::ESP32Marauder()
 #include <esp32_marauder/WiFiScan.h>
 #include <esp32_marauder/settings.h>
 #include <esp32_marauder/Buffer.h>
+
+size_t esp32m_println(const char* msg)
+{
+    const auto s = std::string(msg);
+    Debug::Log.info("ESP32M", s);
+    return s.length();
+}
+
+size_t esp32m_print(const String &s)
+{
+    return esp32m_println(s.c_str());
+}
+
+size_t esp32m_print(const char* msg)
+{
+    return esp32m_println(msg);
+}
+
+size_t esp32m_print(const char m)
+{
+    const auto strVal = std::to_string(m);
+    return esp32m_println(strVal.c_str());
+}
+
+size_t esp32m_println(const String &s)
+{
+    return esp32m_println(s.c_str());
+}
+
+size_t esp32m_println(const size_t val)
+{
+    const auto strVal = std::to_string(val);
+    return esp32m_println(strVal.c_str());
+}
+
+size_t esp32m_println()
+{
+  return 0;
+}
+
+size_t esp32m_println(esp_err_t&, int)
+{
+  return 0;
+}
 
 #ifndef NO_SD
   #include "../../Devices/Storage/ESP32/SDMMCFS2.h"

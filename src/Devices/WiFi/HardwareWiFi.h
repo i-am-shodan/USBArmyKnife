@@ -10,6 +10,7 @@ public:
   virtual void begin(Preferences& prefs);
   virtual void end();
   void setWiFi(const bool& state);
+  bool getState();
 };
 
 namespace Devices

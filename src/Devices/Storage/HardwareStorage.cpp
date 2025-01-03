@@ -12,6 +12,12 @@
     #include "ESP32/SDMMCFS2.h"
     using namespace fs;
     #define FILE_INTERFACE SD_MMC_2
+
+    fs::SDMMCFS getFileInterface()
+    {
+        return FILE_INTERFACE;
+    }
+
 #endif
 
 #define LOG_MMC "MMC"
