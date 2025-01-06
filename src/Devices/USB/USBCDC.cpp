@@ -20,6 +20,7 @@ static std::unordered_map<HostCommand, std::function<void(uint8_t *, size_t)>> c
 static bool usbRawMode = USB_SERIALRAW_DEFAULT;
 static bool usbInitCalled = false;
 static uint8_t errorCount = 0;
+static bool noSerialDebugErrorPrinted = false;
 
 USBCDCWrapper::USBCDCWrapper()
 {
@@ -128,23 +129,30 @@ void USBCDCWrapper::loop(Preferences &prefs)
 
 void USBCDCWrapper::writeBinary(const HostCommand &tag, const uint8_t *buffer, const size_t &size)
 {
-    if (usbRawMode)
+    if (Devices::USB::Core.currentDeviceType() != USBDeviceType::Serial)
     {
-        Debug::Log.info(LOG_CDC, "Cannot write binary, incorrect mode");
-        return;
+        if (!noSerialDebugErrorPrinted)
+        {
+            noSerialDebugErrorPrinted = true;
+            Debug::Log.warning(LOG_CDC, "Cannot write data to serial, USB mode not set to serial");
+        }
     }
-
-    if (serialPortRecvBuffer == nullptr || errorCount >= MAX_SERIAL_READ_ERRORS)
+    else if (usbRawMode)
     {
-        Debug::Log.info(LOG_CDC, "Cannot write binary, not started");
-        return;
+        Debug::Log.error(LOG_CDC, "Cannot write binary, incorrect mode");
     }
-
-    Serial.write((uint8_t)tag);        // tag
-    Serial.write((uint8_t *)&size, 4); // length
-    if (size != 0)
+    else if (serialPortRecvBuffer == nullptr || errorCount >= MAX_SERIAL_READ_ERRORS)
     {
-        Serial.write(buffer, size); // value
+        Debug::Log.error(LOG_CDC, "Cannot write binary, USBCDC not running");
+    }
+    else
+    {
+        Serial.write((uint8_t)tag);        // tag
+        Serial.write((uint8_t *)&size, 4); // length
+        if (size != 0)
+        {
+            Serial.write(buffer, size); // value
+        }
     }
 }
 
@@ -152,7 +160,15 @@ void USBCDCWrapper::writeDebugString(const std::string &msg)
 {
     // be careful about calling debug log here as you could get into a loop
 
-    if (usbRawMode)
+    if (Devices::USB::Core.currentDeviceType() != USBDeviceType::Serial)
+    {
+        if (!noSerialDebugErrorPrinted)
+        {
+            noSerialDebugErrorPrinted = true;
+            Debug::Log.warning(LOG_CDC, "Cannot write debug string to serial, USB mode not set to serial");
+        }
+    }
+    else if (usbRawMode)
     {
         Serial.println(msg.c_str());
     }

@@ -43,8 +43,8 @@ void setup()
   // If you plug in and don't see any LEDs, try commenting this line out
   Attacks::Marauder.begin(prefs);
 
-  Devices::LED.begin(prefs);
   Devices::TFT.begin(prefs);
+  Devices::LED.begin(prefs);
   Devices::Button.begin(prefs);
   Devices::Mic.begin(prefs);
   
@@ -60,6 +60,22 @@ void setup()
   {
 #ifndef NO_SD
     AskFormatSD(prefs);
+#endif
+  }
+  else if (!Attacks::Marauder.isRunning())
+  {
+    // Most users won't see this error as devices without an SD won't have a screen either
+    Devices::TFT.display(0, 0, "Error FlashFS invalid");
+    for (int x = 0; x < 5; x++)
+    {
+      // They might see/report some debug output
+      Devices::LED.changeLEDState(true, 0, 100, 100, x % 2 == 0 ? 255 : 0); // flash RED led
+      Debug::Log.error("Main", "Flash filesystem is invalid, upload new FS image");
+      delay(1000);
+    }
+#ifdef ARDUINO_ARCH_ESP32
+    // Other platforms don't implement ESP32 Marauder so we don't have to worry about a pi
+    ESP.restart();
 #endif
   }
 

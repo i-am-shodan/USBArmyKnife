@@ -8,7 +8,7 @@ namespace Attacks
     SerialAgent Agent;
 }
 
-#define LOG_AGENT "agent"
+#define LOG_AGENT "Agent"
 
 #define USB_AGENT_POLLING_ENABLED "agentPollingEnabled"
 #define USB_AGENT_POLLING_ENABLED_DEFAULT true
@@ -54,7 +54,7 @@ void SerialAgent::begin(Preferences &prefs)
 
 void SerialAgent::loop(Preferences &prefs)
 {
-    if (agentPollingEnabled && m_agentIsConnected == false)
+    if (agentPollingEnabled && m_agentIsConnected == false && Devices::USB::Core.currentDeviceType() == USBDeviceType::Serial)
     {
         unsigned long currentMillis = millis();
         if (currentMillis - previousMillis >= agentPollingIntervalInSec * 1000) {
@@ -66,5 +66,16 @@ void SerialAgent::loop(Preferences &prefs)
 
 void SerialAgent::run(const std::string& cmd)
 {
-    Devices::USB::CDC.writeBinary(HostCommand::Execute, (uint8_t*)cmd.c_str(), cmd.length());
+    if (Devices::USB::Core.currentDeviceType() != USBDeviceType::Serial)
+    {
+        Debug::Log.error(LOG_AGENT, "Cannot run agent command, device is not in serial mode");
+    }
+    else if (!m_agentIsConnected)
+    {
+        Debug::Log.error(LOG_AGENT, "Cannot run agent command, agent is not connected");
+    }
+    else
+    {
+        Devices::USB::CDC.writeBinary(HostCommand::Execute, (uint8_t*)cmd.c_str(), cmd.length());
+    }
 }

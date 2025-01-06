@@ -56,12 +56,12 @@ public:
     }
   }
 private:
-  USBDeviceType curDeviceType;
-  USBClassType curClassType;
-  uint16_t vid;
-  uint16_t pid;
-  std::string manufacturer;
-  std::string product;
+  USBDeviceType curDeviceType = USBDeviceType::Serial;
+  USBClassType curClassType = USBClassType::HID;
+  uint16_t vid = 0;
+  uint16_t pid = 0;
+  std::string manufacturer = "";
+  std::string product = "";
 };
 
 namespace Devices::USB

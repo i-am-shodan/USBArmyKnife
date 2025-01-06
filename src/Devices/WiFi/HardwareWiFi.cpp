@@ -33,6 +33,11 @@ void HardwareWiFi::setWiFi(const bool& state)
   desiredWiFiState = state;
 }
 
+bool HardwareWiFi::getState()
+{
+  return WiFi.AP.started();
+}
+
 void HardwareWiFi::begin(Preferences& prefs)
 {
   registerUserConfigurableSetting(CATEGORY_WIFI, WIFI_AP_NAME, USBArmyKnifeCapability::SettingType::String, WIFI_AP_NAME_DEFAULT);
@@ -93,4 +98,10 @@ void HardwareWiFi::loop(Preferences& prefs)
 void HardwareWiFi::end()
 {
 }
+
+bool HardwareWiFi::getState()
+{
+  return false;
+}
+
 #endif
