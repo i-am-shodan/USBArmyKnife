@@ -11,6 +11,7 @@
 #include "../../Devices/TFT/HardwareTFT.h"
 #include "../../Devices/LED/HardwareLED.h"
 #include "../../Devices/WiFi/HardwareWiFi.h"
+#include "../../Comms/Web/WebServer.h"
 
 #include "../../Attacks/Marauder/Marauder.h"
 #include "../../Attacks/Agent/Agent.h"
@@ -180,6 +181,12 @@ static int handleESP32Marauder(const std::string &str, const std::unordered_map<
 {
     std::string arg = str.substr(str.find(' ') + 1);
     Attacks::Marauder.run(arg);
+    return true;
+}
+
+static int handleWebOff(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    Comms::Web.end();
     return true;
 }
 
@@ -561,8 +568,7 @@ void addDuckyScriptExtensions(
     extCommands["RAW_HID"] = handleRawHid;
 
     // Device related
-    extCommands["WEB_OFF"] = handleWiFiOff;
-    extCommands["WEB_ON"] = handleWiFiOn;
+    extCommands["WEB_OFF"] = handleWebOff;
     extCommands["WIFI_OFF"] = handleWiFiOff;
     extCommands["WIFI_ON"] = handleWiFiOn;
     extCommands["SERIAL"] = handleSerial;

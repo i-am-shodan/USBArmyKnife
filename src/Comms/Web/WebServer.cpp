@@ -409,6 +409,11 @@ WebSite::WebSite()
 
 void WebSite::begin(Preferences &prefs)
 {
+  if (Devices::WiFi.getState() == false)
+  {
+    return;
+  }
+
   preferences = &prefs;
 
   controlInterfaceWebServer.onFileUpload(handleUpload);
@@ -443,8 +448,24 @@ void WebSite::begin(Preferences &prefs)
 
 void WebSite::loop(Preferences &prefs)
 {
+  if (preferences == nullptr)
+  {
+    return;
+  }
+
   ws.cleanupClients();
   audio.cleanupClients();
   ElegantOTA.loop();
 }
+
+void WebSite::end()
+{
+  if (preferences == nullptr)
+  {
+    return;
+  }
+
+  controlInterfaceWebServer.end();
+}
+
 #endif

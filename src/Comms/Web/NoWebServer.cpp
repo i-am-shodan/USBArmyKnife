@@ -19,4 +19,8 @@ void WebSite::loop(Preferences &prefs)
 
 }
 
+void WebSite::end()
+{
+}
+
 #endif

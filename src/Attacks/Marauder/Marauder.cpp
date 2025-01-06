@@ -1,7 +1,9 @@
 #include "Marauder.h"
 
 #define LOG_MARAUDER "ESP32M"
+#include <string>
 #include "../../Debug/Logging.h"
+#include "../../Devices/Storage/HardwareStorage.h"
 
 namespace Attacks
 {
@@ -20,9 +22,54 @@ ESP32Marauder::ESP32Marauder()
 #include <esp32_marauder/settings.h>
 #include <esp32_marauder/Buffer.h>
 
+size_t esp32m_println(const char* msg)
+{
+    const auto s = std::string(msg);
+    Debug::Log.info("ESP32M", s);
+    return s.length();
+}
+
+size_t esp32m_print(const String &s)
+{
+    return esp32m_println(s.c_str());
+}
+
+size_t esp32m_print(const char* msg)
+{
+    return esp32m_println(msg);
+}
+
+size_t esp32m_print(const char m)
+{
+    const auto strVal = std::to_string(m);
+    return esp32m_println(strVal.c_str());
+}
+
+size_t esp32m_println(const String &s)
+{
+    return esp32m_println(s.c_str());
+}
+
+size_t esp32m_println(const size_t val)
+{
+    const auto strVal = std::to_string(val);
+    return esp32m_println(strVal.c_str());
+}
+
+size_t esp32m_println()
+{
+  return 0;
+}
+
+size_t esp32m_println(esp_err_t&, int)
+{
+  return 0;
+}
+
 #ifndef NO_SD
   #include "../../Devices/Storage/ESP32/SDMMCFS2.h"
   using namespace fs;
+  #define FILE_INTERFACE SD_MMC_2
 #else
   #include <sd_defines.h>
 #endif
@@ -37,7 +84,6 @@ LedInterface led_obj;
 
 const String PROGMEM version_number = MARAUDER_VERSION;
 static uint32_t currentTime = 0;
-
 static std::string nextMarauderCommandToRun;
 static bool marauderActivated = false;
 
@@ -45,7 +91,7 @@ void ESP32Marauder::begin(Preferences &prefs)
 {
   led_obj.RunSetup();
   buffer_obj = Buffer();
-  sd_obj.initSD();
+  (void)sd_obj.initSD();
   sd_obj.supported = true;
 #ifndef NO_SD // todo this should prob be an API call
   sd_obj.cardType = SD_MMC_2.cardType();
@@ -59,7 +105,19 @@ void ESP32Marauder::begin(Preferences &prefs)
   sd_obj.sd_files = new LinkedList<String>();
   sd_obj.sd_files->add("Back");
 
+  running = 
+#ifdef NO_SD
   settings_obj.begin();
+#else
+  settings_obj.begin(FILE_INTERFACE, "/esp32m_settings.json");
+#endif
+
+  if (!running)
+  {
+    Debug::Log.info(LOG_MARAUDER, "Error getting settings");
+    return;
+  }
+
   wifi_scan_obj.RunSetup();
   evil_portal_obj.setup();
   cli_obj.RunSetup();
