@@ -11,6 +11,9 @@ public:
   virtual void begin(Preferences& prefs);
 
   void run(const std::string& cmd);
+  bool isRunning() { return running; }
+private:
+  bool running = false;
 };
 
 namespace Attacks

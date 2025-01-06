@@ -3,6 +3,7 @@
 #define LOG_MARAUDER "ESP32M"
 #include <string>
 #include "../../Debug/Logging.h"
+#include "../../Devices/Storage/HardwareStorage.h"
 
 namespace Attacks
 {
@@ -68,6 +69,7 @@ size_t esp32m_println(esp_err_t&, int)
 #ifndef NO_SD
   #include "../../Devices/Storage/ESP32/SDMMCFS2.h"
   using namespace fs;
+  #define FILE_INTERFACE SD_MMC_2
 #else
   #include <sd_defines.h>
 #endif
@@ -82,7 +84,6 @@ LedInterface led_obj;
 
 const String PROGMEM version_number = MARAUDER_VERSION;
 static uint32_t currentTime = 0;
-
 static std::string nextMarauderCommandToRun;
 static bool marauderActivated = false;
 
@@ -90,7 +91,7 @@ void ESP32Marauder::begin(Preferences &prefs)
 {
   led_obj.RunSetup();
   buffer_obj = Buffer();
-  sd_obj.initSD();
+  (void)sd_obj.initSD();
   sd_obj.supported = true;
 #ifndef NO_SD // todo this should prob be an API call
   sd_obj.cardType = SD_MMC_2.cardType();
@@ -104,7 +105,19 @@ void ESP32Marauder::begin(Preferences &prefs)
   sd_obj.sd_files = new LinkedList<String>();
   sd_obj.sd_files->add("Back");
 
+  running = 
+#ifdef NO_SD
   settings_obj.begin();
+#else
+  settings_obj.begin(FILE_INTERFACE, "/esp32m_settings.json");
+#endif
+
+  if (!running)
+  {
+    Debug::Log.info(LOG_MARAUDER, "Error getting settings");
+    return;
+  }
+
   wifi_scan_obj.RunSetup();
   evil_portal_obj.setup();
   cli_obj.RunSetup();
