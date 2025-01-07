@@ -115,44 +115,9 @@ Beaware that your script file should have Windows style (CRLF) line endings. If 
 
 ### Installation
 
-1. Clone the repository:
-    ```sh
-    git clone https://github.com/i-am-shodan/USBArmyKnife.git
-    ```
-1. Now you've cloned the repo you need to pull down the submodules. Run this command in the directory you just cloned to. If you don't do this you will get errors related to ESP32Maurauder
-    ```sh
-    git submodule update --init 
-    ```
-1. Open the project in Visual Studio Code
-
-1. *Optional: add any additional keyboard layouts you need by editing the platform.ini file* 
-
-1. Click the PlatformIO icon (Alien icon)
-
-1. (Remove the dongle if it was inserted) **Press and hold the hardware button**, insert the device, wait 1s and **release the button**.
-   * You should now seen a new COM port/serial device attached to your machine 
-
-1. In the menu expand the device you want to flash.
-   * For the T-Dongle S3 you should expand 'LILYGO-T-Dongle-S3'
-   * For any generic ESP32-S2 you should expand 'Generic-ESP32-S2'
-   * It may take a few seconds to populate the build menu after you've selected your device
-
-1. Press 'Upload'
-
-1. *Only if your device does NOT have an SD card.*
-   1. *Edit the files for the flash filesystem, these are stored in the 'data' directory.*
-   1. *Expand the Platform folder in the build menu from the previous step.*
-   1. *Click 'Upload Filesystem Image'.*
-
-1. When the upload has finished successfully, remove the dongle and insert the micro SD card if you have one
-
-### Updating the codebase to the latest version
-
-If you want to update an existing install you need to:
-1. Use `git pull` to grab the latest changes to this repository
-1. Run `git submodule update --recursive` to make sure all the submodules are up to date
-1. Click 'Full Clean' in the PlatformIO build menu.
-At this point all your code and dependencies will be up to date and you can continue with the build steps above.
+There are two options for getting the USB Army Knife firmware onto your device:
+* [Flashing pre-built firmware using your web browser (easiest route)](https://github.com/i-am-shodan/USBArmyKnife/wiki/Installation#using-a-web-browser)
+* [Building and flashing the source using Visual Studio Code (more powerful)](https://github.com/i-am-shodan/USBArmyKnife/wiki/Installation#using-visual-studio-code)
 
 ### Usage
 
