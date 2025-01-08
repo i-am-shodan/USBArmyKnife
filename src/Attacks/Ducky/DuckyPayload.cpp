@@ -316,6 +316,8 @@ void DuckyPayload::loop(Preferences &prefs)
             // we are safe to clear both of these in whatever mode we are running in
             currentlyExecutingFile.clear(); 
             localCmdLineToExecute.clear();
+            lastSuccessfullyEvaluatedLine = 0;
+            duckyFileParser.Restart();
         }
 
         if (lastExecutionResult == DuckyInterpreter::SCRIPT_ERROR)
