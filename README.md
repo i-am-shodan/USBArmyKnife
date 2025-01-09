@@ -91,33 +91,11 @@ This project implements a variety of attacks based around an easily concealable 
 
 ## Getting Started
 
-### Prerequisites
-
-- **Hardware**:
-   * A supported device, ideally the LilyGo T-Dongle S3 with screen.
-   * For device with an SD card you'll need a FAT32 formatted micro SD card.
-      * For large cards this should have *at most* a single 32GB partition.
-- **Software**: 
-  * [Visual Studio Code](https://code.visualstudio.com/Download)
-  * [PlatformIO Visual Studio Code extension](https://platformio.org/platformio-ide)
-  * GIT
-
-### Preparing your SD card
-
-The USB Army Knife may not run correctly with large SD cards or those with newer filesystems. We recommend using one with at most one 32GB FAT32 partition for maximum compatibility. Smaller capacities can also be used.
-[This article on partitioning an SD card](https://www.instructables.com/Repartition-SD-Card-Windows/) can help with the process of doing this on Windows.
-
-**Note** On first run, if an SD card cannot be found with a supported filesystem the device will offer to format it for you. If you use this option the filesystem created on the SD card may not work under Windows. As such it is advised to create a suitable SD card off device.
-
-### Preparing your script file
-
-Beaware that your script file should have Windows style (CRLF) line endings. If your script is terminating on empty lines convert your script using `unix2dos`.
-
 ### Installation
 
 There are two options for getting the USB Army Knife firmware onto your device:
-* [Flashing pre-built firmware using your web browser (easiest route)](https://github.com/i-am-shodan/USBArmyKnife/wiki/Installation#using-a-web-browser)
-* [Building and flashing the source using Visual Studio Code (more powerful)](https://github.com/i-am-shodan/USBArmyKnife/wiki/Installation#using-visual-studio-code)
+* [Flashing pre-built firmware using your web browser (easiest route)]([https://github.com/i-am-shodan/USBArmyKnife/wiki/Installation#using-a-web-browser](https://github.com/i-am-shodan/USBArmyKnife/wiki/Installation#flashing-with-a-web-browser))
+* [Building and flashing the source using Visual Studio Code (more powerful)]([https://github.com/i-am-shodan/USBArmyKnife/wiki/Installation#using-visual-studio-code](https://github.com/i-am-shodan/USBArmyKnife/wiki/Installation#flashing-with-visual-studio-code-and-platformio))
 
 ### Usage
 
@@ -128,6 +106,7 @@ There are two options for getting the USB Army Knife firmware onto your device:
 1. Use the web interface to create and manage your attacks using DuckyScript.
 
 *ESP-S2 based devices have WiFi support but do not have a web interface. Attacks are managed via DuckyScript files.*
+*RP2040 devices do not have ESP32 Maurader capability*
 
 ### Future plans
 
