@@ -18,7 +18,6 @@ jobs:
         with:
           path: |
             ~/.cache/pip
-            ~/.platformio/.cache
           key: ${{ runner.os }}-pio
       - uses: actions/setup-python@v5
         with:
