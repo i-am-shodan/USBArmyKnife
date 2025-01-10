@@ -80,7 +80,6 @@ Buffer buffer_obj;
 Settings settings_obj;
 CommandLine cli_obj;
 SDInterface sd_obj;
-LedInterface led_obj;
 
 const String PROGMEM version_number = MARAUDER_VERSION;
 static uint32_t currentTime = 0;
@@ -89,7 +88,6 @@ static bool marauderActivated = false;
 
 void ESP32Marauder::begin(Preferences &prefs)
 {
-  led_obj.RunSetup();
   buffer_obj = Buffer();
   (void)sd_obj.initSD();
   sd_obj.supported = true;

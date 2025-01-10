@@ -1,4 +1,0 @@
-[submodule "lib/ESP32Marauder"]
-	path = lib/ESP32Marauder
-	url = https://github.com/i-am-shodan/ESP32Marauder
-	branch = remove_libraries
