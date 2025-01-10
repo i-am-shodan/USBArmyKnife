@@ -887,8 +887,6 @@
     #include <functional>
     #include <LinkedList.h>
     #include "SPIFFS.h"
-    #include "Assets.h"
-
   #endif
   //// END SCREEN STUFF
 

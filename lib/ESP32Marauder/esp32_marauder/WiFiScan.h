@@ -34,15 +34,12 @@
   #include "GpsInterface.h"
 #endif
 #include "settings.h"
-#include "Assets.h"
 #ifdef MARAUDER_FLIPPER
   #include "flipperLED.h"
 #elif defined(XIAO_ESP32_S3)
   #include "xiaoLED.h"
 #elif defined(MARAUDER_M5STICKC)
   #include "stickcLED.h"
-#else
-  #include "LedInterface.h"
 #endif
 
 #define bad_list_length 3
@@ -119,8 +116,6 @@ extern Settings settings_obj;
   extern xiaoLED xiao_led;
 #elif defined(MARAUDER_M5STICKC)
   extern stickcLED stickc_led;
-#else
-  extern LedInterface led_obj;
 #endif
 
 esp_err_t esp_wifi_80211_tx(wifi_interface_t ifx, const void *buffer, int len, bool en_sys_seq);
