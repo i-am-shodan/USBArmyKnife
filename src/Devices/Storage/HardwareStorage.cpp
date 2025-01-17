@@ -227,7 +227,7 @@ uint8_t HardwareStorage::usedPercentage()
 
 bool HardwareStorage::createEmptyFile(const std::string &filename)
 {
-    File file = FILE_INTERFACE.open(filename.c_str(), "r");
+    File file = FILE_INTERFACE.open(filename.c_str(), "w");
     if (!file)
     {
         return false;
