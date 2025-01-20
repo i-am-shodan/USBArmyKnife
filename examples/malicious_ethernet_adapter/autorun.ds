@@ -1,0 +1,21 @@
+REM when running this script make sure your device starts in Serial mode
+DEFINE #SETTING_NAME usbDeviceType
+VAR $SETTING_USB_DEVICE_TYPE_ETHERNET = 2
+
+IF (GET_SETTING_VALUE() != $SETTING_USB_DEVICE_TYPE_ETHERNET) THEN
+    USB_MOUNT_CDROM_READ_ONLY /cdrom.iso
+
+    REM wait for the user to install the driver
+    REM on some OS' a popup will appear but on most modern ones the
+    REM user will need to be encouraged!
+    WHILE (AGENT_CONNECTED() == FALSE)
+        DELAY 2000
+    END_WHILE
+
+    REM We now need to change the device into a USB ethernet adapter
+    SET_SETTING_UINT16 usbDeviceType $SETTING_USB_DEVICE_TYPE_ETHERNET
+    REM this requires a reset
+    RESET
+ELSE
+    REM add some DNS entries?
+END_IF

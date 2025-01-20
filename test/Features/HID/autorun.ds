@@ -1,0 +1,61 @@
+KEYBOARD_LAYOUT win_en-GB
+
+GUI R
+DELAY 1000
+STRING notepad
+ENTER
+DELAY 1000
+
+STRING 3
+DELAY 1000
+ENTER
+STRING 2
+DELAY 1000
+ENTER
+STRING 1
+DELAY 1000
+ENTER
+ENTER
+
+STRING 1. STRING block test - should print abcd
+ENTER
+DELAY 1000
+STRING
+    a
+    b
+    c
+    d
+END_STRING
+ENTER
+ENTER
+ENTER
+
+STRING 2. STRINGLN block test - should print 'The quick brown fox jumps over the lazy dog' three times
+ENTER
+STRINGLN
+    The quick brown fox jumps over the lazy dog
+    The quick brown fox jumps over the lazy dog
+    The quick brown fox jumps over the lazy dog
+END_STRINGLN
+ENTER
+ENTER
+
+STRING 3. ASCII Art test
+ENTER
+
+STRINGLN .                                                       :     
+STRINGLN .                     ,;                               t#,    
+STRINGLN . .    .            f#i            i              i   ;##W.   
+STRINGLN . Di   Dt         .E#t            LE             LE  :#L:WE   
+STRINGLN . E#i  E#i       i#W,            L#E            L#E .KG  ,#D  
+STRINGLN . E#t  E#t      L#D.            G#W.           G#W. EE    ;#f 
+STRINGLN . E#t  E#t    :K#Wfff;         D#K.           D#K. f#.     t#i
+STRINGLN . E########f. i##WLLLLt       E#K.           E#K.  :#G     GK 
+STRINGLN . E#j..K#j...  .E#L         .E#E.          .E#E.    ;#L   LW. 
+STRINGLN . E#t  E#t       f#E:      .K#E           .K#E       t#f f#:  
+STRINGLN . E#t  E#t        ,WW;    .K#D           .K#D         f#D#;   
+STRINGLN . f#t  f#t         .D#;  .W#G           .W#G           G#t    
+STRINGLN .  ii   ii           tt :W##########Wt :W##########Wt   t     
+STRINGLN .                       :,,,,,,,,,,,,,.:,,,,,,,,,,,,,.        
+STRINGLN .
+ENTER
