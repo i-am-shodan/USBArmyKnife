@@ -16,6 +16,8 @@
 #include "../../Attacks/Marauder/Marauder.h"
 #include "../../Attacks/Agent/Agent.h"
 
+#include "../../Utilities/Settings.h"
+
 #include "DuckyPayload.h"
 
 // For VID and PID str handling
@@ -28,6 +30,10 @@ static const std::string Constant_FileIndexFileName = "#_FILE_INDEX_FILE_NAME_";
 // For FILE_INDEX_VALID() and LOAD_FILES_FROM_SD
 static std::vector<std::string> curListOfFiles;
 static int curFileIndexVariable = 0;
+
+bool startsWith(const std::string& str, const std::string& prefix) {
+    return str.rfind(prefix, 0) == 0;
+}
 
 static int handleCalc(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
@@ -103,13 +109,15 @@ static int handleDisplayText(const std::string &str, const std::unordered_map<st
 
 static int handleUSBMode(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
+    bool mountAsCdrom = startsWith(str, "USB_MOUNT_CDROM_READ_ONLY");
+
     std::string arg = str.substr(str.find(' ') + 1);
     const auto entries = Ducky::SplitString(arg);
 
     if (entries.size() == 1)
     {
         Debug::Log.info(LOG_DUCKY, "Mounting disk " + entries[0]);
-        return Devices::USB::MSC.mountDiskImage(entries[0]);
+        return Devices::USB::MSC.mountDiskImage(entries[0], mountAsCdrom);
     }
     else
     {
@@ -209,6 +217,45 @@ static int handleSerial(const std::string &str, const std::unordered_map<std::st
     Serial.begin(speed);
 
     return true;
+}
+
+static int handleSetSetting(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    bool ret = false;
+
+    do
+    {
+        const auto split = Ducky::SplitString(str);
+        if (split.size() != 3)
+        {
+            Debug::Log.error(LOG_DUCKY, "SET_SETTING needs two arguments has: "+std::to_string(split.size() - 1));
+            Debug::Log.error(LOG_DUCKY, str);
+            totalErrors++;
+            break;
+        }
+
+        const auto settingName = split[1];
+        auto settingValue = split[2];
+
+        if (startsWith(str, "SET_SETTING_UINT16") && settingValue.rfind("0x", 0) != 0)
+        {
+            // need to add 0x to front
+            settingValue = "0x" + settingValue;
+        }
+
+        if (startsWith(str, "SET_SETTING_BOOL") && !(settingValue[0] == 0 || settingValue[0] == 1))
+        {
+            Debug::Log.error(LOG_DUCKY, "Invalid bool type, should be 0 or 1");
+            totalErrors++;
+            break;
+        }
+
+        Debug::Log.info(LOG_DUCKY, "Trying to set "+settingName+" to " +settingValue);
+        ret = setSettingValue(*preferences, settingName, settingValue);
+
+    } while (false);
+
+    return ret;
 }
 
 static int handleUsbNcmPcapOn(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
@@ -345,6 +392,34 @@ static int handleButtonPress(const std::string &str, const std::unordered_map<st
     {
         return wasLastPressLong == false;
     }
+}
+
+static int handleGetSettingValue(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    // str is the current line, we need to peak in the constant #FILE
+    if (constants.find("#SETTING_NAME") != constants.cend())
+    {
+        bool error = false;
+        uint16_t value = getIntegerSettingValue(*preferences, constants.at("#SETTING_NAME"), error);
+        if (error)
+        {
+            // todo, this isn't a great pattern. We should be able to set an error here to stop further script
+            // execution. The best we can do is return 0 but what if a setting was really 0.
+            // DuckyScript interpeter either needs:
+            // * a method we can call to stop execution
+            // * a better function declation that we can return an error through
+            Debug::Log.error(LOG_DUCKY, "GET_SETTING_VALUE() error, setting is unknown or string type");
+            totalErrors++;
+            return 0;
+        }
+        Debug::Log.info(LOG_DUCKY, "GET_SETTING_VALUE() returned " + std::to_string(value));
+        return value;
+    }
+    else
+    {
+        Debug::Log.info(LOG_DUCKY, "Error handling GET_SETTING_VALUE() no param");
+        return false;
+    } 
 }
 
 static int handleRunPayload(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
@@ -572,9 +647,15 @@ void addDuckyScriptExtensions(
     extCommands["WIFI_OFF"] = handleWiFiOff;
     extCommands["WIFI_ON"] = handleWiFiOn;
     extCommands["SERIAL"] = handleSerial;
+    extCommands["SET_SETTING_BOOL"] = handleSetSetting;
+    extCommands["SET_SETTING_INT16"] = handleSetSetting;
+    extCommands["SET_SETTING_UINT16"] = handleSetSetting;
+    extCommands["SET_SETTING_STRING"] = handleSetSetting;
+
 
     // USB
     extCommands["USB_MOUNT_DISK_READ_ONLY"] = handleUSBMode;
+    extCommands["USB_MOUNT_CDROM_READ_ONLY"] = handleUSBMode;
     extCommands["USB_NCM_PCAP_ON"] = handleUsbNcmPcapOn;
     extCommands["USB_NCM_PCAP_OFF"] = handleUsbNcmPcapOff;
     extCommands["WAIT_FOR_USB_STORAGE_ACTIVITY"] = handleWaitForUSBStorageActivity;
@@ -594,6 +675,7 @@ void addDuckyScriptExtensions(
     extCommands["LOAD_FILES_FROM_SD()"] = handleFileIndex;
     extCommands["BUTTON_LONG_PRESS()"] = handleButtonPress;
     extCommands["BUTTON_SHORT_PRESS()"] = handleButtonPress;
+    extCommands["GET_SETTING_VALUE()"] = handleGetSettingValue;
 
     consts.emplace_back([]
                         {

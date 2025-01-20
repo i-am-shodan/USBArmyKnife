@@ -13,7 +13,7 @@ public:
   virtual void begin(Preferences& prefs);
   virtual void end();
 
-  bool mountDiskImage(const std::string&);
+  bool mountDiskImage(const std::string&, bool mountAsCD);
   bool mountSD();
   bool hasActivity() { return mscActivity; }
   void resetActivityState() { mscActivity = false; }
