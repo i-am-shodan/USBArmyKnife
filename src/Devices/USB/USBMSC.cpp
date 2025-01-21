@@ -186,11 +186,21 @@ void USBMSC::end()
 
 bool USBMSC::mountDiskImage(const std::string &imageLocation, bool mountAsCD)
 {
+#ifdef ARDUINO_ARCH_RP2040
+    if (mountAsCD)
+    {
+        Debug::Log.error(TAG_USB, "CDROM support is not supported on this device");
+        return false;
+    }
+#endif
+
     std::size_t size = open_msc(imageLocation.c_str());
 
     if (size != 0)
     {
+#ifndef ARDUINO_ARCH_RP2040
         usb_msc.setCDROM(mountAsCD);
+#endif
 
         // Set disk vendor id, product id and revision with string up to 8, 16, 4 characters respectively
         if (mountAsCD)
@@ -223,7 +233,7 @@ bool USBMSC::mountDiskImage(const std::string &imageLocation, bool mountAsCD)
     }
     else
     {
-        Debug::Log.info(TAG_USB, "Could not load " + imageLocation);
+        Debug::Log.error(TAG_USB, "Could not load " + imageLocation);
         return false;
     }
 }
