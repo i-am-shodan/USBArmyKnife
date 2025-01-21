@@ -20,9 +20,10 @@ void registerSettingName(const uint8_t group, const std::string &name, const USB
 
     // ensure we can't register the same name in the same group twice
     const bool notFound = std::none_of(settingLookup[group].cbegin(), settingLookup[group].cend(),
-        [&name](const std::tuple<std::string, USBArmyKnifeCapability::SettingType, std::string> &item){
-            return std::get<0>(item) == name;
-        });
+                                       [&name](const std::tuple<std::string, USBArmyKnifeCapability::SettingType, std::string> &item)
+                                       {
+                                           return std::get<0>(item) == name;
+                                       });
 
     if (notFound)
     {
@@ -62,8 +63,9 @@ bool setSettingValue(Preferences &prefs, const std::string &name, const std::str
                     }
                     break;
                 case USBArmyKnifeCapability::SettingType::Int16:
-                    tempInt = std::stoi(value); 
-                    if (tempInt <= static_cast<int>(INT16_MAX) && tempInt >= static_cast<int>(INT16_MIN)) {
+                    tempInt = std::stoi(value);
+                    if (tempInt <= static_cast<int>(INT16_MAX) && tempInt >= static_cast<int>(INT16_MIN))
+                    {
                         int16_t int16Value = 0;
                         int16Value = static_cast<int16_t>(tempInt);
                         prefs.putShort(name.c_str(), int16Value);
@@ -77,8 +79,9 @@ bool setSettingValue(Preferences &prefs, const std::string &name, const std::str
                 case USBArmyKnifeCapability::SettingType::UInt16:
                     if (value.rfind("0x", 0) == 0)
                     {
-                        tempInt = std::stoi(value, nullptr, 16); 
-                        if (tempInt <= static_cast<int>(INT16_MAX) && tempInt >= 0) {
+                        tempInt = std::stoi(value, nullptr, 16);
+                        if (tempInt <= static_cast<int>(INT16_MAX) && tempInt >= 0)
+                        {
                             uint16_t uint16Value = 0;
                             uint16Value = static_cast<uint16_t>(tempInt);
                             prefs.putUShort(name.c_str(), uint16Value);
@@ -103,6 +106,55 @@ bool setSettingValue(Preferences &prefs, const std::string &name, const std::str
     }
 
     return ret;
+}
+
+uint16_t getIntegerSettingValue(Preferences &prefs, const std::string &name, bool &error)
+{
+    error = false;
+
+    for (const auto &settingCategory : settingLookup)
+    {
+        const std::vector<std::tuple<std::string, USBArmyKnifeCapability::SettingType, std::string>> &settingInCategory = settingCategory.second;
+        for (const auto &setting : settingInCategory)
+        {
+            const std::string &settingName = get<0>(setting);
+            const USBArmyKnifeCapability::SettingType &settingType = get<1>(setting);
+
+            if (settingName != name)
+            {
+                continue;
+            }
+            else if (settingType == USBArmyKnifeCapability::SettingType::String)
+            {
+                goto error;
+            }
+            else if (!prefs.isKey(settingName.c_str()))
+            {
+                const std::string &defaultValue = get<2>(setting);
+                return (uint16_t)atoi(defaultValue.c_str());
+            }
+            else
+            {
+                switch (settingType)
+                {
+                case USBArmyKnifeCapability::SettingType::Bool:
+                    return prefs.getBool(settingName.c_str());
+                    break;
+                case USBArmyKnifeCapability::SettingType::Int16:
+                    return prefs.getShort(settingName.c_str());
+                    break;
+                case USBArmyKnifeCapability::SettingType::UInt16:
+                    return prefs.getUShort(settingName.c_str());
+                default: // string and other types
+                    break;
+                };
+            }
+        }
+    }
+
+error:
+    error = true;
+    return 0;
 }
 
 void enumerateSettingsAsJson(Preferences &prefs, JsonArray array)

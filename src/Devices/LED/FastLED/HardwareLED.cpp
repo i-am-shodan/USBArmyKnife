@@ -1,5 +1,5 @@
 #ifndef NO_LED
-#ifndef LED_CI_PIN
+#if defined(LED_DI_PIN) && !defined(LED_CI_PIN)
 #include "../HardwareLED.h"
 #include <FastLED.h>
 

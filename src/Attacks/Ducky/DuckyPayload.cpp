@@ -61,6 +61,7 @@ static UserDefinedConstants consts;
 static std::string localCmdLineToExecute;
 static bool wasLastPressLong = false; // For buttons
 static int lastSuccessfullyEvaluatedLine = 0;
+static Preferences *preferences = nullptr;
 
 static std::string readCmdLine(const std::string &filename, int lineNum);
 
@@ -276,6 +277,7 @@ DuckyPayload::DuckyPayload()
 
 void DuckyPayload::begin(Preferences &prefs)
 {
+    preferences = &prefs;
     addDuckyScriptExtensions(extCommands, consts);
 }
 
@@ -311,6 +313,16 @@ void DuckyPayload::loop(Preferences &prefs)
         lastExecutionResult = duckyFileParser.Execute(executeFile ? currentlyExecutingFile : "", extCommands, consts);
         const bool executionHasCompleted = lastExecutionResult == DuckyInterpreter::SCRIPT_ERROR || lastExecutionResult == DuckyInterpreter::END_OF_FILE;
 
+        if (lastExecutionResult == DuckyInterpreter::SCRIPT_ERROR)
+        {
+            Debug::Log.error(LOG_DUCKY, executeFile ? ("Script error near line " + std::to_string(lastSuccessfullyEvaluatedLine + 1)) : "Error executing command");
+            totalErrors++;      
+        }
+        else if (lastExecutionResult == DuckyInterpreter::END_OF_FILE)
+        {
+            Debug::Log.info(LOG_DUCKY, "Script finished execution");
+        }
+
         if (executionHasCompleted)
         {
             // we are safe to clear both of these in whatever mode we are running in
@@ -319,17 +331,6 @@ void DuckyPayload::loop(Preferences &prefs)
             lastSuccessfullyEvaluatedLine = 0;
             duckyFileParser.Restart();
         }
-
-        if (lastExecutionResult == DuckyInterpreter::SCRIPT_ERROR)
-        {
-            Debug::Log.error(LOG_DUCKY, executeFile ? ("Script error near line " + std::to_string(lastSuccessfullyEvaluatedLine + 1)) : "Error executing command");
-            totalErrors++;
-            
-        }
-        else if (lastExecutionResult == DuckyInterpreter::END_OF_FILE)
-        {
-            Debug::Log.info(LOG_DUCKY, "Script finished execution");
-        }       
     }
     else if (firstRun)
     {

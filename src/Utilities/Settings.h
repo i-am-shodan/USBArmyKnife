@@ -10,3 +10,4 @@
 void registerSettingName(const uint8_t group, const std::string &name, const USBArmyKnifeCapability::SettingType &type, const std::string& defaultValue);
 void enumerateSettingsAsJson(Preferences &prefs, JsonArray array);
 bool setSettingValue(Preferences &prefs, const std::string &name, const std::string &value);
+uint16_t getIntegerSettingValue(Preferences &prefs, const std::string &name, bool &error);

@@ -197,6 +197,7 @@ bool Settings::toggleSetting(String key) {
 
   if (deserializeJson(json, this->json_settings_string)) {
     esp32m_println("\nCould not parse json");
+    return false;
   }
 
   for (int i = 0; i < json["Settings"].size(); i++) {
@@ -215,6 +216,8 @@ bool Settings::toggleSetting(String key) {
       return false;
     }
   }
+
+  return true;
 }
 
 String Settings::setting_index_to_name(int i) {
@@ -242,12 +245,15 @@ String Settings::getSettingType(String key) {
 
   if (deserializeJson(json, this->json_settings_string)) {
     esp32m_println("\nCould not parse json");
+    return "";
   }
   
   for (int i = 0; i < json["Settings"].size(); i++) {
     if (json["Settings"][i]["name"].as<String>() == key)
       return json["Settings"][i]["type"];
   }
+
+  return "";
 }
 
 void Settings::printJsonSettings(String json_string) {
@@ -267,7 +273,7 @@ void Settings::printJsonSettings(String json_string) {
 }
 
 bool Settings::createDefaultSettings(fs::FS &fs) {
-  createDefaultSettings(fs, DEFAULT_SETTING_FILE);
+  return createDefaultSettings(fs, DEFAULT_SETTING_FILE);
 }
 
 bool Settings::createDefaultSettings(fs::FS &fs, String filename) {

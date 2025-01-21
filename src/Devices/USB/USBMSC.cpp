@@ -184,14 +184,33 @@ void USBMSC::end()
     }
 }
 
-bool USBMSC::mountDiskImage(const std::string &imageLocation)
+bool USBMSC::mountDiskImage(const std::string &imageLocation, bool mountAsCD)
 {
+#ifdef ARDUINO_ARCH_RP2040
+    if (mountAsCD)
+    {
+        Debug::Log.error(TAG_USB, "CDROM support is not supported on this device");
+        return false;
+    }
+#endif
+
     std::size_t size = open_msc(imageLocation.c_str());
 
     if (size != 0)
     {
+#ifndef ARDUINO_ARCH_RP2040
+        usb_msc.setCDROM(mountAsCD);
+#endif
+
         // Set disk vendor id, product id and revision with string up to 8, 16, 4 characters respectively
-        usb_msc.setID("Adafruit", "Mass Storage", "1.0");
+        if (mountAsCD)
+        {
+            usb_msc.setID("Adafruit", "USB CDROM", "1.0");
+        }
+        else
+        {
+            usb_msc.setID("Adafruit", "Mass Storage", "1.0");
+        }
 
         usb_msc.setCapacity(size / LOGICAL_BLOCK_SIZE, LOGICAL_BLOCK_SIZE);
 
@@ -209,12 +228,12 @@ bool USBMSC::mountDiskImage(const std::string &imageLocation)
             return false;
         }
 
-        Debug::Log.info(TAG_USB, "Disk image mounted");
+        Debug::Log.info(TAG_USB, mountAsCD ? "CDROM image mounted" : "Disk image mounted");
         return true;
     }
     else
     {
-        Debug::Log.info(TAG_USB, "Could not load " + imageLocation);
+        Debug::Log.error(TAG_USB, "Could not load " + imageLocation);
         return false;
     }
 }

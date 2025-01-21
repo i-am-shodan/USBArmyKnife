@@ -1,5 +1,5 @@
 #ifndef NO_LED
-#ifdef LED_CI_PIN
+#if defined(LED_DI_PIN) && defined(LED_CI_PIN)
 #include "../HardwareLED.h"
 #include <APA102.h>
 
