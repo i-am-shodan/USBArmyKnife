@@ -77,6 +77,7 @@ This project implements a variety of attacks based around an easily concealable 
 | [Simple UI](./examples/simple_ui/) | A simple yet powerful UI to select scripts/images and run these using the hardware button. Shows how you can build complex UI interactions simply.  |
 | [Stream Mic audio over WiFi](./examples/hotmic/) | The M5Stack AtomS3U has a microphone that you can stream over WiFi.  |
 | [Instantly crash Linux boxes](./examples/linux_panic/) | Deploy a bad filesystem which cause Linux machines which automount to panic. |
+| [Evil USB CDROM/NIC](./examples/malicious_ethernet_adapter/) | Pretend to be a USB NICs which requires a driver from a CDROM device that appears when you plug the NIC in. |
 
 ## Supported Hardware
 
