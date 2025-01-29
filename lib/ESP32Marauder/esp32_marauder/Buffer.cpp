@@ -103,6 +103,7 @@ void Buffer::add(const uint8_t* buf, uint32_t len, bool is_pcap){
   }
   
   write(buf, len); // packet payload
+  packetsCounter++;
 }
 
 void Buffer::append(wifi_promiscuous_pkt_t *packet, int len) {

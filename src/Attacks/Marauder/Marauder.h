@@ -12,6 +12,7 @@ public:
 
   void run(const std::string& cmd);
   bool isRunning() { return running; }
+  uint16_t getPacketCount();
 private:
   bool running = false;
 };

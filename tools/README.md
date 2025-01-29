@@ -1,8 +1,10 @@
-# Agent set up
+# Tools
+
+## Serial based agent
 
 Running the following sets with create you a 16MB USB disk image which contains the serial agent
 
-## Compile the agent
+### Compile the agent
 
 The agent is compiled, by default, into Windows native instructions. Cross compilation is not currently supported by dotnet so you'll need to run these steps on a Windows machine.
 
@@ -17,7 +19,7 @@ dotnet publish -r win-x64
 ```
 Your PATH_TO_AGENT_EXECUTABLE value is `.\bin\Release\net8.0-windows\win-x64\publish\`
 
-## Set up a custom disk image
+### Set up a custom disk image
 
 Setting up the disk image is easier to do on Linux/WSL. Run the following commands as root
 
@@ -40,3 +42,18 @@ losetup -d /dev/loop0
 ```
 
 You can now copy agent.img to your SD card.
+
+## Getting debug logs
+
+The agent API enables you to display debug logs from the device. To do this:
+
+1. Edit the powershell script in the `DebugLogs` to point to the COM port of your device. 
+2. Run the script `.\get_device_debug_output.ps1` in a PowerShell terminal
+3. Connect the device
+
+Sometimes the powershell script might not connect to the device quick enough to collect the debug logs. In that case you need the device to wait until the script has connected. Add the following to your autostart.ds file. This will make the device wait until the PowerShell script has connected.
+```
+WHILE (AGENT_CONNECTED() == FALSE)
+  DELAY 2000
+END_WHILE
+```

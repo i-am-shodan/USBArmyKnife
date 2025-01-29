@@ -149,6 +149,12 @@ void ESP32Marauder::run(const std::string &cmd)
   marauderActivated = true;
   nextMarauderCommandToRun = cmd;
 }
+
+uint16_t ESP32Marauder::getPacketCount()
+{
+  return buffer_obj.getPacketsSinceLastCheck();
+}
+
 #else
 void ESP32Marauder::begin(Preferences &prefs)
 {
@@ -163,6 +169,11 @@ void ESP32Marauder::loop(Preferences &prefs)
 void ESP32Marauder::run(const std::string &cmd)
 {
   Debug::Log.info(LOG_MARAUDER, "ESP32Marauder is not supported on this platform");
+}
+
+uint16_t ESP32Marauder::getPacketCount()
+{
+  return 0;
 }
 
 #endif

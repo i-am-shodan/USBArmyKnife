@@ -59,7 +59,7 @@ static bool requiresReset = false;
 static ExtensionCommands extCommands;
 static UserDefinedConstants consts;
 static std::string localCmdLineToExecute;
-static bool wasLastPressLong = false; // For buttons
+static int8_t lastButtonPressState = -1; // For buttons, -1 is not pressed, 0 short press, 1 long press
 static int lastSuccessfullyEvaluatedLine = 0;
 static Preferences *preferences = nullptr;
 
@@ -112,23 +112,40 @@ static void changeLEDState(bool on, uint8_t hue, uint8_t saturation, uint8_t lum
 }
 
 
-static void doButtonWait(const std::function<void(const int&)> &delay)
+static void doButtonWait(const std::function<void(const int&)> &delay, uint32_t timeout)
 {
+    Devices::Button.resetButtonPressedState();
+    lastButtonPressState = -1;
+    uint32_t timeSpentSleeping = 0;
+
     while (true)
     {
         delay(150);
-        if (Devices::Button.hasButtonBeenPressed())
+
+        // increment timeSpentSleeping if timeout is actually set
+        if (timeout != 0)
         {
-            wasLastPressLong = Devices::Button.wasLastPressLong();
-            Devices::Button.resetButtonPressedState();
+            timeSpentSleeping += 150;
+        }
+
+        if (timeout != 0 && timeSpentSleeping >= timeout)
+        {
+            break;
+        }
+        else if (Devices::Button.hasButtonBeenPressed())
+        {
+            lastButtonPressState = Devices::Button.wasLastPressLong() ? 1 : 0;
             break;
         }
     }
 
+    Devices::Button.resetButtonPressedState();
     timeToWait = 0;
 }
 
-#ifdef ARDUINO_ARCH_ESP32 
+#ifdef ARDUINO_ARCH_ESP32
+static uint32_t tempTimeoutValue = 0;
+
 static void esp32_task_delay(const uint32_t &timeInMs)
 {
    vTaskDelay(pdMS_TO_TICKS(timeInMs)); 
@@ -136,12 +153,13 @@ static void esp32_task_delay(const uint32_t &timeInMs)
 
 void ButtonWaitTask(void *arg)
 {
-    doButtonWait(esp32_task_delay);
+    uint32_t* timeout = (uint32_t*) arg;
+    doButtonWait(esp32_task_delay, *timeout);
     vTaskDelete(NULL);
 }
 #endif
 
-static void waitForButton()
+static void waitForButtonWithTimeout(uint32_t timeout)
 {
     // We can do other things while we are waiting so we kick off a task to wait
     // return, which causes us to loop again
@@ -149,17 +167,23 @@ static void waitForButton()
     timeToWait = -1;
 
 #ifdef ARDUINO_ARCH_ESP32
+    tempTimeoutValue = timeout;
     xTaskCreate(
         ButtonWaitTask, // Function that should be called
         "ButtonWait",   // Name of the task (for debugging)
         1000,           // Stack size (bytes)
-        NULL,           // Parameter to pass
+        &tempTimeoutValue, // Parameter to pass
         1,              // Task priority
         NULL            // Task handle
     );
 #else
-    doButtonWait([](const uint32_t &time) { loop(); });
+    doButtonWait([](const uint32_t &time) { loop(); }, timeout);
 #endif
+}
+
+static void waitForButton()
+{
+    waitForButtonWithTimeout(0);
 }
 
 static void changeUSBMode(DuckyInterpreter::USB_MODE &mode, const uint16_t &vid, const uint16_t &pid, const std::string &man, const std::string &prod, const std::string &serial)
