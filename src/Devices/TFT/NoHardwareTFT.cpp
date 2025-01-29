@@ -1,5 +1,6 @@
 #ifdef NO_TFT
 #include "HardwareTFT.h"
+#include "../../Attacks/Ducky/DuckyPayload.h"
 
 namespace Devices
 {
@@ -36,5 +37,13 @@ void HardwareTFT::loop(Preferences &prefs)
 
 void HardwareTFT::begin(Preferences &prefs)
 {
+    Attacks::Ducky.registerDynamicVariable([this]()
+    {
+        return std::pair("#_DISPLAY_WIDTH_", "0");
+    });
+    Attacks::Ducky.registerDynamicVariable([this]()
+    {
+        return std::pair("#_DISPLAY_HEIGHT_", "0");
+    });
 }
 #endif

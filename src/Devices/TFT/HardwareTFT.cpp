@@ -2,6 +2,7 @@
 #include "HardwareTFT.h"
 
 #include "../../Debug/Logging.h"
+#include "../../Attacks/Ducky/DuckyPayload.h"
 
 #include <LovyanGFX.hpp>
 
@@ -201,5 +202,14 @@ void HardwareTFT::begin(Preferences &prefs)
     lcd.setBrightness(128);
     lcd.clear(TFT_BLACK);
     lcd.display();
+
+    Attacks::Ducky.registerDynamicVariable([this]()
+    {
+        return std::pair("#_DISPLAY_WIDTH_", std::to_string(DISPLAY_WIDTH));
+    });
+    Attacks::Ducky.registerDynamicVariable([this]()
+    {
+        return std::pair("#_DISPLAY_HEIGHT_", std::to_string(DISPLAY_HEIGHT));
+    });
 }
 #endif

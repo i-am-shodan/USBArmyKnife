@@ -23,6 +23,11 @@ class Buffer {
     void append(wifi_promiscuous_pkt_t *packet, int len);
     void append(String log);
     void save();
+    uint16_t getPacketsSinceLastCheck() {
+      uint16_t temp = packetsCounter;
+      packetsCounter = 0;
+      return temp; 
+    }
   private:
     void createFile(String name, bool is_pcap);
     void open(bool is_pcap);
@@ -40,6 +45,8 @@ class Buffer {
 
     uint32_t bufSizeA = 0;
     uint32_t bufSizeB = 0;
+
+    uint16_t packetsCounter = 0;
 
     bool writing = false; // acceppting writes to buffer
     bool useA = true; // writing to bufA or bufB

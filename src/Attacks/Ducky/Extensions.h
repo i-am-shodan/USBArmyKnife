@@ -386,11 +386,11 @@ static int handleButtonPress(const std::string &str, const std::unordered_map<st
     Debug::Log.info(LOG_DUCKY, "handleButtonPress '" + str + "'");
     if (str == "BUTTON_LONG_PRESS()")
     {
-        return wasLastPressLong;
+        return lastButtonPressState == 1;
     }
     else
     {
-        return wasLastPressLong == false;
+        return lastButtonPressState == 0;
     }
 }
 
@@ -420,6 +420,11 @@ static int handleGetSettingValue(const std::string &str, const std::unordered_ma
         Debug::Log.info(LOG_DUCKY, "Error handling GET_SETTING_VALUE() no param");
         return false;
     } 
+}
+
+static int handleGetRecvPackets(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    return Attacks::Marauder.getPacketCount();
 }
 
 static int handleRunPayload(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
@@ -546,6 +551,15 @@ static int handleWaitForUSBStorageActivityToStop(const std::string &str, const s
     return true;
 }
 
+static int handleWaitForButtonOrTimeout(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    const std::string arg = str.substr(str.find(' ') + 1);
+    auto timeout = asciiOrVariableToInt(arg, variables);
+
+    waitForButtonWithTimeout(timeout);
+    return true;
+}
+
 static int handleRawHid(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     bool ret = false;
@@ -590,6 +604,13 @@ static int handleRawHid(const std::string &str, const std::unordered_map<std::st
     }
 
     return ret;
+}
+
+static int handleLog(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    const std::string arg = str.substr(str.find(' ') + 1);
+    Debug::Log.info(LOG_DUCKY, arg);
+    return true;
 }
 
 static int handleKeyboardLayout(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
@@ -642,6 +663,9 @@ void addDuckyScriptExtensions(
     extCommands["RUN_PAYLOAD"] = handleRunPayload;
     extCommands["RAW_HID"] = handleRawHid;
 
+    // Utilities
+    extCommands["LOG"] = handleLog;
+
     // Device related
     extCommands["WEB_OFF"] = handleWebOff;
     extCommands["WIFI_OFF"] = handleWiFiOff;
@@ -652,7 +676,6 @@ void addDuckyScriptExtensions(
     extCommands["SET_SETTING_UINT16"] = handleSetSetting;
     extCommands["SET_SETTING_STRING"] = handleSetSetting;
 
-
     // USB
     extCommands["USB_MOUNT_DISK_READ_ONLY"] = handleUSBMode;
     extCommands["USB_MOUNT_CDROM_READ_ONLY"] = handleUSBMode;
@@ -660,6 +683,8 @@ void addDuckyScriptExtensions(
     extCommands["USB_NCM_PCAP_OFF"] = handleUsbNcmPcapOff;
     extCommands["WAIT_FOR_USB_STORAGE_ACTIVITY"] = handleWaitForUSBStorageActivity;
     extCommands["WAIT_FOR_USB_STORAGE_ACTIVITY_TO_STOP"] = handleWaitForUSBStorageActivityToStop;
+    extCommands["WAIT_FOR_BUTTON_PRESS_OR_TIMEOUT"] = handleWaitForButtonOrTimeout;
+
     extCommands["KEYBOARD_LAYOUT"] = handleKeyboardLayout;
 
     // Agent
@@ -676,6 +701,7 @@ void addDuckyScriptExtensions(
     extCommands["BUTTON_LONG_PRESS()"] = handleButtonPress;
     extCommands["BUTTON_SHORT_PRESS()"] = handleButtonPress;
     extCommands["GET_SETTING_VALUE()"] = handleGetSettingValue;
+    extCommands["ESP32M_GET_RECV_PACKETS()"] = handleGetRecvPackets;
 
     consts.emplace_back([]
                         {
