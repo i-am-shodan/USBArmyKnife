@@ -8,8 +8,11 @@ assignees: ''
 ---
 
 <!-- READ THIS FIRST:
+  Don't waste my time and yours. Please fill this in properly if you want help, otherwise your issue will be closed.
+
   - Make sure you are running the latest version of USB Army Knife before reporting an issue
   - Provide as many details as possible. Paste logs, configuration samples and code into the backticks.
+  - We have a wiki and an FAQ, please read this first!
   DO NOT DELETE ANY TEXT from this template! Otherwise, your issue may be closed without comment.
 -->
 ## Your problem
@@ -26,6 +29,13 @@ assignees: ''
 ```txt
 
 ```
+
+# Language (HID attacks only)
+<!--
+  What language is your device configured to use?
+  What keyboard layout is your victim machine using?
+-->
+
 
 ## Your DuckyScript
 <!--
@@ -45,6 +55,7 @@ Please provide logs from the device either:
 
 ```
 
-- Are you using the latest release:
+- I confirm I have read the FAQ:
+- I confirm I am using the latest release:
 
 ## Additional information
