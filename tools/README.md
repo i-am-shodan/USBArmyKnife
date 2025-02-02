@@ -4,6 +4,8 @@
 
 Running the following sets with create you a 16MB USB disk image which contains the serial agent
 
+**The agent currently only runs on 64-bit machines**
+
 ### Compile the agent
 
 The agent is compiled, by default, into Windows native instructions. Cross compilation is not currently supported by dotnet so you'll need to run these steps on a Windows machine.
