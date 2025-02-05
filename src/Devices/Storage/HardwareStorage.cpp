@@ -2,10 +2,21 @@
 #include "../../Debug/Logging.h"
 
 #ifdef NO_SD
-    #include <SPIFFS.h>
-    #define FILE_INTERFACE SPIFFS
+    #ifdef ARDUINO_ARCH_RP2040
+        #include <VFS.h>
+        #include <LittleFS.h>
+        #define FILE_INTERFACE LittleFS
+    #else
+        #include <SPIFFS.h>
+        #define FILE_INTERFACE SPIFFS
+    #endif
 #elif ARDUINO_ARCH_RP2040
     #include "RP2040/SDClassWrapper.h"
+    using namespace fs;
+    #define FILE_INTERFACE SDCard
+#elif USE_SD_INTERFACE
+    // generic esp32 SD interface
+    #include "GenericSD/SDClassWrapper.h"
     using namespace fs;
     #define FILE_INTERFACE SDCard
 #else
@@ -221,7 +232,19 @@ uint8_t HardwareStorage::usedPercentage()
     {
         return cachedCapacity;
     }
+#if defined(NO_SD) && defined(ARDUINO_ARCH_RP2040)
+    fs::FSInfo info;
+    if (FILE_INTERFACE.info(info))
+    {
+        cachedCapacity = (info.usedBytes / info.totalBytes)* 100;
+    }
+    else
+    {
+        cachedCapacity = 0;
+    }
+#else
     cachedCapacity = (FILE_INTERFACE.usedBytes() / FILE_INTERFACE.totalBytes()) * 100;
+#endif
     return cachedCapacity;
 }
 
@@ -246,7 +269,7 @@ bool HardwareStorage::deleteFile(const std::string& filename)
 HardwareStorage::HardwareStorage()
 {
 #ifndef NO_SD
-#ifndef ARDUINO_ARCH_RP2040
+#if !defined(ARDUINO_ARCH_RP2040) && !defined(USE_SD_INTERFACE)
     SD_MMC = FILE_INTERFACE;
 #endif
 #endif
@@ -264,6 +287,18 @@ void HardwareStorage::begin(Preferences &prefs)
 void HardwareStorage::begin(Preferences &prefs, bool format)
 {
 #ifdef NO_SD
+    #ifdef ARDUINO_ARCH_RP2040
+    if (!FILE_INTERFACE.begin())
+    {
+        Debug::Log.info(LOG_MMC, "FILE_INTERFACE could not be started");
+    }
+    else
+    {
+        running = true;
+        VFS.root(FILE_INTERFACE);
+    }
+    
+    #else
     if (!FILE_INTERFACE.begin(format, "/sdcard"))
     {
         Debug::Log.info(LOG_MMC, "FILE_INTERFACE could not be started");
@@ -272,6 +307,7 @@ void HardwareStorage::begin(Preferences &prefs, bool format)
     {
         running = true;
     }
+    #endif
 #elif defined (SD_MMC_D1_PIN)
     FILE_INTERFACE.setPins(SD_MMC_CLK_PIN, SD_MMC_CMD_PIN, SD_MMC_D0_PIN, SD_MMC_D1_PIN, SD_MMC_D2_PIN, SD_MMC_D3_PIN);
     if (!FILE_INTERFACE.begin("/sdcard", false, format, SDMMC_FREQ_52M))
@@ -290,7 +326,7 @@ void HardwareStorage::begin(Preferences &prefs, bool format)
             running = true;
         }
     }
-#elif defined (ARDUINO_ARCH_RP2040)
+#elif defined(ARDUINO_ARCH_RP2040) || defined(USE_SD_INTERFACE)
     if (!FILE_INTERFACE.begin(format))
     {
         Debug::Log.info(LOG_MMC, "FILE_INTERFACE could not be started");
