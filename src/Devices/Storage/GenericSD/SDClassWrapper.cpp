@@ -1,6 +1,8 @@
 #ifdef USE_SD_INTERFACE
 
 #include "SDClassWrapper.h"
+#include "../../../Debug/Logging.h"
+#include <Arduino.h>
 
 using namespace fs;
 
@@ -17,17 +19,35 @@ bool SDClassWrapper::begin(const bool &format)
 
     sdInitialized = SD.begin(SD_CS_PIN);
 
+    Debug::Log.info(" ", "SD init "+std::to_string(sdInitialized));
+
+    uint32_t cardSize = SD.cardSize() / (1024 * 1024);
+    Debug::Log.info(" ", "SDCard Size: " + std::to_string(cardSize));
+
     return sdInitialized;
 }
 
 File SDClassWrapper::open(const char *path, const char *mode)
 {
+    Debug::Log.error(" ", "Got here 2");
+
     if (!sdInitialized)
     {
+        Debug::Log.error(" ", "SD no init ");
         return File();
     }
 
-    return SD.open(path, mode);
+    auto file = SD.open(path, mode);
+
+    if (!file) {
+        Debug::Log.error(" ", std::string("File could not be opened ")+path);
+    }
+    else
+    {
+        Debug::Log.error(" ", std::string("File was opened! ")+path);
+    }
+
+    return file;
 }
 
 bool SDClassWrapper::exists(const char *path)
@@ -66,6 +86,9 @@ int SDClassWrapper::totalBytes()
 
 FileImplPtr VFSImpl::open(const char *path, const char *mode, const bool create)
 {
+    SD.op
+
+    Debug::Log.error(" ", "Got here 3");
     return FileImplPtr();
     //return SD.open(path, mode, create);
 }
