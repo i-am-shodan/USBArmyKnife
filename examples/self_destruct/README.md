@@ -2,6 +2,10 @@
 
 This is an example of using an auxillary devices connected to the LILYGO T Dongle S3's QWIIC port to perform motion detection. In this example if the device discovers motion close to it then the SELF_DESTRUCT() function is run. In our example this simply prints a graphic and resets the device. You are free to implement your own.
 
+
+https://github.com/user-attachments/assets/d8c192d9-2c56-4526-8ca4-b630c6875a1a
+
+
 ## Set up
 1. Copy autorun.ds and bomb.png onto the SD card
 1. In the platform.ini configuration file uncomment the line `-D EXT_SENSOR_MOTION_LD2410` this will enable the sensor module to be built
