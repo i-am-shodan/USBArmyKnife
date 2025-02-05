@@ -3,12 +3,18 @@
 #include <Adafruit_TinyUSB.h>
 
 #ifdef NO_SD
-    #include <SPIFFS.h>
-    #include "driver/sdmmc_host.h"
-    #include "driver/sdspi_host.h"
-    #include "sdmmc_cmd.h"
-    #include "esp_vfs_fat.h"
-    #define FILE_INTERFACE SPIFFS
+    #ifdef ARDUINO_ARCH_RP2040
+        #include <VFS.h>
+        #include <LittleFS.h>
+        #define FILE_INTERFACE LittleFS
+    #else
+        #include <SPIFFS.h>
+        #include "driver/sdmmc_host.h"
+        #include "driver/sdspi_host.h"
+        #include "sdmmc_cmd.h"
+        #include "esp_vfs_fat.h"
+        #define FILE_INTERFACE SPIFFS
+    #endif
     static int *card = NULL; // raw card access - fake
 #elif defined ARDUINO_ARCH_RP2040
     #include "../../Devices/Storage/RP2040/SDClassWrapper.h"
