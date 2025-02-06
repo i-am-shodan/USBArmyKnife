@@ -11,9 +11,9 @@
   #define SD  fs::SD_MMC_2
 #elif USE_SD_INTERFACE
     // generic esp32 SD interface
-    #include "../../../src/Devices/Storage/GenericSD/SDClassWrapper.h"
+    #include "SD.h"
     using namespace fs;
-    #define FILE_INTERFACE SDCard
+    #define FILE_INTERFACE SD
 #elif USE_SPIFFS_INTERFACE
   #include <SPIFFS.h>
   #define SD SPIFFS

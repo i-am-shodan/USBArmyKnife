@@ -68,9 +68,9 @@ size_t esp32m_println(esp_err_t&, int)
 
 #ifdef USE_SD_INTERFACE
     // generic esp32 SD interface
-    #include "../../Devices/Storage/GenericSD/SDClassWrapper.h"
+    #include "SD.h"
     using namespace fs;
-    #define FILE_INTERFACE SDCard
+    #define FILE_INTERFACE SD
 #elif !defined(NO_SD)
   #include "../../Devices/Storage/ESP32/SDMMCFS2.h"
   using namespace fs;
@@ -97,8 +97,8 @@ void ESP32Marauder::begin(Preferences &prefs)
   (void)sd_obj.initSD();
   sd_obj.supported = true;
 #ifdef USE_SD_INTERFACE
-  sd_obj.cardType = 1;
-  sd_obj.cardSizeMB = 100;
+  sd_obj.cardType = CARD_SD;
+  sd_obj.cardSizeMB = FILE_INTERFACE.cardSize() / 1024;
 #elif !defined(NO_SD) // todo this should prob be an API call
   sd_obj.cardType = SD_MMC_2.cardType();
   sd_obj.cardSizeMB = SD_MMC_2.cardSize() / 1024 / 1024;
