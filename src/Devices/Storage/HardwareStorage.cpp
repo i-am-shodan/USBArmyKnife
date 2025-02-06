@@ -16,9 +16,9 @@
     #define FILE_INTERFACE SDCard
 #elif USE_SD_INTERFACE
     // generic esp32 SD interface
-    #include "GenericSD/SDClassWrapper.h"
+    #include "SD.h"
     using namespace fs;
-    #define FILE_INTERFACE SDCard
+    #define FILE_INTERFACE SD
 #else
     #include "ESP32/SDMMCFS2.h"
     using namespace fs;
@@ -326,7 +326,19 @@ void HardwareStorage::begin(Preferences &prefs, bool format)
             running = true;
         }
     }
-#elif defined(ARDUINO_ARCH_RP2040) || defined(USE_SD_INTERFACE)
+#elif defined(USE_SD_INTERFACE)
+    pinMode(SD_MISO_PIN, INPUT_PULLUP);
+    SPI.begin(SD_SCLK_PIN, SD_MISO_PIN, SD_MOSI_PIN, SD_CS_PIN);
+
+    if (!FILE_INTERFACE.begin(SD_CS_PIN))
+    {
+        Debug::Log.info(LOG_MMC, "FILE_INTERFACE could not be started");
+    }
+    else
+    {
+        running = true;
+    }
+#elif defined(ARDUINO_ARCH_RP2040)
     if (!FILE_INTERFACE.begin(format))
     {
         Debug::Log.info(LOG_MMC, "FILE_INTERFACE could not be started");
