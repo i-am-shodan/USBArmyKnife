@@ -6,6 +6,8 @@ Running the following sets with create you a 16MB USB disk image which contains 
 
 **The agent currently only runs on 64-bit machines**
 
+A pre-built copy of the agent can also be obtained from the last successful build artefact available [here](https://github.com/i-am-shodan/USBArmyKnife/actions/workflows/dotnet.yml)
+
 ### Compile the agent
 
 The agent is compiled, by default, into Windows native instructions. Cross compilation is not currently supported by dotnet so you'll need to run these steps on a Windows machine.
