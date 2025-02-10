@@ -40,7 +40,7 @@ USBHID::USBHID()
 
 void USBHID::begin(Preferences &prefs)
 {
-    if (Devices::USB::Core.currentClassType() == USBClassType::HID && usb_hid == nullptr)
+    if (Devices::USB::Core.currentDeviceType() != USBDeviceType::None && Devices::USB::Core.currentClassType() == USBClassType::HID && usb_hid == nullptr)
     {
         // need to start USB HID
         usb_hid = new Adafruit_USBD_HID(desc_hid_report, sizeof(desc_hid_report), HID_ITF_PROTOCOL_NONE, 2, false);
