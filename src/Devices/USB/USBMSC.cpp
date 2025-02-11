@@ -21,6 +21,12 @@
     using namespace fs;
     #define FILE_INTERFACE SDCard
     static int *card = NULL; // raw card access - fake
+#elif USE_SD_INTERFACE
+    // generic esp32 SD interface
+    #include "SD.h"
+    using namespace fs;
+    #define FILE_INTERFACE SD
+    static int *card = NULL; // raw card access - fake
 #else
     #include "../../Devices/Storage/ESP32/SDMMCFS2.h"
     #include "driver/sdmmc_host.h"
@@ -164,7 +170,7 @@ bool USBMSC::mountSD()
         return false;
     }
 #else
-    Debug::Log.error(TAG_USB, "Mounting the SD card is only supported on ESP32 when a physical SD card is present");
+    Debug::Log.error(TAG_USB, "Raw SD card access is not supported on this device");
     return false;
 #endif
 }
