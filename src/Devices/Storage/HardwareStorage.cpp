@@ -21,6 +21,9 @@
     #define FILE_INTERFACE SD
 #else
     #include "ESP32/SDMMCFS2.h"
+    #include "driver/sdmmc_host.h"
+    #include "driver/sdspi_host.h"
+    #include "sdmmc_cmd.h"
     using namespace fs;
     #define FILE_INTERFACE SD_MMC_2
 
@@ -290,9 +293,10 @@ size_t HardwareStorage::sectorSize()
 #if defined(USE_SD_INTERFACE)
     return FILE_INTERFACE.sectorSize();
 #elif defined (USE_SD_MMC_INTERFACE)
-    return FILE_INTERFACE.card->csd.sector_size
-#endif
+    return FILE_INTERFACE.getCard()->csd.sector_size;
+#else
     return 0;
+#endif
 }
 
 size_t HardwareStorage::deviceCapacity()
@@ -300,9 +304,10 @@ size_t HardwareStorage::deviceCapacity()
 #if defined(USE_SD_INTERFACE)
     return FILE_INTERFACE.cardSize();
 #elif defined (USE_SD_MMC_INTERFACE)
-    return FILE_INTERFACE.card->csd.capacity
-#endif
+    return FILE_INTERFACE.getCard()->csd.capacity;
+#else
     return 0;
+#endif
 }
 
 int32_t HardwareStorage::readRawSectors(uint8_t* buffer, uint32_t lba, uint32_t sectors)
@@ -310,7 +315,7 @@ int32_t HardwareStorage::readRawSectors(uint8_t* buffer, uint32_t lba, uint32_t 
 #if defined(USE_SD_INTERFACE)
     return FILE_INTERFACE.readRAW((uint8_t*) buffer, lba);
 #elif defined (USE_SD_MMC_INTERFACE)
-    return (sdmmc_read_sectors(card, buffer, lba, sectors) == ESP_OK);
+    return (sdmmc_read_sectors(FILE_INTERFACE.getCard(), buffer, lba, sectors) == ESP_OK);
 #else
     return -1;
 #endif
@@ -321,7 +326,7 @@ int32_t HardwareStorage::writeRawSectors(uint8_t* buffer, uint32_t lba, uint32_t
 #if defined(USE_SD_INTERFACE)
     return FILE_INTERFACE.writeRAW(buffer, lba);
 #elif defined (USE_SD_MMC_INTERFACE)
-    return (sdmmc_read_sectors(card, buffer, lba, sectors) == ESP_OK);
+    return (sdmmc_read_sectors(FILE_INTERFACE.getCard(), buffer, lba, sectors) == ESP_OK);
 #else
     return -1;
 #endif
