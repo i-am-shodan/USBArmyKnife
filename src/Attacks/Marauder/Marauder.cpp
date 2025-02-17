@@ -100,8 +100,8 @@ void ESP32Marauder::begin(Preferences &prefs)
   sd_obj.cardType = CARD_SD;
   sd_obj.cardSizeMB = FILE_INTERFACE.cardSize() / 1024;
 #elif !defined(NO_SD) // todo this should prob be an API call
-  sd_obj.cardType = SD_MMC_2.cardType();
-  sd_obj.cardSizeMB = SD_MMC_2.cardSize() / 1024 / 1024;
+  sd_obj.cardType = FILE_INTERFACE.cardType();
+  sd_obj.cardSizeMB = FILE_INTERFACE.cardSize() / 1024 / 1024;
 #else
   sd_obj.cardType = CARD_SD;
   sd_obj.cardSizeMB = SPIFFS.totalBytes() / 1024 / 1024;

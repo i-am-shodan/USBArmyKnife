@@ -71,6 +71,7 @@ void HardwareStorage::writeFileData(const std::string& filename, const uint8_t *
     }
 
     file.close();
+    refreshCache();
 }
 
 File HardwareStorage::openFile(const std::string& filename, const char* mode)
@@ -256,13 +257,13 @@ bool HardwareStorage::createEmptyFile(const std::string &filename)
         return false;
     }
     file.close();
-    filesCache.clear();
+    refreshCache();
     return true;
 }
 
 bool HardwareStorage::deleteFile(const std::string& filename)
 {
-    filesCache.clear();
+    refreshCache();
     return FILE_INTERFACE.remove(filename.c_str());
 }
 
@@ -273,6 +274,67 @@ HardwareStorage::HardwareStorage()
     SD_MMC = FILE_INTERFACE;
 #endif
 #endif
+}
+
+bool HardwareStorage::isRawAccessSupported()
+{
+#if defined(USE_SD_INTERFACE) or defined(USE_SD_MMC_INTERFACE)
+    return true;
+#else
+    return false;
+#endif
+}
+
+size_t HardwareStorage::sectorSize()
+{
+#if defined(USE_SD_INTERFACE)
+    return FILE_INTERFACE.sectorSize();
+#elif defined (USE_SD_MMC_INTERFACE)
+    return FILE_INTERFACE.card->csd.sector_size
+#endif
+    return 0;
+}
+
+size_t HardwareStorage::deviceCapacity()
+{
+#if defined(USE_SD_INTERFACE)
+    return FILE_INTERFACE.cardSize();
+#elif defined (USE_SD_MMC_INTERFACE)
+    return FILE_INTERFACE.card->csd.capacity
+#endif
+    return 0;
+}
+
+int32_t HardwareStorage::readRawSectors(uint8_t* buffer, uint32_t lba, uint32_t sectors)
+{
+#if defined(USE_SD_INTERFACE)
+    return FILE_INTERFACE.readRAW((uint8_t*) buffer, lba);
+#elif defined (USE_SD_MMC_INTERFACE)
+    return (sdmmc_read_sectors(card, buffer, lba, sectors) == ESP_OK);
+#else
+    return -1;
+#endif
+}
+
+int32_t HardwareStorage::writeRawSectors(uint8_t* buffer, uint32_t lba, uint32_t sectors)
+{
+#if defined(USE_SD_INTERFACE)
+    return FILE_INTERFACE.writeRAW(buffer, lba);
+#elif defined (USE_SD_MMC_INTERFACE)
+    return (sdmmc_read_sectors(card, buffer, lba, sectors) == ESP_OK);
+#else
+    return -1;
+#endif
+}
+
+void HardwareStorage::flush()
+{
+    // not currently supported
+}
+
+void HardwareStorage::refreshCache()
+{
+    filesCache.clear();
 }
 
 void HardwareStorage::loop(Preferences &prefs)
