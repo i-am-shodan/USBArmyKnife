@@ -398,6 +398,7 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
       // close file
       Debug::Log.info(LOG_WEB, std::string("File uploaded ")+filename.c_str());
       request->_tempFile.close();
+      Devices::Storage.refreshCache();
     }
     request->send(200);
   }

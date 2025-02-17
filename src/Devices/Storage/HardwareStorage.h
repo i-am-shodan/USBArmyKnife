@@ -23,6 +23,13 @@ public:
   virtual std::string readFile(fs::FS &fs, const char *path);
   virtual bool deleteFile(const std::string& filename);
   virtual File openFile(const std::string& filename, const char* mode);
+  virtual bool isRawAccessSupported();
+  virtual size_t sectorSize();
+  virtual size_t deviceCapacity();
+  virtual int32_t readRawSectors(uint8_t* buffer, uint32_t lba, uint32_t sectors);
+  virtual int32_t writeRawSectors(uint8_t* buffer, uint32_t lba, uint32_t sectors);
+  virtual void flush();
+  virtual void refreshCache();
 private:
   bool running = false;
 };
