@@ -1,0 +1,28 @@
+REM Warning this script may not be supported on all devices!
+
+REM First we need to change the device settings so when it boots
+REM it isn't a USB device. That way it will wait until the script starts
+REM and we will tell it how to behave
+REM This change is persistant. If you want to run your device in the original way you'll
+REM need to either reflash the device or change the settings in the UI
+DEFINE #SETTING_NAME usbDeviceType
+VAR $SETTING_USB_DEVICE_TYPE_NONE = 0
+
+IF (GET_SETTING_VALUE() != $SETTING_USB_DEVICE_TYPE_NONE) THEN
+    DISPLAY_CLEAR
+    DISPLAY_TEXT 0 0 Setting mode to None
+    SET_SETTING_UINT16 usbDeviceType $SETTING_USB_DEVICE_TYPE_NONE
+    REM this requires a reset
+    DELAY 3000
+    RESET
+END_IF
+
+REM now when the device boots up we can more control over the USB stack
+REM lets make the device a USB keyboard and a USB disk
+ATTACKMODE HID STORAGE
+
+DELAY 5000
+
+GUI R
+DELAY 1000
+STRINGLN powershell
