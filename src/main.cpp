@@ -111,7 +111,9 @@ void setup()
     Devices::TFT.display(0, 8+8, "USB CLASS: None");
   }
 
-  Debug::Log.info(TAG, std::string("Version: ")+GIT_COMMIT_HASH);
+  auto versionStr = std::string("Version: ")+GIT_COMMIT_HASH;
+  Devices::TFT.display(0, 8+8+8, versionStr);
+  Debug::Log.info(TAG, versionStr);
 
   aux.begin(prefs);
 }
