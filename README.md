@@ -109,9 +109,19 @@ There are two options for getting the USB Army Knife firmware onto your device:
 *ESP-S2 based devices have WiFi support but do not have a web interface. Attacks are managed via DuckyScript files.*
 *RP2040 devices do not have ESP32 Maurader capability*
 
-### Future plans
+## How to get help
+* Questions about DuckyScript?
+  * [DuckyScript quick reference](https://docs.hak5.org/hak5-usb-rubber-ducky/duckyscript-tm-quick-reference)
+  * [The USB Army Knife command reference](https://github.com/i-am-shodan/USBArmyKnife/wiki) 
+* Problem getting started?
+  * Check out the examples
+  * [The discussions pages](https://github.com/i-am-shodan/USBArmyKnife/discussions)
+* Found a bug?
+  * [Create an issue](https://github.com/i-am-shodan/USBArmyKnife/issues)
 
-#### USB Host Mode / Mobile device support
+## Future plans
+
+### USB Host Mode / Mobile device support
 There is no reason the USB Army Knife can't also operate in USB host mode. That is the same mode a computer works in. In this way the USB Army Knife can issue commands as if it was a computer. With most smart phones supporting PTP (picture transfer protocol) this means you could in theory plug in a USB Army Knife (with a USB adapter) into a phone and have it pull the photos off.
 
 [Espressif have documentation for USB host mode](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/api-reference/peripherals/usb_host.html) and also [example code](https://github.com/espressif/esp-idf/tree/master/examples/peripherals/usb/host). They do not have an example for the PTP protocol.
