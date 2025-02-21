@@ -6,9 +6,29 @@ Running the following sets with create you a 16MB USB disk image which contains 
 
 **The agent currently only runs on 64-bit machines**
 
-A pre-built copy of the agent can also be obtained from the last successful build artefact available [here](https://github.com/i-am-shodan/USBArmyKnife/actions/workflows/dotnet.yml)
-
 ### Compile the agent
+
+1. Clone the repository
+   ```
+   git clone https://github.com/i-am-shodan/USBArmyKnife.git
+   ```
+2. Go into the tools folder and give the craft_agent.sh script permissions:
+   ```
+   sudo chmod a+x craft_agent.sh
+   ```
+3. Execute the script:
+   ```
+   sudo bash craft_agent.sh
+   ```
+4. This script will install github cli. As soon as this is installd it will ask you to authenticate with your github account, to do this just follow the given instructions.
+5. After Authenticating a download menu should open up where you can select several options. You need to choose agent binaries with space and than hit enter to download.
+6. Now wait for the script to finish executing and you should have your finished agent.img 
+
+### Notes:
+The compilation process does not work on WSL due to WSL no having enough acces. This means that this process only works on a complete Linux install.
+
+
+## Manual Instructions
 
 The agent is compiled, by default, into Windows native instructions. Cross compilation is not currently supported by dotnet so you'll need to run these steps on a Windows machine.
 
