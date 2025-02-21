@@ -8,11 +8,7 @@
         && sudo apt update \
         && sudo apt install gh -y
 
-#Clone Repository
-git clone https://github.com/i-am-shodan/USBArmyKnife.git
-
 #Donwload gent binaries
-cd USBArmyKnife
 gh auth login
 gh run download
 
