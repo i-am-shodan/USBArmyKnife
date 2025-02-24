@@ -15,8 +15,6 @@ bool SDClassWrapper::begin(const bool &format)
     SPI.setRX(SD_MISO);
     SPI.setTX(SD_MOSI);
     SPI.setSCK(SD_SCLK);
-    //SPI.setMOSI(SD_MOSI);
-    //SPI.setMISO(SD_MISO);
 
     sdInitialized = SD.begin(SD_CS, SPI);
 
