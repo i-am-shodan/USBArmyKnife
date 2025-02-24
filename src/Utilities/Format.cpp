@@ -39,7 +39,9 @@ void FormatStatusUpdateTask(void *arg)
 #else
 void FormatStatusUpdateTask(void *arg)
 {
+#ifdef ARDUINO_ARCH_ESP32
     vTaskDelete(NULL);
+#endif
 }
 #endif
 

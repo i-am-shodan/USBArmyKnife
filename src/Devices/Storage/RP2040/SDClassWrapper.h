@@ -20,6 +20,10 @@ namespace fs
 
         int usedBytes();
         int totalBytes();
+        size_t sectorSize();
+        size_t cardSize();
+        int32_t readRAW(uint8_t*, uint32_t);
+        int32_t writeRAW(uint8_t*, uint32_t);
     };
 
     class VFSImpl : public FSImpl
