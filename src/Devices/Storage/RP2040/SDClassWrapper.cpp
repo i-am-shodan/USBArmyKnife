@@ -65,6 +65,26 @@ int SDClassWrapper::totalBytes()
     return SD.size();
 }
 
+size_t SDClassWrapper::sectorSize()
+{
+    return SD.blockSize();
+}
+
+size_t SDClassWrapper::cardSize()
+{
+    return SD.totalClusters() * SD.clusterSize();
+}
+
+int32_t SDClassWrapper::readRAW(uint8_t*, uint32_t)
+{
+    return -1;
+}
+
+int32_t SDClassWrapper::writeRAW(uint8_t*, uint32_t)
+{
+    return -1;
+}
+
 bool VFSImpl::setConfig(const FSConfig &cfg)
 {
     return false;
