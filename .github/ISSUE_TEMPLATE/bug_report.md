@@ -57,5 +57,12 @@ Please provide logs from the device either:
 
 - I confirm I have read the FAQ:
 - I confirm I am using the latest release:
+<!--
+  You can find your version number either:
+  * On the Help tab in the UI
+  * Displayed on the devices screen
+  * In the logs
+-->
+- My version number is:
 
 ## Additional information
