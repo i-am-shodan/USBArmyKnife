@@ -1,7 +1,11 @@
 #pragma once
 
 #ifdef NO_SD
-  #include <SPIFFS.h>
+  #ifdef ARDUINO_ARCH_RP2040
+    #include <LittleFS.h>
+  #else
+    #include <SPIFFS.h>
+  #endif
 #elif ARDUINO_ARCH_RP2040
   #include <SD.h>
 #else

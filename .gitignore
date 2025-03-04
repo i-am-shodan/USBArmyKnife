@@ -47,3 +47,4 @@ packages/
 /example/covertstorage/disk.img
 examples/covertstorage/disk.img
 /tools/Agent/mic.pcm
+/src/version.h

@@ -9,6 +9,11 @@
 #ifdef USE_SD_MMC_INTERFACE
   #include "../../../src/Devices/Storage/ESP32/SDMMCFS2.h"
   #define SD  fs::SD_MMC_2
+#elif USE_SD_INTERFACE
+    // generic esp32 SD interface
+    #include "SD.h"
+    using namespace fs;
+    #define FILE_INTERFACE SD
 #elif USE_SPIFFS_INTERFACE
   #include <SPIFFS.h>
   #define SD SPIFFS

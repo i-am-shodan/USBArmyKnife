@@ -21,6 +21,7 @@
 #include "../../Attacks/Ducky/DuckyPayload.h"
 
 #include "../../Utilities/Settings.h"
+#include "../../version.h"
 
 #define LOG_WEB "WEB"
 
@@ -164,6 +165,7 @@ static void webRequestHandler(AsyncWebServerRequest *request)
     root["heapSize"] = ESP.getHeapSize();
     root["agentConnected"] = Attacks::Agent.isAgentConnected();
     root["machineName"] = Attacks::Agent.machineName();
+    root["version"] = GIT_COMMIT_HASH;
 
     float heapUsed = (float)(ESP.getHeapSize() - ESP.getFreeHeap());
     float totalHeap = (float)ESP.getHeapSize();
@@ -398,6 +400,7 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
       // close file
       Debug::Log.info(LOG_WEB, std::string("File uploaded ")+filename.c_str());
       request->_tempFile.close();
+      Devices::Storage.refreshCache();
     }
     request->send(200);
   }
