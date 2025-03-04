@@ -4,10 +4,11 @@
 #include "../Devices/TFT/HardwareTFT.h"
 #include "../Devices/Storage/HardwareStorage.h"
 #include "../Devices/WiFi/HardwareWiFi.h"
+#include "../Debug/Logging.h"
 
 static bool running = false;
 
-#ifdef ARDUINO_ARCH_ESP32
+#if defined(ARDUINO_ARCH_ESP32) && defined(DISPLAY_WIDTH)
 void FormatStatusUpdateTask(void *arg)
 {
     const std::string line1 = "Formatting";
@@ -35,8 +36,16 @@ void FormatStatusUpdateTask(void *arg)
     }
     vTaskDelete(NULL);
 }
+#else
+void FormatStatusUpdateTask(void *arg)
+{
+#ifdef ARDUINO_ARCH_ESP32
+    vTaskDelete(NULL);
+#endif
+}
 #endif
 
+#ifdef DISPLAY_WIDTH
 void AskFormatSD(Preferences &prefs)
 {
     // Display a message when the SD card cannot be found. Some devices are very picky about the
@@ -92,4 +101,20 @@ void AskFormatSD(Preferences &prefs)
     watchdog_reboot(0, SRAM_END, 0);
 #endif
 }
-#endif
+#else
+void AskFormatSD(Preferences &prefs)
+{ 
+    for (int x = 0; x < 5; x++)
+    {
+        Debug::Log.error("Main", "SD card error, cannot ask to format as no display. Will reboot");
+        delay(1000);
+    }
+    
+#ifdef ARDUINO_ARCH_ESP32
+    ESP.restart();
+#elif defined(ARDUINO_ARCH_RP2040)
+    watchdog_reboot(0, SRAM_END, 0);
+#endif       
+}
+#endif //DISPLAY_WIDTH
+#endif // NO_SD

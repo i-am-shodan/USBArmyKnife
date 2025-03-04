@@ -69,3 +69,12 @@ jobs:
         with:
           name: M5-Atom-S3U Firmware binaries
           path: .pio/build/M5-Atom-S3U/*.bin
+
+      - name: Build PlatformIO Project Waveshare-ESP32-S3-GEEK
+        run: pio run --environment Waveshare-ESP32-S3-GEEK
+                
+      - name: Upload Waveshare-ESP32-S3-GEEK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Waveshare-ESP32-S3-GEEK Firmware binaries
+          path: .pio/build/Waveshare-ESP32-S3-GEEK/*.bin

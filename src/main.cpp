@@ -25,6 +25,9 @@ void loop() {}
 #include "AuxiliaryComponent/Auxiliary.h"
 
 #include "Utilities/Format.h"
+#include "version.h"
+
+#define TAG "main"
 
 static Preferences prefs;
 static Auxiliary aux;
@@ -70,7 +73,7 @@ void setup()
     {
       // They might see/report some debug output
       Devices::LED.changeLEDState(true, 0, 100, 100, x % 2 == 0 ? 255 : 0); // flash RED led
-      Debug::Log.error("Main", "Flash filesystem is invalid, upload new FS image");
+      Debug::Log.error(TAG, "Flash filesystem is invalid, upload new FS image");
       delay(1000);
     }
 #ifdef ARDUINO_ARCH_ESP32
@@ -80,7 +83,7 @@ void setup()
   }
 
   Devices::TFT.display(0, 0, "Device now running");
-  Debug::Log.info("Main", "Running!");
+  Debug::Log.info(TAG, "Running!");
 
   if (Devices::USB::Core.currentDeviceType() == USBDeviceType::Serial)
   {
@@ -107,6 +110,10 @@ void setup()
   {
     Devices::TFT.display(0, 8+8, "USB CLASS: None");
   }
+
+  auto versionStr = std::string("Version: ")+GIT_COMMIT_HASH;
+  Devices::TFT.display(0, 8+8+8, versionStr);
+  Debug::Log.info(TAG, versionStr);
 
   aux.begin(prefs);
 }

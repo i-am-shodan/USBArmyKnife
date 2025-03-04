@@ -1,5 +1,6 @@
 import gzip
 import os
+import subprocess
 
 staticFiles = {}
 headerFiles = []
@@ -109,3 +110,13 @@ cpp_vector_code += "};\n\n#endif"
 
 with open("src/html/htmlFiles.cpp", "w") as file:
     file.write(cpp_vector_code)
+
+# Get the current git commit hash
+commit_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip().decode('utf-8')
+
+# Define the content for the version.h file
+header_content = f'#pragma once\nconst char GIT_COMMIT_HASH[] = "{commit_hash}";\n'
+
+# Write the content to version.h
+with open('src/version.h', 'w') as header_file:
+    header_file.write(header_content)
