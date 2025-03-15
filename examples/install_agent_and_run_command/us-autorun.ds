@@ -9,6 +9,8 @@ IF (FILE_EXISTS() == FALSE) THEN
   USB_MOUNT_DISK_READ_ONLY /agent.img
 
   WAIT_FOR_USB_STORAGE_ACTIVITY
+  REM Make sure we leave enough time for the drive box to appear
+  DELAY 5000
 
   REM Searches each drive for a file name in1.bat. Run it if found
 
