@@ -315,7 +315,11 @@ int32_t HardwareStorage::readRawSectors(uint8_t* buffer, uint32_t lba, uint32_t 
 #if defined(USE_SD_INTERFACE)
     return FILE_INTERFACE.readRAW((uint8_t*) buffer, lba);
 #elif defined (USE_SD_MMC_INTERFACE)
-    return (sdmmc_read_sectors(FILE_INTERFACE.getCard(), buffer, lba, sectors) == ESP_OK);
+    if (sdmmc_read_sectors(FILE_INTERFACE.getCard(), buffer, lba, sectors) == ESP_OK)
+    {
+        return sectors * FILE_INTERFACE.getCard()->csd.sector_size;
+    }
+    return -1;
 #else
     return -1;
 #endif
@@ -326,7 +330,11 @@ int32_t HardwareStorage::writeRawSectors(uint8_t* buffer, uint32_t lba, uint32_t
 #if defined(USE_SD_INTERFACE)
     return FILE_INTERFACE.writeRAW(buffer, lba);
 #elif defined (USE_SD_MMC_INTERFACE)
-    return (sdmmc_read_sectors(FILE_INTERFACE.getCard(), buffer, lba, sectors) == ESP_OK);
+    if (sdmmc_write_sectors(FILE_INTERFACE.getCard(), buffer, lba, sectors) == ESP_OK)
+    {
+        return sectors * FILE_INTERFACE.getCard()->csd.sector_size;
+    }
+    return -1;
 #else
     return -1;
 #endif
