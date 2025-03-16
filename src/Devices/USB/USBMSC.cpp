@@ -51,7 +51,7 @@ static int32_t msc_write_cb(uint32_t lba, uint8_t *buffer, uint32_t bufsize)
     else if (Devices::Storage.isRawAccessSupported())
     {
         uint32_t sectors = (bufsize / Devices::Storage.sectorSize());
-        return Devices::Storage.readRawSectors((uint8_t*)buffer, lba, sectors);
+        return Devices::Storage.writeRawSectors((uint8_t*)buffer, lba, sectors);
     }
     return -1;
 }
