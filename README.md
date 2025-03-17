@@ -58,10 +58,10 @@ https://github.com/user-attachments/assets/3c866d29-ef26-4eaf-943b-1206b8c40101
 ## Features
 This project implements a variety of attacks based around an easily concealable USB/WiFi/BT dongle. The attacks include sending BadUSB (USB HID commands using DuckyScript), appearing as mass storage devices, appearing as USB network devices, and performing WiFi and Bluetooth attacks with ESP32 Marauder. Attacks are deployed using a Ducky-like language you probably already know and love. This language has been agumented with a raft of custom commands and even the entire ESP32 Marauder capability (improved). Attacks include:
 
-- **USB HID Attacks**: Send custom HID commands using DuckyScript, supports BadUSB & USB HID and run style attacks.
-- **Mass Storage Device**: Emulate a USB mass storage device.
+- **USB HID Attacks**: Send custom HID commands using DuckyScript, supports BadUSB & USB HID and run style attacks. Supports multiple keyboard layouts/languages.
+- **Mass Storage Device**: Emulate a USB mass storage device (USB drive and CDROM).
 - **USB Network Device**: Appear as a USB network device.
-- **WiFi and Bluetooth Attacks**: Utilize ESP32 Marauder for WiFi and Bluetooth attacks.
+- **WiFi and Bluetooth Attacks**: Utilize ESP32 Marauder for WiFi and Bluetooth attacks. Include EvilAP, Deauth and pcap.
 - **Hot Mic**: Plug in a USB device and stream audio over WiFi
 
 ## Examples
@@ -78,6 +78,7 @@ This project implements a variety of attacks based around an easily concealable 
 | [Stream Mic audio over WiFi](./examples/hotmic/) | The M5Stack AtomS3U has a microphone that you can stream over WiFi.  |
 | [Instantly crash Linux boxes](./examples/linux_panic/) | Deploy a bad filesystem which cause Linux machines which automount to panic. |
 | [Evil USB CDROM/NIC](./examples/malicious_ethernet_adapter/) | Pretend to be a USB NICs which requires a driver from a CDROM device that appears when you plug the NIC in. |
+| [Use different keyboard layouts](./examples/multiple_keyboard_layouts/) | Automatically support different keyboard layouts without rewriting your payloads |
 
 ## Supported Hardware
 
