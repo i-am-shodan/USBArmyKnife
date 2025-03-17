@@ -1,0 +1,14 @@
+REM If you don't set a KEYBOARD_LAYOUT value then the device will output en-US HID REM You must define your Discord webhook if you want to use this method for the exfiltration
+REM This is the USB standard keyboard layout
+STRING American keyboard layout
+
+REM To change this you need to use the KEYBOARD_LAYOUT command AND have your layout compiled into the firmware
+REM To compile a new language in:
+REM 1. Edit platformio.ini and uncomment the correct build flag in the keyboardlayouts section. Do not add too many layouts as memory is limited.
+REM 2. Build and flash the firmware to your device.
+
+KEYBOARD_LAYOUT win_en-GB
+STRING British keyboard layout
+
+KEYBOARD_LAYOUT win_pt-BR
+STRING Brazilian keyboard layout
