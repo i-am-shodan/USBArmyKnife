@@ -73,7 +73,6 @@ void HardwareButton::loop(Preferences &prefs)
   {
     pmu_flag = false;
     (void)power.getIrqStatus();
-    Debug::Log.error(TAG, "Got interrupted");
 
     if (power.isPekeyShortPressIrq())
     {
