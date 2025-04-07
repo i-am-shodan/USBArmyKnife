@@ -33,7 +33,7 @@ void HardwareIR::begin(Preferences &prefs)
 {
     irsend.begin();
 
-    // IR_NEC 4 8 10
+    // NEC1: {D=4,F=8} = IR_NEC 4 8 10
     Attacks::Ducky.registerExtension("IR_NEC", [this](const std::string& str, const std::unordered_map<std::string, std::string>& constants, const std::unordered_map<std::string, int>& variables)
     {
         const std::string arg = str.substr(str.find(' ') + 1);
@@ -57,37 +57,6 @@ void HardwareIR::begin(Preferences &prefs)
             typeOfSignal = decode_type_t::NEC;
             repeats = atoi(entries[3].c_str());
         }
-        return true;
-    });
-
-    Attacks::Ducky.registerExtension("IR_PRONTO", [this](const std::string& str, const std::unordered_map<std::string, std::string>& constants, const std::unordered_map<std::string, int>& variables)
-    {
-        // is it a bad idea to send here?
-        const std::string filename = str.substr(str.find(' ') + 1);
-
-        do
-        {
-            size_t len = Devices::Storage.getFileSize(filename);
-
-            if (len == 0)
-            {
-                Debug::Log.info(TAG, "The filename was invalid: "+filename);
-                break;
-            }
-
-            uint8_t* data = Devices::Storage.readFileAsBinary(filename);
-            if (data == nullptr)
-            {
-                break;
-            }
-
-            uint16_t* pronto = (uint16_t*) data;
-            irsend.sendPronto(pronto, len / 2, 10);
-
-            Debug::Log.info(TAG, "Sent queued");
-
-        } while (false);
-        
         return true;
     });
 
