@@ -1,4 +1,5 @@
 #include "Adafruit_TinyUSB.h"
+#include "esp_ota_ops.h"
 
 #include "../../Debug/Logging.h"
 
@@ -640,6 +641,28 @@ static int handleKeyboardLayout(const std::string &str, const std::unordered_map
     return false;
 }
 
+static int partitionSwap(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+#ifdef LILYGO_T_WATCH_S3
+    const esp_partition_t *partition = esp_ota_get_next_update_partition(NULL);
+
+    if (partition == nullptr)
+    {
+        Debug::Log.error(LOG_DUCKY, "Could not find partition");
+        return;
+    }
+
+    if (esp_ota_set_boot_partition(partition) == ESP_OK) {
+        ESP.restart();
+    }
+    else
+    {
+        Debug::Log.error(LOG_DUCKY, "Could not swap partitions");
+    }
+#endif
+    return true;
+}
+
 void addDuckyScriptExtensions(
     ExtensionCommands &extCommands,
     UserDefinedConstants &consts)
@@ -665,6 +688,7 @@ void addDuckyScriptExtensions(
 
     // Utilities
     extCommands["LOG"] = handleLog;
+    extCommands["PARTITION_SWAP"] = partitionSwap;
 
     // Device related
     extCommands["WEB_OFF"] = handleWebOff;
