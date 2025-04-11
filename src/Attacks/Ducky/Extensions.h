@@ -12,6 +12,7 @@
 #include "../../Devices/TFT/HardwareTFT.h"
 #include "../../Devices/LED/HardwareLED.h"
 #include "../../Devices/WiFi/HardwareWiFi.h"
+#include "../../Devices/Touch/HardwareTouch.h"
 #include "../../Comms/Web/WebServer.h"
 
 #include "../../Attacks/Marauder/Marauder.h"
@@ -649,7 +650,7 @@ static int partitionSwap(const std::string &str, const std::unordered_map<std::s
     if (partition == nullptr)
     {
         Debug::Log.error(LOG_DUCKY, "Could not find partition");
-        return;
+        return true;
     }
 
     if (esp_ota_set_boot_partition(partition) == ESP_OK) {
@@ -661,6 +662,62 @@ static int partitionSwap(const std::string &str, const std::unordered_map<std::s
     }
 #endif
     return true;
+}
+
+static void doTouchActivityWait(const std::function<void(const int &)> &delay)
+{
+    Devices::Touch.resetTouchState();
+
+    while (true)
+    {
+        delay(150);
+        if (Devices::Touch.hasBeenTouched())
+        {
+            break;
+        }
+    }
+
+    timeToWait = 0;
+}
+
+#ifdef ARDUINO_ARCH_ESP32
+void doTouchActivityWaitTask(void *arg)
+{
+    doTouchActivityWait(esp32_task_delay);
+    vTaskDelete(NULL);
+}
+#endif
+
+static int waitForTouch(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    // We can do other things while we are waiting so we kick off a task to wait
+    // return, which causes us to loop again
+    // in our loop we check if the task is finished and only continue processing if it has
+    Debug::Log.info(LOG_DUCKY, "Waiting for touch activity");
+
+    timeToWait = -1;
+
+#ifdef ARDUINO_ARCH_ESP32
+    xTaskCreate(
+        doTouchActivityWaitTask, // Function that should be called
+        "TouchWait",                 // Name of the task (for debugging)
+        1000,                      // Stack size (bytes)
+        NULL,                      // Parameter to pass
+        1,                         // Task priority
+        NULL                       // Task handle
+    );
+#else
+    doTouchActivityWait([](const uint32_t &time) { loop(); });
+#endif
+
+    return true;
+}
+
+static int getTouchPosition(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    const auto pos = startsWith(str, "GET_X_POS") ? Devices::Touch.getXPos() : Devices::Touch.getYPos();
+    Debug::Log.info(LOG_DUCKY, str + " " + std::to_string(pos) );
+    return pos;
 }
 
 void addDuckyScriptExtensions(
@@ -679,6 +736,11 @@ void addDuckyScriptExtensions(
     extCommands["DISPLAY_CLEAR"] = handleDisplayClear;
     extCommands["LED"] = handleLED;
     extCommands["LED_B"] = handleLEDBlue;
+
+    // touch
+    extCommands["WAIT_FOR_TOUCH"] = waitForTouch;
+    extCommands["GET_X_POS()"] = getTouchPosition;
+    extCommands["GET_Y_POS()"] = getTouchPosition;
 
     // Other attacks
     extCommands["CALC"] = handleCalc;
