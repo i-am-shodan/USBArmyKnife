@@ -7,6 +7,7 @@ void loop() {}
 #include <uptime.h>
 #include <Adafruit_TinyUSB.h>
 
+#include "Devices/Platform/BoardSupport.h"
 #include "Devices/Button/HardwareButton.h"
 #include "Devices/LED/HardwareLED.h"
 #include "Devices/TFT/HardwareTFT.h"
@@ -15,6 +16,7 @@ void loop() {}
 #include "Devices/WiFi/HardwareWiFi.h"
 #include "Devices/Microphone/HardwareMicrophone.h"
 #include "Devices/IR/HardwareIR.h"
+#include "Devices/Touch/HardwareTouch.h"
 
 #include "Comms/Web/WebServer.h"
 
@@ -32,6 +34,7 @@ void loop() {}
 
 static Preferences prefs;
 static Auxiliary aux;
+static BoardSupport board;
 
 void setup()
 {
@@ -39,6 +42,9 @@ void setup()
 
   // First set up our core components / hw
   Debug::Log.begin(prefs);
+
+  // set up underlying platform hardware
+  board.begin(prefs);
 
   Devices::Storage.begin(prefs);
   // ESP32 Marauder uses a BT library that gets stuck in an infinite loop if it
@@ -55,6 +61,7 @@ void setup()
   Devices::USB::Core.begin(prefs);
   Devices::WiFi.begin(prefs);
   Devices::IR.begin(prefs);
+  Devices::Touch.begin(prefs);
 
   Comms::Web.begin(prefs);
 
@@ -113,6 +120,8 @@ void setup()
     Devices::TFT.display(0, 8+8, "USB CLASS: None");
   }
 
+  Debug::Log.info(TAG, DEVICE_MAKE_MODEL);
+
   auto versionStr = std::string("Version: ")+GIT_COMMIT_HASH;
   Devices::TFT.display(0, 8+8+8, versionStr);
   Debug::Log.info(TAG, versionStr);
@@ -123,6 +132,7 @@ void setup()
 void loop()
 {
   uptime::calculateUptime();
+  board.loop(prefs);
 
   Debug::Log.loop(prefs);
 
@@ -134,6 +144,7 @@ void loop()
   Devices::TFT.loop(prefs);
   Devices::Mic.loop(prefs);
   Devices::IR.loop(prefs);
+  Devices::Touch.loop(prefs);
 
   Comms::Web.loop(prefs);
 
