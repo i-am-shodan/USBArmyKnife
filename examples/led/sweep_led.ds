@@ -1,0 +1,13 @@
+REM Test LED output color by sweeping the hue
+VAR $H = 0
+WHILE (TRUE)
+    DISPLAY_CLEAR
+    LED $H 100 100 255
+    DISPLAY_TEXT 10 20 Sweeping LED hue value...
+    DISPLAY_TEXT 10 30 LED at $H 100 100 255
+    DELAY 100
+    IF ($H == 255) THEN
+        $H = 0
+    END_IF
+    $H = ($H + 1)
+END_WHILE
