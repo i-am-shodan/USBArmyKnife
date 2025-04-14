@@ -1,0 +1,32 @@
+REM Clear screen and turn off LED to kill any looping job, reset and exit.
+DISPLAY_CLEAR
+DISPLAY_TEXT 10 20 Clearing screen and,
+DISPLAY_TEXT 10 30      turning off LED...
+
+FUNCTION LED_RGB_FLASH()
+    VAR $D = 10
+    LED 0 100 100 128
+    DELAY $D
+    LED 64 100 100 128
+    DELAY $D
+    LED 120 100 100 128
+    DELAY $D
+    LED 140 100 100 128
+    DELAY $D
+    LED 237 100 100 128
+    DISPLAY_CLEAR
+    DELAY $D
+    LED 250 100 100 128
+    DISPLAY_CLEAR
+    DELAY $D
+    LED 0 100 100 128
+    DELAY $D
+    LED_OFF
+END_FUNCTION
+
+LED_RGB_FLASH()
+DELAY 4000
+
+DISPLAY_CLEAR
+
+REM All Done
