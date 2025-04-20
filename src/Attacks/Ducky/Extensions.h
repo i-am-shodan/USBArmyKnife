@@ -344,7 +344,7 @@ static int handleAgentConnected(const std::string &str, const std::unordered_map
     return Attacks::Agent.isAgentConnected();
 }
 
-// handles LOAD_FILES_FROM_SD(), LOAD_DS_FILES_FROM_SD and IS_FILE_INDEX_VALID()
+// handles LOAD_FILES_FROM_SD(), LOAD_DS_FILES_FROM_SD() and IS_FILE_INDEX_VALID()
 static int handleFileIndex(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     bool ret = false;
