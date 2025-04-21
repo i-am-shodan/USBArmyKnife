@@ -472,6 +472,7 @@ void doMSCActivityWait(const std::function<void(const int &)> &delay)
     }
 
     timeToWait = 0;
+    Debug::Log.info(LOG_DUCKY, "MSC finished waiting");
 }
 
 #ifdef ARDUINO_ARCH_ESP32
@@ -531,6 +532,7 @@ static void doMSCActivityWaitToStop(const std::function<void(const int &)> &dela
     }
 
     timeToWait = 0;
+    Debug::Log.info(LOG_DUCKY, "MSC finished waiting");
 }
 
 #ifdef ARDUINO_ARCH_ESP32
