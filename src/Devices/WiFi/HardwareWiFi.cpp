@@ -2,6 +2,11 @@
 #include <WiFi.h>
 
 #include "../../Debug/Logging.h"
+
+#ifndef WIFI_POWER_LEVEL
+  #define WIFI_POWER WIFI_POWER_21dBm // default power level is MAX
+#endif
+
 #define LOG_WIFI "WiFi"
 
 #define WIFI_AP_NAME                    "wifi-ap"
@@ -54,10 +59,8 @@ void HardwareWiFi::begin(Preferences& prefs)
   {
     WiFi.softAPConfig(IPAddress(4, 3, 2, 1), INADDR_NONE, IPAddress(255, 255, 255, 0));
     WiFi.softAP(wiFiApName, wiFiApPwd);
-    #if defined(LOLIN_WIFI_FIX) && (defined(ARDUINO_ARCH_ESP32C3) || defined(ARDUINO_ARCH_ESP32S2) || defined(ARDUINO_ARCH_ESP32S3))
-      WiFi.setTxPower(WIFI_POWER_8_5dBm);
-      WiFi.setSleep(false);
-    #endif
+    WiFi.setTxPower(WIFI_POWER);
+    WiFi.setSleep(false);
     wiFiUp = true;
   } 
 }
