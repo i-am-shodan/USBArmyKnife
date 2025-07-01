@@ -610,8 +610,19 @@ static int handleRawHid(const std::string &str, const std::unordered_map<std::st
 
 static int handleLog(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
-    const std::string arg = str.substr(str.find(' ') + 1);
-    Debug::Log.info(LOG_DUCKY, arg);
+    std::string text = str.substr(str.find(' ') + 1);
+
+    for (const auto& pair : variables)
+    {
+        text = Ducky::replaceAllOccurrences(text, pair.first, std::to_string(pair.second));
+    }
+
+    for (const auto& pair : constants)
+    {
+        text = Ducky::replaceAllOccurrences(text, pair.first, pair.second);
+    }
+
+    Debug::Log.info(LOG_DUCKY, text);
     return true;
 }
 
@@ -644,6 +655,8 @@ static int handleKeyboardLayout(const std::string &str, const std::unordered_map
 
 static int partitionSwap(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
+    Debug::Log.info(LOG_DUCKY, "Starting partition swap, this will reboot the device");
+
 #ifdef LILYGO_T_WATCH_S3
     const esp_partition_t *partition = esp_ota_get_next_update_partition(NULL);
 
@@ -654,12 +667,15 @@ static int partitionSwap(const std::string &str, const std::unordered_map<std::s
     }
 
     if (esp_ota_set_boot_partition(partition) == ESP_OK) {
+        Debug::Log.info(LOG_DUCKY, "Swapped partitions, will reboot");
         ESP.restart();
     }
     else
     {
         Debug::Log.error(LOG_DUCKY, "Could not swap partitions");
     }
+#else
+    Debug::Log.error(LOG_DUCKY, "Partition swap not supported on this device");
 #endif
     return true;
 }
