@@ -81,12 +81,12 @@ void BoardSupport::begin(Preferences &prefs)
         power.setBLDO2Voltage(3300);
 
         //! GPS Power
-        power.setDC3Voltage(3300);
-        power.enableDC3();
+        //power.setDC3Voltage(3300);
+        //power.enableDC3();
 
         //! No use
         power.disableDC2();
-        // disableDC3();
+        power.disableDC3(); // gps
         power.disableDC4();
         power.disableDC5();
         power.disableBLDO1();
