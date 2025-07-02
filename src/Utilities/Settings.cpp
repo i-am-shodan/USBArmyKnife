@@ -59,8 +59,21 @@ bool setSettingValue(Preferences &prefs, const std::string &name, const std::str
                     }
                     else
                     {
-                        Debug::Log.info(LOG_SETTINGS, "Invalid setting value, bool is too large");
-                    }
+                        std::string valueUpper = value;
+                        std::transform(valueUpper.begin(), valueUpper.end(), valueUpper.begin(), ::toupper);
+                        if (valueUpper == "TRUE")
+                        {
+                            prefs.putBool(name.c_str(), true);
+                        }
+                        else if (valueUpper == "FALSE")
+                        {
+                            prefs.putBool(name.c_str(), false);
+                        }
+                        else
+                        {
+                            Debug::Log.info(LOG_SETTINGS, "Invalid setting value, bool is too large");
+                        }
+                    }          
                     break;
                 case USBArmyKnifeCapability::SettingType::Int16:
                     tempInt = std::stoi(value);

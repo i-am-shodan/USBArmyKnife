@@ -18,8 +18,6 @@ void loop() {}
 #include "Devices/IR/HardwareIR.h"
 #include "Devices/Touch/HardwareTouch.h"
 
-#include "Comms/Web/WebServer.h"
-
 #include "Attacks/Marauder/Marauder.h"
 #include "Attacks/Ducky/DuckyPayload.h"
 #include "Attacks/Agent/Agent.h"
@@ -62,8 +60,6 @@ void setup()
   Devices::WiFi.begin(prefs);
   Devices::IR.begin(prefs);
   Devices::Touch.begin(prefs);
-
-  Comms::Web.begin(prefs);
 
   Attacks::Ducky.begin(prefs);
   Attacks::Agent.begin(prefs);
@@ -145,8 +141,6 @@ void loop()
   Devices::Mic.loop(prefs);
   Devices::IR.loop(prefs);
   Devices::Touch.loop(prefs);
-
-  Comms::Web.loop(prefs);
 
   Attacks::Ducky.loop(prefs);
   Attacks::Marauder.loop(prefs);
