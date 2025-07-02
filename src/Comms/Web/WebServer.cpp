@@ -292,7 +292,7 @@ static void webRequestHandler(AsyncWebServerRequest *request)
 
     if (file.available())
     {
-      Debug::Log.info(LOG_WEB, std::string("Sending file"));
+      Debug::Log.info(LOG_WEB, std::string("Sending file: ") + filename.c_str());
       AsyncWebServerResponse *response = request->beginResponse(file, filename, "application/octet-stream", true);
       request->send(response);
       // file.close(); // TODO in order for download to work the file can't be closed
@@ -301,7 +301,7 @@ static void webRequestHandler(AsyncWebServerRequest *request)
     }
     else
     {
-      Debug::Log.info(LOG_WEB, std::string("File not found"));
+      Debug::Log.info(LOG_WEB, std::string("File not found: ") + filename.c_str());
       request->send(404);
     }
   }
@@ -367,6 +367,7 @@ static void webRequestHandler(AsyncWebServerRequest *request)
     else
     {
       // Serial.println("sending 404");
+      Debug::Log.error(LOG_WEB, std::string("Unknown URL: ") + url.c_str());
       request->send(404);
     }
   }
@@ -468,7 +469,9 @@ void WebSite::end()
     return;
   }
 
-  controlInterfaceWebServer.end();
+  // Not removing handlers etc is likely to leak memory
+  // However we seem to get crashes if we do :(
+  // TODO for later
 }
 
 #endif

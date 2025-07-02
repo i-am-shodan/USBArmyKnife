@@ -245,11 +245,26 @@ static int handleSetSetting(const std::string &str, const std::unordered_map<std
             settingValue = "0x" + settingValue;
         }
 
-        if (startsWith(str, "SET_SETTING_BOOL") && !(settingValue[0] == 0 || settingValue[0] == 1))
+        if (startsWith(str, "SET_SETTING_BOOL"))
         {
-            Debug::Log.error(LOG_DUCKY, "Invalid bool type, should be 0 or 1");
-            totalErrors++;
-            break;
+            if (settingValue == "0" || settingValue == "1" || settingValue == "TRUE" || settingValue == "FALSE")
+            {
+                // convert to 0 or 1
+                if (settingValue == "TRUE" || settingValue == "1")
+                {
+                    settingValue = "1";
+                }
+                else
+                {
+                    settingValue = "0";
+                }
+            }
+            else
+            {
+                Debug::Log.error(LOG_DUCKY, "Invalid bool type, should be 0,1,TRUE or FALSE, got " + settingValue);
+                totalErrors++;
+                break;
+            }
         }
 
         Debug::Log.info(LOG_DUCKY, "Trying to set "+settingName+" to " +settingValue);
@@ -414,7 +429,7 @@ static int handleGetSettingValue(const std::string &str, const std::unordered_ma
             totalErrors++;
             return 0;
         }
-        Debug::Log.info(LOG_DUCKY, "GET_SETTING_VALUE() returned " + std::to_string(value));
+        Debug::Log.info(LOG_DUCKY, "GET_SETTING_VALUE() for "+constants.at("#SETTING_NAME")+" returned " + std::to_string(value));
         return value;
     }
     else
@@ -736,6 +751,32 @@ static int getTouchPosition(const std::string &str, const std::unordered_map<std
     return pos;
 }
 
+static int handleMouseJiggle(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    Devices::USB::HID.mouseMove(1, 1);
+    Devices::USB::HID.mouseMove(-1, -1);
+    return true;
+}
+
+static int handleMouseMove(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    const std::string arg = str.substr(str.find(' ') + 1);
+
+    const auto entries = Ducky::SplitString(arg);
+    if (entries.size() == 2)
+    {
+        int xDelta = asciiOrVariableToInt(entries[0], variables);
+        int yDelta = asciiOrVariableToInt(entries[1], variables);
+        Devices::USB::HID.mouseMove(xDelta, yDelta);
+        return true;
+    }
+    else
+    {
+        Debug::Log.info(LOG_DUCKY, "Bad argument count: " + std::to_string(entries.size()));
+        return false;
+    }
+}
+
 void addDuckyScriptExtensions(
     ExtensionCommands &extCommands,
     UserDefinedConstants &consts)
@@ -786,6 +827,8 @@ void addDuckyScriptExtensions(
     extCommands["WAIT_FOR_USB_STORAGE_ACTIVITY"] = handleWaitForUSBStorageActivity;
     extCommands["WAIT_FOR_USB_STORAGE_ACTIVITY_TO_STOP"] = handleWaitForUSBStorageActivityToStop;
     extCommands["WAIT_FOR_BUTTON_PRESS_OR_TIMEOUT"] = handleWaitForButtonOrTimeout;
+    extCommands["MOUSE_JIGGLE"] = handleMouseJiggle;
+    extCommands["MOUSE_MOVE"] = handleMouseMove;
 
     extCommands["KEYBOARD_LAYOUT"] = handleKeyboardLayout;
 

@@ -9,9 +9,13 @@
 #include "../../../Devices/WiFi/HardwareWiFi.h"
 #define TAG "Board"
 
+#define MAX_WORKING_TEMPERATURE 90.0f // degrees Celsius, we will enable overheating protection if we go above this
+#define NORMAL_WORKING_TEMPERATURE 72.0f // degrees Celsius
+
 static temperature_sensor_handle_t temp_sensor = nullptr;
 static unsigned long lastMinuteWeChecked = 0;
-static bool overheatingProtectionEnabled = true;
+static bool overheatingProtectionEnabled = false;
+static bool lastCheckWasTooHot = false;
 
 BoardSupport::BoardSupport()
 {
@@ -25,7 +29,7 @@ void BoardSupport::begin(Preferences &prefs)
     // which can only handle 65 C
 
     // The ESP32 can measure -10 ~ 80 with good accuracy
-    temperature_sensor_config_t temp_sensor_config = TEMPERATURE_SENSOR_CONFIG_DEFAULT(10, 80);
+    temperature_sensor_config_t temp_sensor_config = TEMPERATURE_SENSOR_CONFIG_DEFAULT(50, 125);
     if (temperature_sensor_install(&temp_sensor_config, &temp_sensor) != ESP_OK)
     {
         Debug::Log.error(TAG, "Failed to install temperature sensor");
@@ -50,18 +54,31 @@ void BoardSupport::loop(Preferences &prefs)
     if (temperature_sensor_get_celsius(temp_sensor, &tsens_value) == ESP_OK)
     {
         Debug::Log.info(TAG, "Temperature sensor value: " + std::to_string(tsens_value) + " C");
-        if (tsens_value > 60.0f && !overheatingProtectionEnabled)
+        if (tsens_value > MAX_WORKING_TEMPERATURE && lastCheckWasTooHot && !overheatingProtectionEnabled)
         {
+            Debug::Log.warning(TAG, "Enabling overheating protection");
             // Turn off Marauder and wifi to try and reduce temperature
             Attacks::Marauder.run("stopscan");
             Devices::WiFi.setWiFi(false);
             overheatingProtectionEnabled = true;
+            lastCheckWasTooHot = false;
         }
-        else if (tsens_value <= 40.0f && overheatingProtectionEnabled)
+        else if (tsens_value > MAX_WORKING_TEMPERATURE)
         {
+            Debug::Log.warning(TAG, "Devices is getting too hot");
+            lastCheckWasTooHot = true;
+        }
+        else if (tsens_value <= NORMAL_WORKING_TEMPERATURE && overheatingProtectionEnabled)
+        {
+            Debug::Log.warning(TAG, "Disabling overheating protection");
             // Turn on wifi again
             Devices::WiFi.setWiFi(true);
             overheatingProtectionEnabled = false;
+            lastCheckWasTooHot = false;
+        }
+        else if (tsens_value <= MAX_WORKING_TEMPERATURE)
+        {
+            lastCheckWasTooHot = false;
         }
     }
     else
