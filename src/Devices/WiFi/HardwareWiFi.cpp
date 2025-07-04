@@ -56,6 +56,11 @@ bool HardwareWiFi::getState()
   return (wifiAPMode == true && WiFi.AP.started()) || (wifiAPMode == false && WiFi.status() == WL_CONNECTED);
 }
 
+std::string HardwareWiFi::currentIPAddress()
+{
+  return std::string(WiFi.localIP().toString().c_str());
+}
+
 void HardwareWiFi::begin(Preferences& prefs)
 {
   registerUserConfigurableSetting(CATEGORY_WIFI, WIFI_AP_MODE, USBArmyKnifeCapability::SettingType::Bool, WIFI_AP_MODE_DEFAULT);
@@ -152,6 +157,11 @@ void HardwareWiFi::end()
 bool HardwareWiFi::getState()
 {
   return false;
+}
+
+std::string HardwareWiFi::currentIPAddress()
+{
+  return std::string();
 }
 
 #endif
