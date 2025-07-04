@@ -28,10 +28,12 @@ static const std::string Constant_VID = "#_VID_";
 static std::string pidStr;
 static const std::string Constant_PID = "#_PID_";
 static const std::string Constant_FileIndexFileName = "#_FILE_INDEX_FILE_NAME_";
+static const std::string Constant_CurrentIP = "#_CURRENT_IP_";
 
 // For FILE_INDEX_VALID() and LOAD_FILES_FROM_SD
 static std::vector<std::string> curListOfFiles;
 static int curFileIndexVariable = 0;
+static std::string curCachedIP;
 
 bool startsWith(const std::string& str, const std::string& prefix) {
     return str.rfind(prefix, 0) == 0;
@@ -777,6 +779,11 @@ static int handleMouseMove(const std::string &str, const std::unordered_map<std:
     }
 }
 
+static int handleIsWiFiConnected(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    return Devices::WiFi.getState();
+}
+
 void addDuckyScriptExtensions(
     ExtensionCommands &extCommands,
     UserDefinedConstants &consts)
@@ -847,27 +854,31 @@ void addDuckyScriptExtensions(
     extCommands["BUTTON_SHORT_PRESS()"] = handleButtonPress;
     extCommands["GET_SETTING_VALUE()"] = handleGetSettingValue;
     extCommands["ESP32M_GET_RECV_PACKETS()"] = handleGetRecvPackets;
+    extCommands["WIFI_CONNECTED()"] = handleIsWiFiConnected;
 
+    // clang-format off
     consts.emplace_back([]
-                        {
+    {
         if (vidStr.empty())
         {
             char hexString[5] = {0};
             sprintf(hexString,"%x",Devices::USB::Core.getVID()); // converts to hexadecimal base.
             vidStr = std::string(hexString);
         }
-        return std::pair(Constant_VID, vidStr); });
+        return std::pair(Constant_VID, vidStr);
+    });
     consts.emplace_back([]
-                        {
+    {
         if (pidStr.empty())
         {
             char hexString[5] = {0};
             sprintf(hexString,"%x",Devices::USB::Core.getPID()); // converts to hexadecimal base.
             pidStr = std::string(hexString);
         }
-        return std::pair(Constant_PID, pidStr); });
+        return std::pair(Constant_PID, pidStr); 
+    });
     consts.emplace_back([]
-                        {
+    {
         if (curListOfFiles.size() != 0)
         {
             return std::pair(Constant_FileIndexFileName, curListOfFiles[curFileIndexVariable]);
@@ -875,5 +886,23 @@ void addDuckyScriptExtensions(
         else
         {
             return std::pair(Constant_FileIndexFileName, std::string());
-        } });
+        }
+    });
+    consts.emplace_back([]
+    { 
+        if (Devices::WiFi.getState())
+        {
+            if (curCachedIP.empty())
+            {
+                curCachedIP = Devices::WiFi.currentIPAddress();
+            }   
+        }
+        else
+        {
+            curCachedIP.clear();
+        }
+
+        return std::pair(Constant_CurrentIP, curCachedIP);
+    });
+    // clang-format on
 }

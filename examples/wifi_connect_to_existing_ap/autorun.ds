@@ -1,0 +1,24 @@
+REM Rather that creating its own access point this example connects to an existing Wi-Fi network.
+DEFINE #SETTING_NAME wifi-ap-mode
+
+REM First we need to check that we are running in access point mode.
+REM If we are, change the setting
+IF (GET_SETTING_VALUE() == TRUE) THEN
+    LOG Changing settings to connect to an existing Wi-Fi network
+    SET_SETTING_STRING wifi-ap ***REMOVED***
+    SET_SETTING_STRING wifi-pwd ***REMOVED***
+    SET_SETTING_BOOL wifi-ap-mode FALSE
+    RESET
+ELSE
+    LOG Already running in station mode
+END_IF
+
+REM Wait until WiFi is connected
+WHILE (WIFI_CONNECTED() == FALSE) 
+    LOG Waiting for WiFi to be connected
+    DELAY 1000
+END_WHILE
+
+LOG IP = #_CURRENT_IP_
+DISPLAY_CLEAR
+DISPLAY_TEXT 0 0 IP = #_CURRENT_IP_

@@ -341,6 +341,11 @@ static void webRequestHandler(AsyncWebServerRequest *request)
     }
     request->redirect("/index.html"); // redirect to our main page
   }
+  else if (url.startsWith("/uploadFile"))
+  {
+    // ignore, handled else where
+    request->send(404);
+  }
   else
   {
     std::pair<const uint8_t *, size_t> data;

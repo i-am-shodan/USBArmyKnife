@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "../../USBArmyKnifeCapability.h"
 
 class HardwareWiFi : USBArmyKnifeCapability {
@@ -11,6 +13,7 @@ public:
   virtual void end();
   void setWiFi(const bool& state);
   bool getState();
+  std::string currentIPAddress();
 };
 
 namespace Devices
