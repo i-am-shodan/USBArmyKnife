@@ -283,6 +283,12 @@ std::string DuckyPayload::getPayloadRunningStatus()
 
 void DuckyPayload::setPayload(const std::string &path)
 {
+    if (getPayloadRunningStatus() == "Running")
+    {
+        Debug::Log.error(LOG_DUCKY, "Could not run payload, a payload is already running");
+        return;
+    }
+
     // Convert to std::string
     std::string newFileToExecute(path.c_str(), path.length());
     currentlyExecutingFile = newFileToExecute;
