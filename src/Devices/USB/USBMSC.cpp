@@ -179,13 +179,13 @@ bool USBMSC::mountDiskImage(const std::string &imageLocation, bool mountAsCD)
         // Set Lun ready (disk is always ready)
         usb_msc.setUnitReady(true);
 
-        Devices::USB::Core.reset();
-
         if (!usb_msc.begin())
         {
             Debug::Log.info(TAG_USB, "Failed to start USB MSC");
             return false;
         }
+
+        Devices::USB::Core.reset();
 
         Debug::Log.info(TAG_USB, mountAsCD ? "CDROM image mounted" : "Disk image mounted");
         return true;
