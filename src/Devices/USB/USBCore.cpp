@@ -178,8 +178,7 @@ void USBCore::reset()
     Debug::Log.info(LOG_USB, "USB reset");
 
     tud_disconnect();
-
-    delay(1000);
+    delay(250);
     tud_connect();
   }
   else
