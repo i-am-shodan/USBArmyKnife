@@ -44,6 +44,13 @@ void HardwareLED::changeLEDState(bool on, uint8_t hue, uint8_t saturation, uint8
   }
   else
   {
+    // The LED need some colour correction, otherwise the colours are not what you expect.
+    // https://github.com/i-am-shodan/USBArmyKnife/issues/83
+    if (hue == 100 && saturation == 100 && lum == 100) // green
+    {
+      hue = 120;     
+    }
+
     // our brightness is between 0 - 255, need to rescale between 0-31
     brightness = (uint8_t) ((float) brightness * (31.f / 255.f));
     colors[0] = hsvToRgb(hue, saturation, lum);
