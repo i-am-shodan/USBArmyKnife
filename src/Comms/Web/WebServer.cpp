@@ -230,7 +230,7 @@ static void webRequestHandler(AsyncWebServerRequest *request)
   else if (url == "/runfile" && request->hasParam("filename"))
   {
     const String filename = request->getParam("filename")->value();
-    Debug::Log.info(LOG_WEB, std::string("Run file") + filename.c_str());
+    Debug::Log.info(LOG_WEB, std::string("Executing file from webUI - ") + filename.c_str());
 
     Attacks::Ducky.setPayload(filename.c_str());
     request->redirect("/index.html"); // redirect to our main page

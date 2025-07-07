@@ -363,7 +363,7 @@ static int handleAgentConnected(const std::string &str, const std::unordered_map
     return Attacks::Agent.isAgentConnected();
 }
 
-// handles both LOAD_FILES_FROM_SD() and IS_FILE_INDEX_VALID()
+// handles LOAD_FILES_FROM_SD(), LOAD_DS_FILES_FROM_SD() and IS_FILE_INDEX_VALID()
 static int handleFileIndex(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     bool ret = false;
@@ -371,6 +371,21 @@ static int handleFileIndex(const std::string &str, const std::unordered_map<std:
     if (str == "LOAD_FILES_FROM_SD()")
     {
         curListOfFiles = Devices::Storage.listFiles();
+        ret = true;
+    }
+    else if (str == "LOAD_DS_FILES_FROM_SD()")
+    {
+        std::vector<std::string> allFiles = Devices::Storage.listFiles();
+        curListOfFiles.clear(); // Clear any previous entries
+
+        for (const auto& file : allFiles)
+        {
+            if (file.size() >= 3 && file.substr(file.size() - 3) == ".ds")
+            {
+                curListOfFiles.push_back(file);
+            }
+        }
+
         ret = true;
     }
     else
@@ -476,6 +491,7 @@ void doMSCActivityWait(const std::function<void(const int &)> &delay)
     }
 
     timeToWait = 0;
+    Debug::Log.info(LOG_DUCKY, "MSC finished waiting");
 }
 
 #ifdef ARDUINO_ARCH_ESP32
@@ -535,6 +551,7 @@ static void doMSCActivityWaitToStop(const std::function<void(const int &)> &dela
     }
 
     timeToWait = 0;
+    Debug::Log.info(LOG_DUCKY, "MSC finished waiting");
 }
 
 #ifdef ARDUINO_ARCH_ESP32
@@ -850,6 +867,7 @@ void addDuckyScriptExtensions(
     extCommands["AGENT_CONNECTED()"] = handleAgentConnected;
     extCommands["FILE_INDEX_VALID()"] = handleFileIndex;
     extCommands["LOAD_FILES_FROM_SD()"] = handleFileIndex;
+    extCommands["LOAD_DS_FILES_FROM_SD()"] = handleFileIndex;
     extCommands["BUTTON_LONG_PRESS()"] = handleButtonPress;
     extCommands["BUTTON_SHORT_PRESS()"] = handleButtonPress;
     extCommands["GET_SETTING_VALUE()"] = handleGetSettingValue;

