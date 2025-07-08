@@ -78,3 +78,21 @@ jobs:
         with:
           name: Waveshare-ESP32-S3-GEEK Firmware binaries
           path: .pio/build/Waveshare-ESP32-S3-GEEK/*.bin
+
+      - name: Build PlatformIO Project LILYGO-T-Watch-S3
+        run: pio run --environment LILYGO-T-Watch-S3
+                
+      - name: Upload LILYGO-T-Watch-S3 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LILYGO-T-Watch-S3 Firmware binaries
+          path: .pio/build/LILYGO-T-Watch-S3/*.bin
+
+      - name: Build PlatformIO Project Evil-Crow-Cable-Wind
+        run: pio run --environment Evil-Crow-Cable-Wind
+                
+      - name: Upload Evil-Crow-Cable-Wind artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Evil-Crow-Cable-Wind Firmware binaries
+          path: .pio/build/Evil-Crow-Cable-Wind/*.bin

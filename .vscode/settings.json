@@ -71,10 +71,11 @@
         "charconv": "cpp",
         "future": "cpp",
         "variant": "cpp",
-        "csignal": "cpp"
+        "csignal": "cpp",
+        "*.tpp": "cpp"
     },
     "theme-by-language.themes": {
         "filename:.*\\.ds$": "LightDuckyScript"
     },
-    "workbench.colorTheme": "PowerShell ISE"
+    "workbench.colorTheme": "Visual Studio Light"
 }

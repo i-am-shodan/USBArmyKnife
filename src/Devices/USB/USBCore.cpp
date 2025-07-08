@@ -176,22 +176,14 @@ void USBCore::reset()
   if (TinyUSBDevice.ready() && TinyUSBDevice.mounted())
   {
     Debug::Log.info(LOG_USB, "USB reset");
-    if (!TinyUSBDevice.detach())
-    {
-      Debug::Log.info(LOG_USB, "Detach failed");
-    }
 
     tud_disconnect();
-    delay(100);
+    delay(250);
     tud_connect();
-
-#ifdef ARDUINO_ARCH_ESP32 
-    TinyUSB_Device_Init(0, curDeviceType == USBDeviceType::NCM);
-#else
-    TinyUSB_Device_Init(0);
-#endif
-
-    TinyUSBDevice.attach();
+  }
+  else
+  {
+    Debug::Log.info(LOG_USB, "USB not ready or not mounted");
   }
 }
 

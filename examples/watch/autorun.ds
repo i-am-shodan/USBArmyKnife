@@ -1,0 +1,151 @@
+FUNCTION BUTTON_ONE()
+    REM implement your own routine here!
+    LOG Menu one pressed
+    REM This sends a turn on command to an LG TV
+    IR_NEC 4 8 2
+    LOG The code was sent
+END_FUNCTION
+
+FUNCTION BUTTON_TWO()
+    REM implement your own routine here!
+    LOG Menu two pressed
+    REM This sends an activate command to a door lock
+    IR_DOOR_DSK7P03
+END_FUNCTION
+
+FUNCTION BUTTON_THREE()
+    REM implement your own routine here!
+    LOG Menu three pressed
+    GUI r
+    DELAY 500
+    STRINGLN notepad
+    DELAY 1000
+    STRING Hello World
+END_FUNCTION
+
+VAR $RICKROLL = FALSE
+
+FUNCTION BUTTON_FOUR()
+    REM implement your own routine here!
+    LOG Menu four pressed
+    IF ($RICKROLL == FALSE)
+        LOG Starting rick roll
+        ESP32M attack -t rickroll
+        $RICKROLL = TRUE
+    ELSE
+        LOG Stopping rick roll
+        ESP32M stopscan
+        $RICKROLL = FALSE
+    END_IF
+END_FUNCTION
+
+FUNCTION BUTTON_FIVE()
+    REM implement your own routine here!
+    LOG Menu five pressed
+    REM this jumps back to the other firmware
+    PARTITION_SWAP
+END_FUNCTION
+
+FUNCTION BUTTON_SIX()
+    REM implement your own routine here!
+    LOG Menu six pressed
+    RESTART_PAYLOAD
+END_FUNCTION
+
+FUNCTION DRAW_MENU()
+    DISPLAY_PNG /menu.png
+    REM BUTTON_ONE
+    DISPLAY_TEXT 20 20 INFRARED
+    DISPLAY_TEXT 20 30 TV
+
+    REM BUTTON_TWO
+    DISPLAY_TEXT 140 20 INFRARED
+    DISPLAY_TEXT 140 30 Open door
+
+    REM BUTTON_THREE
+    DISPLAY_TEXT 20 100 HID attack
+
+    REM BUTTON_FOUR
+    DISPLAY_TEXT 140 100 Rick roll
+    DISPLAY_TEXT 140 110 Start/Stop
+
+    REM BUTTON_FIVE
+    DISPLAY_TEXT 20 180 Reset to
+    DISPLAY_TEXT 20 190 Other firmware
+
+    REM BUTTON_SIX
+    DISPLAY_TEXT 140 180 Back to
+    DISPLAY_TEXT 140 190 Watch face
+END_FUNCTION
+
+FUNCTION GET_FIRST_BUTTON_ON_TOUCHED_ROW()
+    VAR $FIRST_BUTTON_ON_ROW = 0
+
+    REM y access starts at top left
+    IF (GET_Y_POS() <= 80)
+        LOG Touch on first row
+        $FIRST_BUTTON_ON_ROW = 1
+    ELSE IF (GET_Y_POS() <= 160)
+        LOG Touch on second row
+        $FIRST_BUTTON_ON_ROW = 3
+    ELSE
+        LOG Touch on third row
+        $FIRST_BUTTON_ON_ROW = 5
+    END_IF
+END_FUNCTION
+
+FUNCTION GET_MENU_ENTRY_FROM_TOUCH()
+    REM This resets the touch screen coordinates
+    REM which means when GET_X_POS / GET_Y_POS we get the latest press
+    WAIT_FOR_TOUCH
+
+    GET_FIRST_BUTTON_ON_TOUCHED_ROW()
+    LOG First button on touched row is $FIRST_BUTTON_ON_ROW
+
+    REM Check if we need to add one because
+    REM We are using the second column
+    IF (GET_X_POS() >= 120)
+        $MENU_ENTRY = $FIRST_BUTTON_ON_ROW + 1
+    ELSE
+        $MENU_ENTRY = $FIRST_BUTTON_ON_ROW
+    END_IF
+END_FUNCTION
+
+VAR $MENU_ENTRY = 0
+VAR $RUNNING = 1
+
+WHILE (TRUE)
+    DISPLAY_PNG /watchface.png
+    WAIT_FOR_BUTTON_PRESS
+
+    DRAW_MENU()
+    GET_MENU_ENTRY_FROM_TOUCH()
+
+    LOG Got menu entry $MENU_ENTRY
+
+    IF ($MENU_ENTRY == 0)
+        REM Do nothing and go back to watch mode
+        RESTART_PAYLOAD
+    ELSE IF ($MENU_ENTRY == 1)
+        DISPLAY_CLEAR
+        BUTTON_ONE()
+    ELSE IF ($MENU_ENTRY == 2)
+        DISPLAY_CLEAR
+        BUTTON_TWO()
+    ELSE IF ($MENU_ENTRY == 3)
+        DISPLAY_CLEAR
+        BUTTON_THREE()
+    ELSE IF ($MENU_ENTRY == 4)
+        DISPLAY_CLEAR
+        BUTTON_FOUR()
+    ELSE IF ($MENU_ENTRY == 5)
+        DISPLAY_CLEAR
+        BUTTON_FIVE()
+    ELSE IF ($MENU_ENTRY == 6)
+        DISPLAY_CLEAR
+        BUTTON_SIX()
+    ELSE
+        LOG menu entry invalid
+        RESTART_PAYLOAD
+    END_IF
+END_WHILE

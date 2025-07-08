@@ -1,5 +1,9 @@
 #include "Adafruit_TinyUSB.h"
 
+#ifdef ARDUINO_ARCH_ESP32
+#include "esp_ota_ops.h" // for OTA
+#endif
+
 #include "../../Debug/Logging.h"
 
 #include "../../Devices/Button/HardwareButton.h"
@@ -11,6 +15,7 @@
 #include "../../Devices/TFT/HardwareTFT.h"
 #include "../../Devices/LED/HardwareLED.h"
 #include "../../Devices/WiFi/HardwareWiFi.h"
+#include "../../Devices/Touch/HardwareTouch.h"
 #include "../../Comms/Web/WebServer.h"
 
 #include "../../Attacks/Marauder/Marauder.h"
@@ -26,10 +31,12 @@ static const std::string Constant_VID = "#_VID_";
 static std::string pidStr;
 static const std::string Constant_PID = "#_PID_";
 static const std::string Constant_FileIndexFileName = "#_FILE_INDEX_FILE_NAME_";
+static const std::string Constant_CurrentIP = "#_CURRENT_IP_";
 
 // For FILE_INDEX_VALID() and LOAD_FILES_FROM_SD
 static std::vector<std::string> curListOfFiles;
 static int curFileIndexVariable = 0;
+static std::string curCachedIP;
 
 bool startsWith(const std::string& str, const std::string& prefix) {
     return str.rfind(prefix, 0) == 0;
@@ -243,11 +250,26 @@ static int handleSetSetting(const std::string &str, const std::unordered_map<std
             settingValue = "0x" + settingValue;
         }
 
-        if (startsWith(str, "SET_SETTING_BOOL") && !(settingValue[0] == 0 || settingValue[0] == 1))
+        if (startsWith(str, "SET_SETTING_BOOL"))
         {
-            Debug::Log.error(LOG_DUCKY, "Invalid bool type, should be 0 or 1");
-            totalErrors++;
-            break;
+            if (settingValue == "0" || settingValue == "1" || settingValue == "TRUE" || settingValue == "FALSE")
+            {
+                // convert to 0 or 1
+                if (settingValue == "TRUE" || settingValue == "1")
+                {
+                    settingValue = "1";
+                }
+                else
+                {
+                    settingValue = "0";
+                }
+            }
+            else
+            {
+                Debug::Log.error(LOG_DUCKY, "Invalid bool type, should be 0,1,TRUE or FALSE, got " + settingValue);
+                totalErrors++;
+                break;
+            }
         }
 
         Debug::Log.info(LOG_DUCKY, "Trying to set "+settingName+" to " +settingValue);
@@ -427,7 +449,7 @@ static int handleGetSettingValue(const std::string &str, const std::unordered_ma
             totalErrors++;
             return 0;
         }
-        Debug::Log.info(LOG_DUCKY, "GET_SETTING_VALUE() returned " + std::to_string(value));
+        Debug::Log.info(LOG_DUCKY, "GET_SETTING_VALUE() for "+constants.at("#SETTING_NAME")+" returned " + std::to_string(value));
         return value;
     }
     else
@@ -625,8 +647,19 @@ static int handleRawHid(const std::string &str, const std::unordered_map<std::st
 
 static int handleLog(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
-    const std::string arg = str.substr(str.find(' ') + 1);
-    Debug::Log.info(LOG_DUCKY, arg);
+    std::string text = str.substr(str.find(' ') + 1);
+
+    for (const auto& pair : variables)
+    {
+        text = Ducky::replaceAllOccurrences(text, pair.first, std::to_string(pair.second));
+    }
+
+    for (const auto& pair : constants)
+    {
+        text = Ducky::replaceAllOccurrences(text, pair.first, pair.second);
+    }
+
+    Debug::Log.info(LOG_DUCKY, text);
     return true;
 }
 
@@ -657,6 +690,120 @@ static int handleKeyboardLayout(const std::string &str, const std::unordered_map
     return false;
 }
 
+static int partitionSwap(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    Debug::Log.info(LOG_DUCKY, "Starting partition swap, this will reboot the device");
+
+#ifdef LILYGO_T_WATCH_S3
+    const esp_partition_t *partition = esp_ota_get_next_update_partition(NULL);
+
+    if (partition == nullptr)
+    {
+        Debug::Log.error(LOG_DUCKY, "Could not find partition");
+        return true;
+    }
+
+    if (esp_ota_set_boot_partition(partition) == ESP_OK) {
+        Debug::Log.info(LOG_DUCKY, "Swapped partitions, will reboot");
+        ESP.restart();
+    }
+    else
+    {
+        Debug::Log.error(LOG_DUCKY, "Could not swap partitions");
+    }
+#else
+    Debug::Log.error(LOG_DUCKY, "Partition swap not supported on this device");
+#endif
+    return true;
+}
+
+static void doTouchActivityWait(const std::function<void(const int &)> &delay)
+{
+    Devices::Touch.resetTouchState();
+
+    while (true)
+    {
+        delay(150);
+        if (Devices::Touch.hasBeenTouched())
+        {
+            break;
+        }
+    }
+
+    timeToWait = 0;
+}
+
+#ifdef ARDUINO_ARCH_ESP32
+void doTouchActivityWaitTask(void *arg)
+{
+    doTouchActivityWait(esp32_task_delay);
+    vTaskDelete(NULL);
+}
+#endif
+
+static int waitForTouch(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    // We can do other things while we are waiting so we kick off a task to wait
+    // return, which causes us to loop again
+    // in our loop we check if the task is finished and only continue processing if it has
+    Debug::Log.info(LOG_DUCKY, "Waiting for touch activity");
+
+    timeToWait = -1;
+
+#ifdef ARDUINO_ARCH_ESP32
+    xTaskCreate(
+        doTouchActivityWaitTask, // Function that should be called
+        "TouchWait",                 // Name of the task (for debugging)
+        1000,                      // Stack size (bytes)
+        NULL,                      // Parameter to pass
+        1,                         // Task priority
+        NULL                       // Task handle
+    );
+#else
+    doTouchActivityWait([](const uint32_t &time) { loop(); });
+#endif
+
+    return true;
+}
+
+static int getTouchPosition(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    const auto pos = startsWith(str, "GET_X_POS") ? Devices::Touch.getXPos() : Devices::Touch.getYPos();
+    Debug::Log.info(LOG_DUCKY, str + " " + std::to_string(pos) );
+    return pos;
+}
+
+static int handleMouseJiggle(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    Devices::USB::HID.mouseMove(1, 1);
+    Devices::USB::HID.mouseMove(-1, -1);
+    return true;
+}
+
+static int handleMouseMove(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    const std::string arg = str.substr(str.find(' ') + 1);
+
+    const auto entries = Ducky::SplitString(arg);
+    if (entries.size() == 2)
+    {
+        int xDelta = asciiOrVariableToInt(entries[0], variables);
+        int yDelta = asciiOrVariableToInt(entries[1], variables);
+        Devices::USB::HID.mouseMove(xDelta, yDelta);
+        return true;
+    }
+    else
+    {
+        Debug::Log.info(LOG_DUCKY, "Bad argument count: " + std::to_string(entries.size()));
+        return false;
+    }
+}
+
+static int handleIsWiFiConnected(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    return Devices::WiFi.getState();
+}
+
 void addDuckyScriptExtensions(
     ExtensionCommands &extCommands,
     UserDefinedConstants &consts)
@@ -674,6 +821,11 @@ void addDuckyScriptExtensions(
     extCommands["LED"] = handleLED;
     extCommands["LED_B"] = handleLEDBlue;
 
+    // touch
+    extCommands["WAIT_FOR_TOUCH"] = waitForTouch;
+    extCommands["GET_X_POS()"] = getTouchPosition;
+    extCommands["GET_Y_POS()"] = getTouchPosition;
+
     // Other attacks
     extCommands["CALC"] = handleCalc;
     extCommands["ESP32M"] = handleESP32Marauder;
@@ -682,6 +834,7 @@ void addDuckyScriptExtensions(
 
     // Utilities
     extCommands["LOG"] = handleLog;
+    extCommands["PARTITION_SWAP"] = partitionSwap;
 
     // Device related
     extCommands["WEB_OFF"] = handleWebOff;
@@ -701,6 +854,8 @@ void addDuckyScriptExtensions(
     extCommands["WAIT_FOR_USB_STORAGE_ACTIVITY"] = handleWaitForUSBStorageActivity;
     extCommands["WAIT_FOR_USB_STORAGE_ACTIVITY_TO_STOP"] = handleWaitForUSBStorageActivityToStop;
     extCommands["WAIT_FOR_BUTTON_PRESS_OR_TIMEOUT"] = handleWaitForButtonOrTimeout;
+    extCommands["MOUSE_JIGGLE"] = handleMouseJiggle;
+    extCommands["MOUSE_MOVE"] = handleMouseMove;
 
     extCommands["KEYBOARD_LAYOUT"] = handleKeyboardLayout;
 
@@ -720,27 +875,31 @@ void addDuckyScriptExtensions(
     extCommands["BUTTON_SHORT_PRESS()"] = handleButtonPress;
     extCommands["GET_SETTING_VALUE()"] = handleGetSettingValue;
     extCommands["ESP32M_GET_RECV_PACKETS()"] = handleGetRecvPackets;
+    extCommands["WIFI_CONNECTED()"] = handleIsWiFiConnected;
 
+    // clang-format off
     consts.emplace_back([]
-                        {
+    {
         if (vidStr.empty())
         {
             char hexString[5] = {0};
             sprintf(hexString,"%x",Devices::USB::Core.getVID()); // converts to hexadecimal base.
             vidStr = std::string(hexString);
         }
-        return std::pair(Constant_VID, vidStr); });
+        return std::pair(Constant_VID, vidStr);
+    });
     consts.emplace_back([]
-                        {
+    {
         if (pidStr.empty())
         {
             char hexString[5] = {0};
             sprintf(hexString,"%x",Devices::USB::Core.getPID()); // converts to hexadecimal base.
             pidStr = std::string(hexString);
         }
-        return std::pair(Constant_PID, pidStr); });
+        return std::pair(Constant_PID, pidStr); 
+    });
     consts.emplace_back([]
-                        {
+    {
         if (curListOfFiles.size() != 0)
         {
             return std::pair(Constant_FileIndexFileName, curListOfFiles[curFileIndexVariable]);
@@ -748,5 +907,23 @@ void addDuckyScriptExtensions(
         else
         {
             return std::pair(Constant_FileIndexFileName, std::string());
-        } });
+        }
+    });
+    consts.emplace_back([]
+    { 
+        if (Devices::WiFi.getState())
+        {
+            if (curCachedIP.empty())
+            {
+                curCachedIP = Devices::WiFi.currentIPAddress();
+            }   
+        }
+        else
+        {
+            curCachedIP.clear();
+        }
+
+        return std::pair(Constant_CurrentIP, curCachedIP);
+    });
+    // clang-format on
 }
