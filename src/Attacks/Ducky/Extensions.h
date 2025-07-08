@@ -1,5 +1,8 @@
 #include "Adafruit_TinyUSB.h"
-#include "esp_ota_ops.h"
+
+#ifdef ARDUINO_ARCH_ESP32
+#include "esp_ota_ops.h" // for OTA
+#endif
 
 #include "../../Debug/Logging.h"
 
