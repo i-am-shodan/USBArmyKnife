@@ -5,8 +5,8 @@ REM First we need to check that we are running in access point mode.
 REM If we are, change the setting
 IF (GET_SETTING_VALUE() == TRUE) THEN
     LOG Changing settings to connect to an existing Wi-Fi network
-    SET_SETTING_STRING wifi-ap ***REMOVED***
-    SET_SETTING_STRING wifi-pwd ***REMOVED***
+    SET_SETTING_STRING wifi-ap YourAccessPoint
+    SET_SETTING_STRING wifi-pwd YourPassword
     SET_SETTING_BOOL wifi-ap-mode FALSE
     RESET
 ELSE
