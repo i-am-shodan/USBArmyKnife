@@ -95,7 +95,7 @@ This project implements a variety of attacks based around an easily concealable 
 | **Waveshare-RP2040-GEEK** ![screenshot](./docs/images/rp2040-geek.jpg) | RP2040-GEEK is a development board designed by Waveshare. It has USB-A, 1.14-inch LCD screen, an SD card and has external ports (SWD, UART and I2C). **This board does not run the ESP32 chipset. USB ethernet (NCM) mode are whole disk SD usage are both currently unsupported. ESP32 Maurader cannot work on this device!** On Windows you may also need to set this device to use a WinUSB driver using [Zadig](https://zadig.akeo.ie/). Hold down the button when you plug it in to get the device into flashing mode. | <ul><li>[AliExpress](https://s.click.aliexpress.com/e/_EvdfVGH)</li><li>[Amazon UK](https://amzn.to/3YZvD1f)</li><li>[Amazon US](https://amzn.to/3YY4Ouy)</li></ul>
 
 ## Getting Started
-Firstly please check the [wiki](https://github.com/i-am-shodan/USBArmyKnife/wiki) for a step by step guides and all manner of advice for getting started.
+Firstly please check the [wiki](https://github.com/i-am-shodan/USBArmyKnife/wiki) for a step by step guide and all manner of advice for getting started.
 
 ### Installation
 
