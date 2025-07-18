@@ -394,11 +394,38 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
       }
 
       request->_tempFile = Devices::Storage.openFile(std::string("/")+filename.c_str(), "w");
+      if (!request->_tempFile.availableForWrite())
+      {
+        Debug::Log.error(LOG_WEB, std::string("File not available, no write permission"));
+        request->send(500);
+        return;
+      }
     }
 
-    if (len && request->_tempFile.available())
+    if (len != 0 && request->_tempFile.availableForWrite())
     {
-      request->_tempFile.write(data, len);
+      if (request->_tempFile.write(data, len) != len)
+      {
+        Debug::Log.error(LOG_WEB, std::string("Error writing data to file"));
+        request->send(500);
+        return;
+      }
+      else
+      {
+        Debug::Log.info(LOG_WEB, std::string("Wrote data to file"));
+      }
+    }
+    else if (!request->_tempFile.availableForWrite())
+    {
+      Debug::Log.error(LOG_WEB, std::string("File not available, could not write"));
+      request->send(500);
+      return;
+    }
+    else if (!final) // len == 0
+    {
+      Debug::Log.error(LOG_WEB, std::string("File data to write is 0 bytes"));
+      request->send(500);
+      return;
     }
 
     if (final)

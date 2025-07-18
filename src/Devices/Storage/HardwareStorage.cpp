@@ -82,7 +82,7 @@ File HardwareStorage::openFile(const std::string& filename, const char* mode)
     File file = FILE_INTERFACE.open(filename.c_str(), mode);
     if (!file)
     {
-        Debug::Log.info(LOG_MMC, "Could not open file");
+        Debug::Log.error(LOG_MMC, "Could not open file");
         return File();
     }
 
