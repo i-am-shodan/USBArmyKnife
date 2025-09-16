@@ -52,6 +52,15 @@ jobs:
           name: Generic-ESP32-S2 Firmware binaries
           path: .pio/build/Generic-ESP32-S2/*.bin
 
+      - name: Build PlatformIO Project Generic-ESP32-S3
+        run: pio run --environment Generic-ESP32-S3
+          
+      - name: Upload Generic-ESP32-S3 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Generic-ESP32-S3 Firmware binaries
+          path: .pio/build/Generic-ESP32-S3/*.bin
+
       - name: Build PlatformIO Project Waveshare-RP2040-GEEK
         run: pio run --environment Waveshare-RP2040-GEEK
             

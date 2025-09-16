@@ -61,3 +61,13 @@ WHILE (AGENT_CONNECTED() == FALSE)
   DELAY 2000
 END_WHILE
 ```
+
+## Building a debug Agent
+
+On Windows run
+
+````
+cd tools\Agent
+dotnet build --configuration Debug /p:OutputType=Exe
+.\bin\Debug\net8.0-windows\PortableApp.exe vid=cafe pid=403f
+````

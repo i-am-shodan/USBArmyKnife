@@ -75,7 +75,6 @@ class Program
 #if DEBUG
                 Console.WriteLine("Already running, quitting");
 #endif
-                Console.WriteLine("Already running, quitting");
                 return;
             }
 

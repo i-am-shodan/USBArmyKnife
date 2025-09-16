@@ -17,19 +17,32 @@ static int32_t msc_read_cb(uint32_t lba, void *buffer, uint32_t bufsize)
 {
     Devices::USB::MSC.setActivityStateState(true);
 
-    if (mscFile.available())
+    if (strlen(mscFile.name()) != 0)
     {
-        mscFile.seek(lba * LOGICAL_BLOCK_SIZE);
+        if (!mscFile.seek(lba * LOGICAL_BLOCK_SIZE))
+        {
+            Debug::Log.error(TAG_USB, "Disk seek error");
+            return -1;
+        }
+        
         if (mscFile.readBytes((char *)buffer, bufsize) == bufsize)
         {
             // bufSize should always be a multiple of LOGICAL_BLOCK_SIZE so on read success return that
             return bufsize;
+        }
+        else
+        {
+            Debug::Log.error(TAG_USB, "Could not read data from file");
         }
     }
     else if (Devices::Storage.isRawAccessSupported())
     {
         uint32_t sectors = (bufsize / Devices::Storage.sectorSize());
         return Devices::Storage.readRawSectors((uint8_t*)buffer, lba, sectors);
+    }
+    else
+    {
+        Debug::Log.error(TAG_USB, "No disk data to read");
     }
     return -1;
 }
@@ -41,7 +54,7 @@ static int32_t msc_write_cb(uint32_t lba, uint8_t *buffer, uint32_t bufsize)
 {
     Devices::USB::MSC.setActivityStateState(true);
 
-    if (mscFile.available())
+    if (strlen(mscFile.name()) != 0)
     {
         // writing to file images is not currently supported, we lie and say the
         // write occured as that will make it look like everything is ok to the OS
@@ -53,6 +66,10 @@ static int32_t msc_write_cb(uint32_t lba, uint8_t *buffer, uint32_t bufsize)
         uint32_t sectors = (bufsize / Devices::Storage.sectorSize());
         return Devices::Storage.writeRawSectors((uint8_t*)buffer, lba, sectors);
     }
+    else
+    {
+        Debug::Log.error(TAG_USB, "Could not write");
+    }
     return -1;
 }
 
@@ -60,7 +77,7 @@ static int32_t msc_write_cb(uint32_t lba, uint8_t *buffer, uint32_t bufsize)
 // used to flush any pending cache.
 static void msc_flush_cb()
 {
-    if (mscFile.available())
+    if (strlen(mscFile.name()) != 0)
     {
         mscFile.flush();
     }
@@ -73,7 +90,7 @@ static void msc_flush_cb()
 static size_t open_msc(const char *path)
 {
     mscFile = Devices::Storage.openFile(path, "r");
-    if (!mscFile.available())
+    if (strlen(mscFile.name()) == 0)
     {
         return 0;
     }
