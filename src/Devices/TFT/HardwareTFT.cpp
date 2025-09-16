@@ -28,6 +28,8 @@ class LGFX_Panel : public lgfx::LGFX_Device
     lgfx::Panel_ST7789 _panel_instance;
 #elif defined(LILYGO_T_WATCH_S3)
     lgfx::Panel_ST7789 _panel_instance;
+#elif defined(POCKET_DONGLE_S3)
+    lgfx::Panel_ST7735S _panel_instance;
 #else
     #error Invalid display type // Full list here: https://github.com/lovyan03/LovyanGFX/tree/master/src/lgfx/v1/panel
 #endif
@@ -99,6 +101,14 @@ public:
             cfg.offset_y = 0;                 // Y direction offset amount of the panel
             cfg.dummy_read_pixel = 8;         // Number of bits for dummy read before pixel read
             cfg.dummy_read_bits = 1;          // Number of dummy read bits before non-pixel data read
+#elif defined(POCKET_DONGLE_S3)
+            cfg.offset_x = 26;                // Panel offset in X direction
+            cfg.offset_y = 1;                 // Y direction offset amount of the panel
+            cfg.dummy_read_pixel = 8;         // Number of bits for dummy read before pixel read
+            cfg.dummy_read_bits = 1;          // Number of dummy read bits before non-pixel data read
+            // Please set the following only when the display is shifted with a driver with a variable number of pixels such as ST7735 or ILI9163.
+            cfg.memory_width = 132;  // Maximum width supported by driver IC
+            cfg.memory_height = 160; // Maximum height supported by driver IC
 #else
     #error Invalid display type // Full list here: https://github.com/lovyan03/LovyanGFX/tree/master/src/lgfx/v1/panel
 #endif
