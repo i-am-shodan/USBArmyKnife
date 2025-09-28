@@ -2,6 +2,7 @@
 
 #include <string>
 #include <cstdint>
+#include <vector>
 
 #ifdef NO_SD
   #ifdef ARDUINO_ARCH_RP2040
