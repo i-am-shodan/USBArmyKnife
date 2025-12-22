@@ -17,7 +17,7 @@ static int32_t msc_read_cb(uint32_t lba, void *buffer, uint32_t bufsize)
 {
     Devices::USB::MSC.setActivityStateState(true);
 
-    if (strlen(mscFile.name()) != 0)
+    if (mscFile && strlen(mscFile.name()) != 0)
     {
         if (!mscFile.seek(lba * LOGICAL_BLOCK_SIZE))
         {
@@ -54,7 +54,7 @@ static int32_t msc_write_cb(uint32_t lba, uint8_t *buffer, uint32_t bufsize)
 {
     Devices::USB::MSC.setActivityStateState(true);
 
-    if (strlen(mscFile.name()) != 0)
+    if (mscFile && strlen(mscFile.name()) != 0)
     {
         // writing to file images is not currently supported, we lie and say the
         // write occured as that will make it look like everything is ok to the OS
