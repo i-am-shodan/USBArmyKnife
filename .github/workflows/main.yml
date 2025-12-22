@@ -61,9 +61,6 @@ jobs:
           name: Generic-ESP32-S3 Firmware binaries
           path: .pio/build/Generic-ESP32-S3/*.bin
 
-      - name: Build PlatformIO Project Waveshare-RP2040-GEEK
-        run: pio run --environment Waveshare-RP2040-GEEK
-
       - name: Remove PlatformIO Cache
         run: pio settings set enable_cache no
       - name: Clear build directory
@@ -72,7 +69,10 @@ jobs:
         run: pio platform update
       - name: Build PlatformIO Project Waveshare-RP2040-GEEK
         run: pio run --environment Waveshare-RP2040-GEEK
-            
+
+      - name: Build PlatformIO Project Waveshare-RP2040-GEEK
+        run: pio run --environment Waveshare-RP2040-GEEK
+
       - name: Upload Waveshare-RP2040-GEEK artifact
         uses: actions/upload-artifact@v4
         with:
