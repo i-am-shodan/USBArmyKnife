@@ -21,7 +21,7 @@ jobs:
           key: ${{ runner.os }}-pio
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.13'
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
@@ -60,15 +60,6 @@ jobs:
         with:
           name: Generic-ESP32-S3 Firmware binaries
           path: .pio/build/Generic-ESP32-S3/*.bin
-
-      - name: Remove PlatformIO Cache
-        run: pio settings set enable_cache no
-      - name: Clear build directory
-        run: rm -rf .pio
-      - name: Upgrade PlatformIO toolchain
-        run: pio platform update
-      - name: Build PlatformIO Project Waveshare-RP2040-GEEK
-        run: pio run --environment Waveshare-RP2040-GEEK
 
       - name: Build PlatformIO Project Waveshare-RP2040-GEEK
         run: pio run --environment Waveshare-RP2040-GEEK
