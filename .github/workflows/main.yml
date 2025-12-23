@@ -62,7 +62,7 @@ jobs:
           path: .pio/build/Generic-ESP32-S3/*.bin
 
       - name: Build PlatformIO Project Waveshare-RP2040-GEEK
-        run: pio run --environment Waveshare-RP2040-GEEK < /dev/null
+        run: yes '' | pio run --environment Waveshare-RP2040-GEEK
 
       - name: Upload Waveshare-RP2040-GEEK artifact
         uses: actions/upload-artifact@v4
