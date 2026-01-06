@@ -32,7 +32,27 @@ void loop() {}
 
 static Preferences prefs;
 static Auxiliary aux;
-static BoardSupport board;
+
+static int currentLine = 0;
+
+static void displayMessage(const char* heading, const char* value = nullptr, bool warning = false)
+{
+  const auto WHITE = Devices::TFT.convertStringToColor("WHITE");
+  const auto LIGHTGREY = Devices::TFT.convertStringToColor("LIGHTGREY");
+  const auto RED = Devices::TFT.convertStringToColor("RED");
+
+  Devices::TFT.setForegroundColor(LIGHTGREY);
+  Devices::TFT.display(0, currentLine * 8, heading);
+
+  if (value != nullptr)
+  {
+    Devices::TFT.setForegroundColor(warning ? RED : WHITE);
+    Devices::TFT.display((strlen(heading) + 1) * 6, currentLine * 8, value);
+  }
+
+  Devices::TFT.setForegroundColor(WHITE);
+  currentLine++;
+}
 
 void setup()
 {
@@ -42,7 +62,7 @@ void setup()
   Debug::Log.begin(prefs);
 
   // set up underlying platform hardware
-  board.begin(prefs);
+  Devices::Board.begin(prefs);
 
   Devices::Storage.begin(prefs);
   // ESP32 Marauder uses a BT library that gets stuck in an infinite loop if it
@@ -87,40 +107,39 @@ void setup()
 #endif
   }
 
-  Devices::TFT.display(0, 0, "Device now running");
+  displayMessage("Device now running");
   Debug::Log.info(TAG, "Running!");
 
   if (Devices::USB::Core.currentDeviceType() == USBDeviceType::Serial)
   {
-    Devices::TFT.display(0, 8, "USB MODE: Serial");
+    displayMessage("USB MODE:", "Serial");
   }
   else if (Devices::USB::Core.currentDeviceType() == USBDeviceType::NCM)
   {
-    Devices::TFT.display(0, 8, "USB MODE: NCM");
+    displayMessage("USB MODE:", "NCM");
   }
   else
   {
-    Devices::TFT.display(0, 8, "USB MODE: Disabled");
+    displayMessage("USB MODE:", "Disabled", true);
   }
 
   if (Devices::USB::Core.currentClassType() == USBClassType::HID)
   {
-    Devices::TFT.display(0, 8+8, "USB CLASS: HID");
+    displayMessage("USB CLASS:", "HID");
   }
   else if (Devices::USB::Core.currentClassType() == USBClassType::Storage)
   {
-    Devices::TFT.display(0, 8+8, "USB CLASS: Storage");
+    displayMessage("USB CLASS:", "Storage");
   }
   else
   {
-    Devices::TFT.display(0, 8+8, "USB CLASS: None");
+    displayMessage("USB CLASS:", "None", true);
   }
 
   Debug::Log.info(TAG, DEVICE_MAKE_MODEL);
 
-  auto versionStr = std::string("Version: ")+GIT_COMMIT_HASH;
-  Devices::TFT.display(0, 8+8+8, versionStr);
-  Debug::Log.info(TAG, versionStr);
+  displayMessage("Version:", GIT_COMMIT_HASH);
+  Debug::Log.info(TAG, std::string("Version: ")+GIT_COMMIT_HASH);
 
   aux.begin(prefs);
 }
@@ -128,7 +147,7 @@ void setup()
 void loop()
 {
   uptime::calculateUptime();
-  board.loop(prefs);
+  Devices::Board.loop(prefs);
 
   Debug::Log.loop(prefs);
 

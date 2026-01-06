@@ -16,6 +16,7 @@
 #include "../../Devices/LED/HardwareLED.h"
 #include "../../Devices/WiFi/HardwareWiFi.h"
 #include "../../Devices/Touch/HardwareTouch.h"
+#include "../../Devices/Platform/BoardSupport.h"
 #include "../../Comms/Web/WebServer.h"
 
 #include "../../Attacks/Marauder/Marauder.h"
@@ -804,6 +805,23 @@ static int handleIsWiFiConnected(const std::string &str, const std::unordered_ma
     return Devices::WiFi.getState();
 }
 
+static int handleResetSettings(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    resetSettings(*preferences);
+    return true;
+}
+
+static int handleUsbReset(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    Devices::USB::Core.reset();
+    return true;
+}
+
+static int handleHasCrashed(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    return Devices::Board.hasCrashed();
+}
+
 void addDuckyScriptExtensions(
     ExtensionCommands &extCommands,
     UserDefinedConstants &consts)
@@ -845,12 +863,14 @@ void addDuckyScriptExtensions(
     extCommands["SET_SETTING_INT16"] = handleSetSetting;
     extCommands["SET_SETTING_UINT16"] = handleSetSetting;
     extCommands["SET_SETTING_STRING"] = handleSetSetting;
+    extCommands["RESET_SETTINGS"] = handleResetSettings;
 
     // USB
     extCommands["USB_MOUNT_DISK_READ_ONLY"] = handleUSBMode;
     extCommands["USB_MOUNT_CDROM_READ_ONLY"] = handleUSBMode;
     extCommands["USB_NCM_PCAP_ON"] = handleUsbNcmPcapOn;
     extCommands["USB_NCM_PCAP_OFF"] = handleUsbNcmPcapOff;
+    extCommands["USB_RESET"] = handleUsbReset;
     extCommands["WAIT_FOR_USB_STORAGE_ACTIVITY"] = handleWaitForUSBStorageActivity;
     extCommands["WAIT_FOR_USB_STORAGE_ACTIVITY_TO_STOP"] = handleWaitForUSBStorageActivityToStop;
     extCommands["WAIT_FOR_BUTTON_PRESS_OR_TIMEOUT"] = handleWaitForButtonOrTimeout;
@@ -876,6 +896,7 @@ void addDuckyScriptExtensions(
     extCommands["GET_SETTING_VALUE()"] = handleGetSettingValue;
     extCommands["ESP32M_GET_RECV_PACKETS()"] = handleGetRecvPackets;
     extCommands["WIFI_CONNECTED()"] = handleIsWiFiConnected;
+    extCommands["HAS_CRASHED()"] = handleHasCrashed;
 
     // clang-format off
     consts.emplace_back([]
