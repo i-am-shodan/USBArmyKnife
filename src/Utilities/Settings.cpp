@@ -235,3 +235,20 @@ void enumerateSettingsAsJson(Preferences &prefs, JsonArray array)
         }
     }
 }
+
+void resetSettings(Preferences &prefs)
+{
+    for (const auto &settingCategory : settingLookup)
+    {
+        const std::vector<std::tuple<std::string, USBArmyKnifeCapability::SettingType, std::string>> &settingInCategory = settingCategory.second;
+        for (const auto &setting : settingInCategory)
+        {
+            const std::string &settingName = get<0>(setting);
+
+            if (!prefs.isKey(settingName.c_str()))
+            {
+                prefs.remove(settingName.c_str());
+            }
+        }
+    }
+}
