@@ -98,10 +98,8 @@ void USBHID::keyboard_release()
         return;
     }
 
-    KEY_EVENT event;
+    KEY_EVENT event = {0};
     event.ID = RID_KEYBOARD;
-    event.Keycode[0] = 0;
-    event.Modifiers = 0;
 
     eventsToProcess.push(event);
 }

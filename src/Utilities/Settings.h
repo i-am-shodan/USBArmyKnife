@@ -11,3 +11,4 @@ void registerSettingName(const uint8_t group, const std::string &name, const USB
 void enumerateSettingsAsJson(Preferences &prefs, JsonArray array);
 bool setSettingValue(Preferences &prefs, const std::string &name, const std::string &value);
 uint16_t getIntegerSettingValue(Preferences &prefs, const std::string &name, bool &error);
+void resetSettings(Preferences &prefs);

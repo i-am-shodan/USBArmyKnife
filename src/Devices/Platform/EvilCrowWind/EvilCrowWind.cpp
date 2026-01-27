@@ -3,7 +3,7 @@
 #include <uptime.h>
 #include "driver/temperature_sensor.h"
 
-#include "../BoardSupport.h"
+#include "EvilCrowWind.h"
 #include "../../../Debug/Logging.h"
 #include "../../../Attacks/Marauder/Marauder.h"
 #include "../../../Devices/WiFi/HardwareWiFi.h"
@@ -17,12 +17,19 @@ static unsigned long lastMinuteWeChecked = 0;
 static bool overheatingProtectionEnabled = false;
 static bool lastCheckWasTooHot = false;
 
-BoardSupport::BoardSupport()
+namespace Devices
+{
+    EvilCrowWind Board;
+}
+
+EvilCrowWind::EvilCrowWind()
 {
 }
 
-void BoardSupport::begin(Preferences &prefs)
+void EvilCrowWind::begin(Preferences &prefs)
 {
+    ESP32BoardSupport::begin(prefs);
+
     // https://github.com/i-am-shodan/USBArmyKnife/issues/168
     // the operating temperature of the ESP32-S3-PICO-1-N8R2 which most cables are build around is –40 ~ 85 C
     // we do want to limit internal temperature sensor to a more reasonable range as some were built using ESP32-S3-PICO-1-N8R8
@@ -43,8 +50,10 @@ void BoardSupport::begin(Preferences &prefs)
     }
 }
 
-void BoardSupport::loop(Preferences &prefs)
+void EvilCrowWind::loop(Preferences &prefs)
 {
+    ESP32BoardSupport::loop(prefs);
+
     if (lastMinuteWeChecked == uptime::getMinutes())
     {
         return; // we already checked this minute

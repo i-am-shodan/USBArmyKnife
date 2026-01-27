@@ -293,6 +293,10 @@ size_t HardwareStorage::sectorSize()
 #if defined(USE_SD_INTERFACE)
     return FILE_INTERFACE.sectorSize();
 #elif defined (USE_SD_MMC_INTERFACE)
+    if (FILE_INTERFACE.getCard() == nullptr)
+    {
+        return 0;
+    }
     return FILE_INTERFACE.getCard()->csd.sector_size;
 #else
     return 0;
