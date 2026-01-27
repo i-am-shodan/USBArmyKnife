@@ -2,7 +2,7 @@ REM To run this, you first need to create a disk image which contains the agent
 REM Follow tools/README.md for instructions
 REM Make sure the disk image is named agent.img you put it on the SD card
 
-LOG UK agent script
+LOG US agent script
 
 DEFINE #FILE /agentInstalled
 
