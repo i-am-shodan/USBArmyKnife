@@ -27,7 +27,7 @@ void ESP32BoardSupport::begin(Preferences &prefs)
 
     backtrace_saver::init();
     const auto &resetReason = esp_reset_reason();
-    hasHadCrash = resetReason != ESP_RST_UNKNOWN && resetReason != ESP_RST_POWERON;
+    hasHadCrash = resetReason != ESP_RST_UNKNOWN && resetReason != ESP_RST_POWERON && resetReason != ESP_RST_SW;
 }
 
 bool ESP32BoardSupport::hasCrashed()
