@@ -245,9 +245,12 @@ void resetSettings(Preferences &prefs)
         {
             const std::string &settingName = get<0>(setting);
 
-            if (!prefs.isKey(settingName.c_str()))
+            if (prefs.isKey(settingName.c_str()))
             {
-                prefs.remove(settingName.c_str());
+                if (prefs.remove(settingName.c_str()))
+                {
+                    Debug::Log.info(LOG_SETTINGS, std::string("Unset ") + settingName.c_str());
+                }
             }
         }
     }
