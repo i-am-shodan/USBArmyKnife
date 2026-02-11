@@ -56,10 +56,8 @@ static int32_t msc_write_cb(uint32_t lba, uint8_t *buffer, uint32_t bufsize)
 
     if (mscFile && strlen(mscFile.name()) != 0)
     {
-        // writing to file images is not currently supported, we lie and say the
-        // write occured as that will make it look like everything is ok to the OS
-        // fs cache manager
-        return bufsize;
+        // writing to file images is not currently supported
+        return -1;
     }
     else if (Devices::Storage.isRawAccessSupported())
     {
@@ -115,8 +113,14 @@ bool USBMSC::mountSD()
     // Set disk vendor id, product id and revision with string up to 8, 16, 4 characters respectively
     usb_msc.setID("Adafruit", "Mass Storage", "1.0");
 
-    auto capacity = Devices::Storage.deviceCapacity();
-    auto sectorSize = Devices::Storage.sectorSize();
+    const auto capacity = Devices::Storage.deviceCapacity();
+    const auto sectorSize = Devices::Storage.sectorSize();
+
+    if (sectorSize == 0 || capacity == 0)
+    {
+        Debug::Log.info(TAG_USB, "SD card reported invalid size");
+        return false;
+    }
 
     usb_msc.setCapacity(capacity, sectorSize);
 
@@ -170,7 +174,7 @@ bool USBMSC::mountDiskImage(const std::string &imageLocation, bool mountAsCD)
     }
 #endif
 
-    std::size_t size = open_msc(imageLocation.c_str());
+    const std::size_t size = open_msc(imageLocation.c_str());
 
     if (size != 0)
     {

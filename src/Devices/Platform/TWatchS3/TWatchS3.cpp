@@ -1,5 +1,5 @@
 #ifdef LILYGO_T_WATCH_S3
-#include "../BoardSupport.h"
+#include "TWatchS3.h"
 #include "../../../Debug/Logging.h"
 #include "../../Button/HardwareButton.h"
 #define TAG "Board"
@@ -10,7 +10,12 @@
 static XPowersPMU power;
 static bool pmu_flag = false;
 
-BoardSupport::BoardSupport()
+namespace Devices
+{
+    TWatchS3 Board;
+}
+
+TWatchS3::TWatchS3()
 {
 }
 
@@ -19,8 +24,10 @@ void setFlag(void)
     pmu_flag = true;
 }
 
-void BoardSupport::begin(Preferences &prefs)
+void TWatchS3::begin(Preferences &prefs)
 {
+    ESP32BoardSupport::begin(prefs);
+
     const uint8_t i2c_sda = BOARD_I2C_SDA;
     const uint8_t i2c_scl = BOARD_I2C_SCL;
     const uint8_t pmu_irq_pin = BOARD_PMU_INT;
@@ -144,8 +151,10 @@ void BoardSupport::begin(Preferences &prefs)
     } while (false);
 }
 
-void BoardSupport::loop(Preferences &prefs)
+void TWatchS3::loop(Preferences &prefs)
 {
+    ESP32BoardSupport::loop(prefs);
+
     if (pmu_flag)
     {
         pmu_flag = false;

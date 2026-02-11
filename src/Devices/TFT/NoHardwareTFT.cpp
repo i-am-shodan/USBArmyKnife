@@ -27,6 +27,26 @@ void HardwareTFT::displayPng(HardwareStorage &storage, const std::string &filena
 {
 }
 
+void HardwareTFT::displayRectangle(const int& x, const int& y, const int& width, const int& height)
+{
+
+}
+
+void HardwareTFT::setForegroundColor(int color)
+{
+
+}
+
+void HardwareTFT::setBackgroundColor(int color)
+{
+
+}
+
+int HardwareTFT::convertStringToColor(const std::string& color)
+{
+    return -1;
+}
+
 HardwareTFT::HardwareTFT()
 {
 }
