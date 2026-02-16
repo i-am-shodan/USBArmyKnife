@@ -62,6 +62,7 @@ private:
   uint16_t pid = 0;
   std::string manufacturer = "";
   std::string product = "";
+  std::string serialDescriptor = "";
 };
 
 namespace Devices::USB

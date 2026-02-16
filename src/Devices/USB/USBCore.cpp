@@ -107,11 +107,15 @@ void USBCore::changeUSBMode(DuckyInterpreter::USB_MODE &mode, const uint16_t &vi
     vid = vidValue == 0 ? prefs.getUShort(USB_DeviceVID, USB_DeviceVID_Default) : vidValue;
     pid = pidValue == 0 ? prefs.getUShort(USB_DevicePID, USB_DevicePID_Default) : pidValue;
 
+    manufacturer = man;
+    product = prod;
+    serialDescriptor = serial;
+
     // we are moving from USB off to USB on, ensure USB strings are set correctly
     TinyUSBDevice.setID(vid, pid);
-    TinyUSBDevice.setManufacturerDescriptor(man.c_str());
-    TinyUSBDevice.setProductDescriptor(prod.c_str());
-    TinyUSBDevice.setSerialDescriptor(serial.c_str());
+    TinyUSBDevice.setManufacturerDescriptor(manufacturer.c_str());
+    TinyUSBDevice.setProductDescriptor(product.c_str());
+    TinyUSBDevice.setSerialDescriptor(serialDescriptor.c_str());
   }
 
   if (mode & DuckyInterpreter::USB_MODE::STORAGE)
