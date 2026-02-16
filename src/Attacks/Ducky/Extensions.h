@@ -333,7 +333,7 @@ static int handleWaitForhandleAgentRunResult(const std::string &str, const std::
     xTaskCreate(
         AgentRunResultWaitTask, // Function that should be called
         "AgentRunWait",         // Name of the task (for debugging)
-        1000,                   // Stack size (bytes)
+        2000,                   // Stack size (bytes)
         NULL,                   // Parameter to pass
         1,                      // Task priority
         NULL                    // Task handle
@@ -519,7 +519,7 @@ static int handleWaitForUSBStorageActivity(const std::string &str, const std::un
     xTaskCreate(
         MSCActivityWaitTask, // Function that should be called
         "MSCWait",           // Name of the task (for debugging)
-        1000,                // Stack size (bytes)
+        2000,                // Stack size (bytes)
         NULL,                // Parameter to pass
         1,                   // Task priority
         NULL                 // Task handle
@@ -579,7 +579,7 @@ static int handleWaitForUSBStorageActivityToStop(const std::string &str, const s
     xTaskCreate(
         MSCActivityWaitToStopTask, // Function that should be called
         "MSCWait",                 // Name of the task (for debugging)
-        1000,                      // Stack size (bytes)
+        2000,                      // Stack size (bytes)
         NULL,                      // Parameter to pass
         1,                         // Task priority
         NULL                       // Task handle
@@ -755,7 +755,7 @@ static int waitForTouch(const std::string &str, const std::unordered_map<std::st
     xTaskCreate(
         doTouchActivityWaitTask, // Function that should be called
         "TouchWait",                 // Name of the task (for debugging)
-        1000,                      // Stack size (bytes)
+        2000,                      // Stack size (bytes)
         NULL,                      // Parameter to pass
         1,                         // Task priority
         NULL                       // Task handle
