@@ -75,7 +75,7 @@ static int32_t msc_write_cb(uint32_t lba, uint8_t *buffer, uint32_t bufsize)
 // used to flush any pending cache.
 static void msc_flush_cb()
 {
-    if (strlen(mscFile.name()) != 0)
+    if (mscFile && strlen(mscFile.name()) != 0)
     {
         mscFile.flush();
     }
