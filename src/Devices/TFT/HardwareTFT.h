@@ -17,6 +17,7 @@ public:
   void setForegroundColor(int color);
   void setBackgroundColor(int color);
   void setTextSize(int size);
+  int getTextSize();
   int convertStringToColor(const std::string& color);
   void clearScreen();
   void powerOff();

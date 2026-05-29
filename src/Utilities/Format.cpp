@@ -7,6 +7,7 @@
 #include "../Debug/Logging.h"
 
 static bool running = false;
+static float scale = 1.0 ;
 
 #if defined(ARDUINO_ARCH_ESP32) && defined(DISPLAY_WIDTH)
 void FormatStatusUpdateTask(void *arg)
@@ -17,20 +18,20 @@ void FormatStatusUpdateTask(void *arg)
     int count = 0;
     Devices::TFT.clearScreen();
     Devices::TFT.display(0, 0, line1);
-    Devices::TFT.display(0, 10, line2);
+    Devices::TFT.display(0, 10 * scale, line2);
 
     while (running)
     {
         vTaskDelay(pdMS_TO_TICKS(1500));
         Devices::LED.changeLEDState(count % 2 == 0, 24, 100, 100, 255);
-        Devices::TFT.display(count, 20, ".");
+        Devices::TFT.display(count, 20 * scale, ".");
         count++;
 
         if (count >= DISPLAY_WIDTH -1)
         {
             Devices::TFT.clearScreen();
             Devices::TFT.display(0, 0, line1);
-            Devices::TFT.display(0, 10, line2);
+            Devices::TFT.display(0, 10 * scale, line2);
             count = 0;
         }
     }
@@ -48,16 +49,17 @@ void FormatStatusUpdateTask(void *arg)
 #ifdef DISPLAY_WIDTH
 void AskFormatSD(Preferences &prefs)
 {
+    scale = Devices::TFT.getTextSize() / 10.0 ;
     // Display a message when the SD card cannot be found. Some devices are very picky about the
     // make and model of SD card they support, if you are debugging and are reading this try another card
     // and format with 1 FAT32 partition <32gb
     Devices::TFT.display(0, 0, "Error: Valid SD not found");
 
-    Devices::TFT.display(0, 20, "Hold button to attempt");
-    Devices::TFT.display(0, 30, "to format the SD card.");
+    Devices::TFT.display(0, 20 * scale, "Hold button to attempt");
+    Devices::TFT.display(0, 30 * scale, "to format the SD card.");
 
-    Devices::TFT.display(0, 50, "Note: the drive will not");
-    Devices::TFT.display(0, 60, "be readable on Windows");
+    Devices::TFT.display(0, 50 * scale, "Note: the drive will not");
+    Devices::TFT.display(0, 60 * scale, "be readable on Windows");
 
     // we don't want people using the web interface if the SD card is bad
     Devices::WiFi.end();

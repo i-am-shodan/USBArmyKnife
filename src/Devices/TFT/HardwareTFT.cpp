@@ -276,6 +276,11 @@ void HardwareTFT::setTextSize(int size)
     lcd.setTextSize(textSize);
 }
 
+int HardwareTFT::getTextSize()
+{
+    return  static_cast<int>(std::round(lcd.getTextSizeX() * 10)) ;
+}
+
 HardwareTFT::HardwareTFT()
 {
 }

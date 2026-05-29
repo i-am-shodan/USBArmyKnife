@@ -40,14 +40,18 @@ static void displayMessage(const char* heading, const char* value = nullptr, boo
   const auto WHITE = Devices::TFT.convertStringToColor("WHITE");
   const auto LIGHTGREY = Devices::TFT.convertStringToColor("LIGHTGREY");
   const auto RED = Devices::TFT.convertStringToColor("RED");
-
+  float scale = Devices::TFT.getTextSize() / 10.0; 
+  
   Devices::TFT.setForegroundColor(LIGHTGREY);
-  Devices::TFT.display(0, currentLine * 8, heading);
+  Devices::TFT.display(0, static_cast<int>(std::round(currentLine * 8 * scale)), heading);
 
   if (value != nullptr)
   {
     Devices::TFT.setForegroundColor(warning ? RED : WHITE);
-    Devices::TFT.display((strlen(heading) + 1) * 6, currentLine * 8, value);
+    Devices::TFT.display( static_cast<int>(std::round((strlen(heading) + 1) * 6 * scale)),
+                          static_cast<int>(std::round(currentLine * 8 * scale)),
+                          value
+                        );
   }
 
   Devices::TFT.setForegroundColor(WHITE);
