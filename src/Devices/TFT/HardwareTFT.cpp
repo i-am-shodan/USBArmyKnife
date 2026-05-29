@@ -9,6 +9,10 @@
 #include <unordered_map>
 
 #define LOG_TFT "TFT"
+
+#define TFT_TextSize "tftTextSize"
+#define TFT_TextSize_Default 10
+
 #define MAX_RADIUS 4
 static uint8_t heatBeatRadius = MAX_RADIUS;
 static int heatBeatColor = TFT_WHITE;
@@ -266,6 +270,12 @@ int HardwareTFT::convertStringToColor(const std::string &color)
     return lcd.color24to16(value);
 }
 
+void HardwareTFT::setTextSize(int size)
+{
+    float textSize = (float) size / 10.0 ;
+    lcd.setTextSize(textSize);
+}
+
 HardwareTFT::HardwareTFT()
 {
 }
@@ -300,11 +310,13 @@ void HardwareTFT::loop(Preferences &prefs)
 
 void HardwareTFT::begin(Preferences &prefs)
 {
+    registerUserConfigurableSetting(CATEGORY_TFT, TFT_TextSize, USBArmyKnifeCapability::SettingType::Int16, (int16_t)TFT_TextSize_Default);
+    float textSize = (float)prefs.getShort(TFT_TextSize, TFT_TextSize_Default) / (float)10.0;
     lcd.init();
     lcd.setBrightness(128);
     lcd.clear(backgroundColor);
     lcd.display();
-
+    lcd.setTextSize(textSize);
     Attacks::Ducky.registerDynamicVariable([this]()
                                            { return std::pair("#_DISPLAY_WIDTH_", std::to_string(DISPLAY_WIDTH)); });
     Attacks::Ducky.registerDynamicVariable([this]()
