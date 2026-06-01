@@ -117,8 +117,8 @@ static int handleDisplayText(const std::string &str, const std::unordered_map<st
 
 static int handleDisplaySetTextSize(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
-    std::string arg = str.substr(str.find(' ') + 1);
-    int textSize = asciiOrVariableToInt(arg, variables);
+    const std::string arg = str.substr(str.find(' ') + 1);
+    const int textSize = asciiOrVariableToInt(arg, variables);
     Devices::TFT.setTextSize(textSize);
     return true;
 }

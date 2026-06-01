@@ -54,7 +54,7 @@ void HardwareTFT::setTextSize(int size)
 
 int HardwareTFT::getTextSize()
 {
-    return  10 ;
+    return  10;
 }
 
 HardwareTFT::HardwareTFT()

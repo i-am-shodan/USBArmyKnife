@@ -270,15 +270,15 @@ int HardwareTFT::convertStringToColor(const std::string &color)
     return lcd.color24to16(value);
 }
 
-void HardwareTFT::setTextSize(int size)
+void HardwareTFT::setTextSize(const int size)
 {
-    float textSize = (float) size / 10.0 ;
+    const float textSize = (float) size / 10.0;
     lcd.setTextSize(textSize);
 }
 
 int HardwareTFT::getTextSize()
 {
-    return  static_cast<int>(std::round(lcd.getTextSizeX() * 10)) ;
+    return  static_cast<int>(std::round(lcd.getTextSizeX() * 10));
 }
 
 HardwareTFT::HardwareTFT()
