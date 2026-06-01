@@ -16,6 +16,8 @@ public:
   void displayRectangle(const int& x, const int& y, const int& width, const int& height);
   void setForegroundColor(int color);
   void setBackgroundColor(int color);
+  void setTextSize(int size);
+  int getTextSize();
   int convertStringToColor(const std::string& color);
   void clearScreen();
   void powerOff();

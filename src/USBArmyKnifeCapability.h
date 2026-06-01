@@ -4,6 +4,7 @@
 
 #define CATEGORY_USB 1
 #define CATEGORY_WIFI 2
+#define CATEGORY_TFT 3
 
 class USBArmyKnifeCapability
 {
