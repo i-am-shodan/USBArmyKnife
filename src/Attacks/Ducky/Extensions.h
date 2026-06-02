@@ -118,7 +118,21 @@ static int handleDisplayText(const std::string &str, const std::unordered_map<st
 static int handleDisplaySetTextSize(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     const std::string arg = str.substr(str.find(' ') + 1);
+    const auto entries = Ducky::SplitString(arg);
+
+    if (entries.size() != 1)
+    {
+        Debug::Log.error(LOG_DUCKY, "Bad argument count: " + std::to_string(entries.size()));
+        return false;
+    }
+
     const int textSize = asciiOrVariableToInt(arg, variables);
+    if (textSize <= 0)
+    {
+        Debug::Log.error(LOG_DUCKY, "DISPLAY_SET_TEXT_SIZE arg must be > 0, units of 0.1x");
+        return false;
+    }
+
     Devices::TFT.setTextSize(textSize);
     return true;
 }
