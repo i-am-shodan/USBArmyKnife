@@ -5,6 +5,19 @@
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/O5O8145AVW)
 <a href="https://www.buymeacoffee.com/therealshodan" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
+
+> ## 🚀 USB Army Knife v2 is brewing — and it's a beast
+>
+> After two years of active development on v1, v2 is planned to turn the USB Army Knife into a full **red-team platform in your pocket**. A big announcement is coming this summer but I wanted to tease:
+>
+> - **Brand-new web UI** — smaller, faster, sleeker & multilingual, with a **built-in VNC viewer** to watch and drive the target straight from your browser. This won't be tied to any web tools like today so anyone can change it.
+> - **New UAK Scripting engine** — DuckyScript v3-compatible, but goes way beyond what DuckyScript 3 can do with full string and return code support. This makes writing neater and more robust payloads much easier.
+> - **New cross-platform Agent** for **Windows, Linux *and* macOS** — live VNC, microphone capture and maybe even network access over the USB serial link.
+> - **Many new capabilities** — Brand new functionality across networking, files, captive portal, bluetooth and many more! USB 2.0 for faster throughput with read-only and read-write containers!
+> - **AI-ready** — an MCP server with a real UAK script validator so your AIs can write and check payloads before they hit the device.
+>
+> This is just a tease and there is still A LOT to do! But I hope v2 will make UAK into one tiny stick that scripts itself, picks its target, controls the device, hears the room, and maybe can even talk to its siblings...
+
 # USB Army Knife
  
 <div align="center">
