@@ -27,13 +27,13 @@
 #define USB_Version "usbVersion"
 #define USB_Version_Default (uint16_t)0x0101
 
-#define USB_DeviceVersion "usbDeviceVersion"
+#define USB_DeviceVersion "usbDevVersion"
 #define USB_DeviceVersion_Default (uint16_t)0x0101
 
-#define USB_DeviceManufacturer "usbDeviceManufacturer"
+#define USB_DeviceManufacturer "usbDevMfr"
 #define USB_DeviceManufacturer_Default "Espressif Systems"
 
-#define USB_DeviceProductDescriptor "usbDeviceProductDescriptor"
+#define USB_DeviceProductDescriptor "usbDevProdDesc"
 #define USB_DeviceProductDescriptor_Default "TinyUSB Device"
 
 std::string curUSBMode = "NONE";

@@ -11,8 +11,17 @@
 
 static std::unordered_map<uint8_t, std::vector<std::tuple<std::string, USBArmyKnifeCapability::SettingType, std::string>>> settingLookup;
 
+// NVS keys are limited to 15 characters (NVS_KEY_NAME_MAX_SIZE - 1); longer
+// names silently fail to persist via Preferences on ESP32.
+#define NVS_MAX_KEY_LEN 15
+
 void registerSettingName(const uint8_t group, const std::string &name, const USBArmyKnifeCapability::SettingType &type, const std::string &defaultValue)
 {
+    if (name.length() > NVS_MAX_KEY_LEN)
+    {
+        Debug::Log.error(LOG_SETTINGS, "Setting name '" + name + "' exceeds NVS key limit of " + std::to_string(NVS_MAX_KEY_LEN) + " chars and will not persist");
+    }
+
     if (settingLookup.find(group) == settingLookup.cend())
     {
         settingLookup[group] = std::vector<std::tuple<std::string, USBArmyKnifeCapability::SettingType, std::string>>();

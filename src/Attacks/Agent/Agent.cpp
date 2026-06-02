@@ -10,10 +10,10 @@ namespace Attacks
 
 #define LOG_AGENT "Agent"
 
-#define USB_AGENT_POLLING_ENABLED "agentPollingEnabled"
+#define USB_AGENT_POLLING_ENABLED "agentPolling"
 #define USB_AGENT_POLLING_ENABLED_DEFAULT true
 
-#define USB_AGENT_POLLING_TIME_IN_SEC "agentPollingTime"
+#define USB_AGENT_POLLING_TIME_IN_SEC "agentPollSec"
 #define USB_AGENT_POLLING_TIME_IN_SEC_DEFAULT 15
 
 static bool agentPollingEnabled = USB_AGENT_POLLING_ENABLED_DEFAULT;
