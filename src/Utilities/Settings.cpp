@@ -196,6 +196,9 @@ void enumerateSettingsAsJson(Preferences &prefs, JsonArray array)
         case CATEGORY_WIFI:
             categoryObj["name"] = "WIFI";
             break;
+        case CATEGORY_TFT:
+            categoryObj["name"] = "TFT";
+            break;
         default:
             categoryObj["name"] = "UNKNOWN";
             break;

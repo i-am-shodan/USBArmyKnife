@@ -115,6 +115,15 @@ static int handleDisplayText(const std::string &str, const std::unordered_map<st
     return true;
 }
 
+static int handleDisplaySetTextSize(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
+{
+    const std::string arg = str.substr(str.find(' ') + 1);
+    const int textSize = asciiOrVariableToInt(arg, variables);
+    Devices::TFT.setTextSize(textSize);
+    return true;
+}
+
+
 static int handleUSBMode(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
     bool mountAsCdrom = startsWith(str, "USB_MOUNT_CDROM_READ_ONLY");
@@ -836,6 +845,7 @@ void addDuckyScriptExtensions(
     extCommands["DISPLAY_PNG"] = handleDisplayPNG;
     extCommands["DISPLAY_TEXT"] = handleDisplayText;
     extCommands["DISPLAY_CLEAR"] = handleDisplayClear;
+    extCommands["DISPLAY_SET_TEXT_SIZE"] = handleDisplaySetTextSize;
     extCommands["LED"] = handleLED;
     extCommands["LED_B"] = handleLEDBlue;
 
