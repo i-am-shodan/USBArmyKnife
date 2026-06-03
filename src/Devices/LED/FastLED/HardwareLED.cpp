@@ -14,6 +14,7 @@ void HardwareLED::changeLEDState(bool on, uint8_t hue, uint8_t saturation, uint8
 {
   if (on == true)
   {
+#if !defined(WAVESHARE_ESP32_S3_LCD_147)
     // For some reason I need to do colour correction here. I wonder if the CRGB is the wrong byte order?
     if (hue == 0 && saturation == 100 && lum == 100) // red
     {
@@ -27,7 +28,7 @@ void HardwareLED::changeLEDState(bool on, uint8_t hue, uint8_t saturation, uint8
     {
       hue = 160;
     }
-
+#endif
     saturation = map(saturation, 0, 100, 30, 255);
     lum = map(lum, 0, 100, 100, 255);
         
@@ -53,7 +54,11 @@ void HardwareLED::loop(Preferences& prefs)
 
 void HardwareLED::begin(Preferences &prefs)
 {
+#if defined(WAVESHARE_ESP32_S3_LCD_147)
+  FastLED.addLeds<WS2812, LED_DI_PIN, RGB>(leds, NUM_LEDS);
+#else
   FastLED.addLeds<WS2812, LED_DI_PIN>(leds, NUM_LEDS);
+#endif
   FastLED.setBrightness(0);
   FastLED.show();
 }
