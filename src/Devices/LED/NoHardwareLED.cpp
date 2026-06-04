@@ -10,6 +10,10 @@ void HardwareLED::changeLEDState(bool on, uint8_t hue, uint8_t saturation, uint8
 {
 }
 
+void HardwareLED::setLEDBlue(uint8_t brightness)
+{
+}
+
 HardwareLED::HardwareLED()
 {
 }

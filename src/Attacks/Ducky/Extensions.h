@@ -181,8 +181,7 @@ static int handleLED(const std::string &str, const std::unordered_map<std::strin
 
 static int handleLEDBlue(const std::string &str, const std::unordered_map<std::string, std::string> &constants, const std::unordered_map<std::string, int> &variables)
 {
-    /* Blue is 160: https://github.com/FastLED/FastLED/wiki/FastLED-HSV-Colors */
-    Devices::LED.changeLEDState(true, 160, 100, 100, 255);
+    Devices::LED.setLEDBlue(255);
     return true;
 }
 

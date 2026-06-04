@@ -44,6 +44,13 @@ void HardwareLED::changeLEDState(bool on, uint8_t hue, uint8_t saturation, uint8
   FastLED.show();
 }
 
+void HardwareLED::setLEDBlue(uint8_t brightness)
+{
+  leds[0] = CRGB::Blue;
+  FastLED.setBrightness(brightness);
+  FastLED.show();
+}
+
 HardwareLED::HardwareLED()
 {
 }

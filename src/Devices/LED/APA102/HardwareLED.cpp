@@ -58,6 +58,13 @@ void HardwareLED::changeLEDState(bool on, uint8_t hue, uint8_t saturation, uint8
   }
 }
 
+void HardwareLED::setLEDBlue(uint8_t brightness)
+{
+    brightness = (uint8_t) ((float) brightness * (31.f / 255.f));
+    colors[0] = rgb_color(0,0,255);
+    ledStrip.write(colors, 1, brightness);
+}
+
 HardwareLED::HardwareLED()
 {
 }
