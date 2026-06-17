@@ -208,8 +208,21 @@ static void listDir(std::vector<std::string> &files, fs::FS &fs, const char *dir
         }
         else
         {
-            std::string filename = std::string(file.name());
-            files.emplace_back("/" + filename);
+            const char* path =
+#ifdef ARDUINO_ARCH_RP2040
+            file.fullName();
+#else
+            file.path();
+#endif
+            std::string filename(path);
+            if (filename.empty() || filename[0] != '/')
+            {
+                files.emplace_back("/" + filename);
+            }
+            else
+            {
+                files.emplace_back(filename);
+            }
         }
         file = root.openNextFile();
     }
