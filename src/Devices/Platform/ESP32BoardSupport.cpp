@@ -27,7 +27,10 @@ void ESP32BoardSupport::begin(Preferences &prefs)
 
     backtrace_saver::init();
     const auto &resetReason = esp_reset_reason();
-    hasHadCrash = resetReason != ESP_RST_UNKNOWN && resetReason != ESP_RST_POWERON && resetReason != ESP_RST_SW;
+    // ESP_RST_EXT / ESP_RST_JTAG are produced by a normal post-flash or debugger
+    // reset (e.g. esptool --after hard_reset on ESP32-S3 native USB), not a crash.
+    hasHadCrash = resetReason != ESP_RST_UNKNOWN && resetReason != ESP_RST_POWERON && resetReason != ESP_RST_SW &&
+                  resetReason != ESP_RST_EXT && resetReason != ESP_RST_JTAG;
 }
 
 bool ESP32BoardSupport::hasCrashed()
