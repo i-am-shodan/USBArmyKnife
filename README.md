@@ -167,6 +167,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=i-am-shodan/USBArmyKnife&type=Date)](https://star-history.com/#i-am-shodan/USBArmyKnife&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=i-am-shodan/USBArmyKnife&type=Date)](https://star-history.dera.page/#i-am-shodan/USBArmyKnife&Date)
 
 
