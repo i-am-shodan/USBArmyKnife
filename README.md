@@ -6,9 +6,9 @@
 <a href="https://www.buymeacoffee.com/therealshodan" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
 
-> ## 🚀 USB Army Knife v2 is brewing — and it's a beast
+> ## 🚀 USB Army Knife v2 is steeping — and its going to be a beast
 >
-> After two years of active development on v1, v2 is planned to turn the USB Army Knife into a full **red-team platform in your pocket**. A big announcement is coming this summer but I wanted to tease:
+> After two years of active development on v1, v2 is planned to turn the USB Army Knife into a full **red-team platform in your pocket**. A big announcement is coming this autumn but I still wanted to tease:
 >
 > - **Brand-new web UI** — smaller, faster, sleeker & multilingual, with a **built-in VNC viewer** to watch and drive the target straight from your browser. This won't be tied to any web tools like today so anyone can change it.
 > - **New UAK Scripting engine** — DuckyScript v3-compatible, but goes way beyond what DuckyScript 3 can do with full string and return code support. This makes writing neater and more robust payloads much easier.
@@ -16,7 +16,9 @@
 > - **Many new capabilities** — Brand new functionality across networking, files, captive portal, bluetooth and many more! USB 2.0 for faster throughput with read-only and read-write containers!
 > - **AI-ready** — an MCP server with a real UAK script validator so your AIs can write and check payloads before they hit the device.
 >
-> This is just a tease and there is still A LOT to do! But I hope v2 will make UAK into one tiny stick that scripts itself, picks its target, controls the device, hears the room, and maybe can even talk to its siblings...
+> A ton of this work has now been completed and I've been busy working with hardware that will be powerful enough to run this new platform. What's clear is that the dongle that started this project won't be able to handle the newer V2 features. But I for one love
+its form factor.
+> What I'm sure of is that v2 will take UAK make one tiny stick that scripts itself, picks its target, controls the device, hears the room, and maybe can even talk to its siblings...
 
 # USB Army Knife
  
