@@ -1,11 +1,11 @@
 GUI r
 DELAY 1000
-STRING https://www.youtube.com/watch?v=xvFZjo5PgG0
+STRING https://youtube.com/shorts/q-OO3fjbh5A?si=Sp8JUD56Ws-mzaR-
 DELAY 1000
 ENTER
 
-REM Now blast the lyrics over WiFI
-ESP32M attack -t rickroll
+REM Now blast the video over WiFI
+ESP32M attack WiFI
 
 VAR $INDEX = 1
 WHILE (TRUE)
