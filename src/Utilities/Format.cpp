@@ -7,7 +7,7 @@
 #include "../Debug/Logging.h"
 
 static bool running = false;
-static float scale = 1.0 ;
+static float scale = 1.0;
 
 #if defined(ARDUINO_ARCH_ESP32) && defined(DISPLAY_WIDTH)
 void FormatStatusUpdateTask(void *arg)
@@ -27,7 +27,7 @@ void FormatStatusUpdateTask(void *arg)
         Devices::TFT.display(count, 20 * scale, ".");
         count++;
 
-        if (count >= DISPLAY_WIDTH -1)
+        if (count >= DISPLAY_WIDTH - 1)
         {
             Devices::TFT.clearScreen();
             Devices::TFT.display(0, 0, line1);
@@ -49,7 +49,7 @@ void FormatStatusUpdateTask(void *arg)
 #ifdef DISPLAY_WIDTH
 void AskFormatSD(Preferences &prefs)
 {
-    scale = Devices::TFT.getTextSize() / 10.0 ;
+    scale = Devices::TFT.getTextSize() / 10.0;
     // Display a message when the SD card cannot be found. Some devices are very picky about the
     // make and model of SD card they support, if you are debugging and are reading this try another card
     // and format with 1 FAT32 partition <32gb
@@ -79,7 +79,7 @@ void AskFormatSD(Preferences &prefs)
                 4000,                   // Stack size (bytes)
                 NULL,                   // Parameter to pass
                 1,                      // Task priority
-                NULL            // Task handle
+                NULL                    // Task handle
             );
 #else
             Devices::TFT.clearScreen();
@@ -105,18 +105,8 @@ void AskFormatSD(Preferences &prefs)
 }
 #else
 void AskFormatSD(Preferences &prefs)
-{ 
-    for (int x = 0; x < 5; x++)
-    {
-        Debug::Log.error("Main", "SD card error, cannot ask to format as no display. Will reboot");
-        delay(1000);
-    }
-    
-#ifdef ARDUINO_ARCH_ESP32
-    ESP.restart();
-#elif defined(ARDUINO_ARCH_RP2040)
-    watchdog_reboot(0, SRAM_END, 0);
-#endif       
+{
+    Debug::Log.error("Main", "SD card error, no display, not rebooting");
 }
-#endif //DISPLAY_WIDTH
+#endif // DISPLAY_WIDTH
 #endif // NO_SD
