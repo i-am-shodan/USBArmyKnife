@@ -240,6 +240,17 @@ uint8_t HardwareStorage::usedPercentage()
     {
         return 0;
     }
+#if defined(NO_SD) && defined(ARDUINO_ARCH_RP2040)
+    fs::FSInfo info;
+    if (FILE_INTERFACE.info(info) && info.totalBytes != 0)
+    {
+        cachedCapacity = (info.usedBytes * 100) / info.totalBytes;
+    }
+    else
+    {
+        cachedCapacity = 0;
+    }
+#else
     uint64_t total = FILE_INTERFACE.totalBytes();
     if (total == 0)
     {
@@ -249,6 +260,7 @@ uint8_t HardwareStorage::usedPercentage()
     {
         cachedCapacity = (FILE_INTERFACE.usedBytes() * 100) / total;
     }
+#endif
     return cachedCapacity;
 }
 
