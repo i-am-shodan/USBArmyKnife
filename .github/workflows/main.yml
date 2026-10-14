@@ -123,3 +123,14 @@ jobs:
           path: |
             .pio/build/Evil-Crow-Cable-Wind/*.bin
             .pio/build/Evil-Crow-Cable-Wind/*.elf
+
+      - name: Build PlatformIO Project Pocket-Dongle-S3
+        run: pio run --environment Pocket-Dongle-S3
+
+      - name: Upload Pocket-Dongle-S3 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Pocket-Dongle-S3 Firmware binaries
+          path: |
+            .pio/build/Pocket-Dongle-S3/*.bin
+            .pio/build/Pocket-Dongle-S3/*.elf
